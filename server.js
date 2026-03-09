@@ -297,8 +297,76 @@ ${extraPrompt || ""}
     res.status(500).json({ error: err.message });
   }
 });
+// =============================
+// GEMINI TOOL ENDPOINT
+// =============================
+app.post("/api/gemini-tool", async (req, res) => {
+  try {
+    const { task, input } = req.body;
 
+    let prompt = "";
+
+    if (task === "storyboard") {
+      prompt = `
+Buat storyboard video cinematic dari ide berikut:
+
+${input}
+
+Format:
+Scene 1
+Scene 2
+Scene 3
+Visual Prompt
+Camera
+Lighting
+`;
+    }
+
+    if (task === "infographic") {
+      prompt = `
+Buat konsep infografis dari topik berikut:
+
+${input}
+
+Format:
+Judul
+4 poin utama
+layout visual
+warna utama
+prompt infografis
+`;
+    }
+
+    if (task === "prompt") {
+      prompt = `
+Buat prompt cinematic AI image dari ide berikut:
+
+${input}
+
+Format:
+Prompt utama
+Negative prompt
+Lighting
+Camera
+Style
+`;
+    }
+
+    const result = await callGemini([{ text: prompt }]);
+
+    res.json({
+      success: true,
+      result
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server berjalan di http://0.0.0.0:${PORT}`);
   console.log(`🤖 Model: ${MODEL}`);
 });
+
