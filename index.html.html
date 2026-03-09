@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AI Studio Pro</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#0f3d75;
+color:white;
+padding:20px;
+}
+
+.card{
+background:#1e4f8c;
+padding:20px;
+margin-bottom:20px;
+border-radius:12px;
+}
+
+textarea,input,select{
+width:100%;
+margin-top:10px;
+padding:10px;
+border-radius:8px;
+border:none;
+}
+
+button{
+margin-top:10px;
+padding:12px;
+border:none;
+border-radius:8px;
+background:#4cb3ff;
+color:white;
+cursor:pointer;
+}
+
+.result{
+margin-top:15px;
+background:#0c2c52;
+padding:15px;
+border-radius:10px;
+white-space:pre-wrap;
+}
+
+.preview img,
+.preview video{
+width:120px;
+margin:5px;
+border-radius:8px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>AI Studio Pro</h1>
+
+<!-- FOTO -->
+
+<div class="card">
+
+<h2>Gabungkan Foto</h2>
+
+<input type="file" id="img1">
+<input type="file" id="img2">
+<input type="file" id="img3">
+<input type="file" id="img4">
+
+<div id="preview" class="preview"></div>
+
+<textarea id="photoPrompt"></textarea>
+
+<button onclick="mergePhotos()">Gabungkan</button>
+
+<div id="photoResult" class="result"></div>
+
+</div>
+
+
+<!-- VIDEO -->
+
+<div class="card">
+
+<h2>Analisa Video</h2>
+
+<input type="file" id="videoInput">
+
+<select id="language">
+<option>Bahasa Indonesia</option>
+<option>English</option>
+</select>
+
+<select id="style">
+<option>Cinematic</option>
+<option>Realistic</option>
+<option>Anime</option>
+</select>
+
+<textarea id="videoPrompt"></textarea>
+
+<button onclick="analyzeVideo()">Analisa</button>
+
+<div id="videoResult" class="result"></div>
+
+</div>
+
+
+<!-- INFOGRAFIS -->
+
+<div class="card">
+
+<h2>Generator Infografis</h2>
+
+<input type="text" id="topic" placeholder="Topik">
+
+<select id="platform">
+<option>Instagram</option>
+<option>TikTok</option>
+<option>Poster</option>
+</select>
+
+<select id="styleInfographic">
+<option>Modern</option>
+<option>Minimal</option>
+<option>Colorful</option>
+</select>
+
+<textarea id="extraPrompt"></textarea>
+
+<button onclick="generateInfographic()">Generate</button>
+
+<div id="infographicResult" class="result"></div>
+
+</div>
+
+
+<script>
+
+const API="http://localhost:3001";
+
+
+function toBase64(file){
+return new Promise((resolve)=>{
+const reader=new FileReader();
+reader.onload=()=>{
+resolve(reader.result.split(",")[1]);
+}
+reader.readAsDataURL(file);
+});
+}
+
+
+// =========================
+// FOTO
+// =========================
+
+async function mergePhotos(){
+
+const files=[
+img1.files[0],
+img2.files[0],
+img3.files[0],
+img4.files[0]
+].filter(Boolean);
+
+if(files.length<2){
+alert("Upload minimal 2 foto");
+return;
+}
+
+const images=[];
+
+for(const f of files){
+const base64=await toBase64(f);
+
+images.push({
+mimeType:f.type,
+data:base64
+});
+}
+
+const res=await fetch(API+"/api/merge-photos",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+images,
+userPrompt:photoPrompt.value
+})
+});
+
+const data=await res.json();
+
+photoResult.textContent=data.text || data.error;
+
+}
+
+
+// =========================
+// VIDEO
+// =========================
+
+async function analyzeVideo(){
+
+const file=videoInput.files[0];
+
+if(!file){
+alert("Upload video");
+return;
+}
+
+const base64=await toBase64(file);
+
+const res=await fetch(API+"/api/analyze-video",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+videoBase64:base64,
+mimeType:file.type,
+prompt:videoPrompt.value,
+language:language.value,
+style:style.value
+})
+});
+
+const data=await res.json();
+
+videoResult.textContent=data.text || data.error;
+
+}
+
+
+
+// =========================
+// INFOGRAFIS
+// =========================
+
+async function generateInfographic(){
+
+const res=await fetch(API+"/api/generate-infographic",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+topic:topic.value,
+platform:platform.value,
+style:styleInfographic.value,
+extraPrompt:extraPrompt.value
+})
+});
+
+const data=await res.json();
+
+infographicResult.textContent=data.text || data.error;
+
+}
+
+</script>
+
+</body>
+</html>
