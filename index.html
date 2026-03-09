@@ -266,6 +266,35 @@ infographicResult.textContent=data.text || data.error;
 }
 
 </script>
+async function generateInfographic() {
+  const topic = document.getElementById("topic").value;
+  const platform = document.getElementById("platform").value;
+  const style = document.getElementById("styleInfographic").value;
+  const extraPrompt = document.getElementById("extraPrompt").value;
 
+  const resultBox = document.getElementById("infographicResult");
+  resultBox.innerText = "Generating...";
+
+  try {
+    const res = await fetch("/api/generate-infographic", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        topic,
+        platform,
+        style,
+        extraPrompt
+      })
+    });
+
+    const data = await res.json();
+    resultBox.innerText = data.result || data.error;
+  } catch (err) {
+    resultBox.innerText = "Error: " + err.message;
+  }
+}
 </body>
 </html>
+
