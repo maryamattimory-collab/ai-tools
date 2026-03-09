@@ -1,4 +1,3 @@
-
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -6,27 +5,19 @@ require("dotenv").config();
 
 const app = express();
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080;
 const API_KEY = process.env.GEMINI_API_KEY;
 const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
 app.use(cors());
 app.use(express.json({ limit: "200mb" }));
 app.use(express.urlencoded({ extended: true, limit: "200mb" }));
-
-// Supaya file seperti index.html, css, js bisa dibuka langsung
 app.use(express.static(__dirname));
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 async function callGemini(parts) {
   if (!API_KEY) {
-    throw new Error("API KEY tidak ditemukan di file .env");
+    throw new Error("GEMINI_API_KEY tidak ditemukan.");
   }
-
-  await sleep(3000);
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`,
@@ -56,16 +47,14 @@ async function callGemini(parts) {
   return textParts.map((p) => p.text || "").join("\n").trim();
 }
 
-// Halaman utama: tampilkan index.html
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Cek kesehatan server
 app.get("/health", (req, res) => {
   res.json({
     success: true,
-    message: "AI Studio Backend Aktif",
+    message: "AI Studio Pro Backend Aktif",
     model: MODEL,
     apiKey: API_KEY ? "Terkonfigurasi" : "Belum ada",
   });
@@ -78,17 +67,15 @@ app.post("/api/merge-photos", async (req, res) => {
   try {
     const { images, userPrompt } = req.body;
 
-    if (!images || images.length < 2) {
-      return res.status(400).json({ error: "Minimal 2 foto." });
+    if (!images || !Array.isArray(images) || images.length < 2) {
+      return res.status(400).json({ error: "Minimal upload 2 foto." });
     }
 
     const parts = [];
 
     for (const img of images) {
       if (!img || !img.mimeType || !img.data) {
-        return res.status(400).json({
-          error: "Format gambar tidak valid.",
-        });
+        return res.status(400).json({ error: "Format gambar tidak valid." });
       }
 
       parts.push({
@@ -228,9 +215,9 @@ ${prompt || ""}
 // =============================
 app.post("/api/generate-infographic", async (req, res) => {
   try {
-    const { topic, platform, style, audience, extraPrompt } = req.body;
+    const { topic, platform, style, extraPrompt } = req.body;
 
-    if (!topic) {
+    if (!topic || !topic.trim()) {
       return res.status(400).json({ error: "Topik kosong." });
     }
 
@@ -240,7 +227,6 @@ app.post("/api/generate-infographic", async (req, res) => {
 Kamu adalah AI Infographic Creator.
 
 Buat konsep infografis dari topik:
-
 "${topic}"
 
 Format output:
@@ -278,9 +264,6 @@ NEGATIVE PROMPT:
 CTA:
 ...
 
-Audience:
-${audience || "Umum"}
-
 Instruksi tambahan:
 ${extraPrompt || ""}
         `,
@@ -298,76 +281,8 @@ ${extraPrompt || ""}
     res.status(500).json({ error: err.message });
   }
 });
-// =============================
-// GEMINI TOOL ENDPOINT
-// =============================
-app.post("/api/gemini-tool", async (req, res) => {
-  try {
-    const { task, input } = req.body;
 
-    let prompt = "";
-
-    if (task === "storyboard") {
-      prompt = `
-Buat storyboard video cinematic dari ide berikut:
-
-${input}
-
-Format:
-Scene 1
-Scene 2
-Scene 3
-Visual Prompt
-Camera
-Lighting
-`;
-    }
-
-    if (task === "infographic") {
-      prompt = `
-Buat konsep infografis dari topik berikut:
-
-${input}
-
-Format:
-Judul
-4 poin utama
-layout visual
-warna utama
-prompt infografis
-`;
-    }
-
-    if (task === "prompt") {
-      prompt = `
-Buat prompt cinematic AI image dari ide berikut:
-
-${input}
-
-Format:
-Prompt utama
-Negative prompt
-Lighting
-Camera
-Style
-`;
-    }
-
-    const result = await callGemini([{ text: prompt }]);
-
-    res.json({
-      success: true,
-      result
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      error: error.message
-    });
-  }
-});
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server berjalan di http://0.0.0.0:${PORT}`);
-  console.log(`🤖 Model: ${MODEL}`);
+  console.log("Server berjalan di port " + PORT);
+  console.log("Model: " + MODEL);
 });
-
