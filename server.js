@@ -283,6 +283,8 @@ ${extraPrompt || ""}
 });
 
 app.listen(PORT, "0.0.0.0", () => {
+
   console.log("Server berjalan di port " + PORT);
   console.log("Model: " + MODEL);
 });
+
