@@ -79,11 +79,19 @@ body:JSON.stringify({message:prompt})
 
 const data = await res.json();
 
-document.getElementById("result").innerText =
-JSON.stringify(data, null, 2);
+const text = data.result?.text || data.reply || data.result || data.text || JSON.stringify(data,null,2);
+
+document.getElementById("result").innerHTML =
+text + '<br><br><button onclick="copyText()">Salin</button>';
+
+window.lastResult = text;
 }
 
 </script>
 
+function copyText(){
+navigator.clipboard.writeText(window.lastResult);
+alert("Teks berhasil disalin!");
+}
 </body>
 </html>
