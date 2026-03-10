@@ -129,6 +129,39 @@ if(mode === "infographic"){
   fn = "generate_infographic";
 }
   if (fn === "generate_infographic") {
+ 
+  if (fn === "generate_veo_prompt") {
+  const res = await fetch(`${MAIN_TOOL_URL}/api/generate-veo-prompt`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      topic: args.topic || args.prompt || "",
+      style: args.style || "Cinematic",
+      duration: args.duration || "8 detik",
+      extraPrompt: args.extraPrompt || ""
+    })
+  });
+
+  return await res.json();
+}
+ if (fn === "generate_leonardo_prompt") {
+  const res = await fetch(`${MAIN_TOOL_URL}/api/generate-leonardo-prompt`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      topic: args.topic || args.prompt || "",
+      style: args.style || "Cinematic",
+      extraPrompt: args.extraPrompt || ""
+    })
+  });
+
+  return await res.json();
+}
+    
     const res = await fetch(`${MAIN_TOOL_URL}/api/generate-infographic`, {
       method: "POST",
       headers: {
