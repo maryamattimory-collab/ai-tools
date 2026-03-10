@@ -109,9 +109,25 @@ async function callGeminiWithTools(message) {
 }
 
 async function runTool(functionCall) {
-  const fn = functionCall.name;
+  let fn = functionCall.name;
   const args = functionCall.args || {};
+const mode = args.mode || "";
 
+if(mode === "veo"){
+  fn = "generate_veo_prompt";
+}
+
+if(mode === "leonardo"){
+  fn = "generate_leonardo_prompt";
+}
+
+if(mode === "tiktok"){
+  fn = "generate_tiktok_carousel";
+}
+
+if(mode === "infographic"){
+  fn = "generate_infographic";
+}
   if (fn === "generate_infographic") {
     const res = await fetch(`${MAIN_TOOL_URL}/api/generate-infographic`, {
       method: "POST",
