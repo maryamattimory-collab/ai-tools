@@ -2,127 +2,151 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>AI Studio Pro Chat</title>
+<title>AI Studio Pro</title>
 
 <style>
 body{
 font-family:Arial;
 background:#0f172a;
 color:white;
-padding:40px;
+margin:0;
+padding:20px;
 }
 
 .container{
-max-width:700px;
+max-width:800px;
 margin:auto;
 }
 
 textarea{
 width:100%;
-height:100px;
+height:120px;
 padding:10px;
 border-radius:8px;
 border:none;
-margin-top:10px;
+}
+
+select{
+padding:8px;
+border-radius:8px;
 }
 
 button{
-margin-top:10px;
-padding:10px 20px;
+padding:10px 16px;
 border:none;
 border-radius:8px;
-background:#3b82f6;
+background:#38bdf8;
 color:white;
 cursor:pointer;
+margin-top:10px;
 }
 
-.result{
+.chat{
 margin-top:20px;
-padding:20px;
-background:#1e293b;
-border-radius:10px;
+}
+
+.bubble{
+padding:14px;
+border-radius:12px;
+margin-top:10px;
 white-space:pre-wrap;
 }
-</style>
 
+.user{
+background:#2563eb;
+text-align:right;
+}
+
+.ai{
+background:#1e293b;
+}
+</style>
 </head>
 
 <body>
 
 <div class="container">
 
-<h2>AI Studio Pro Chat</h2>
+<h2>AI Studio Pro</h2>
 
-  <select id="mode">
+<select id="mode">
 <option value="infographic">Infografis</option>
-<option value="video">Script Video</option>
-<option value="veo">Prompt Veo</option>
-<option value="leonardo">Prompt Leonardo</option>
 <option value="tiktok">TikTok Carousel</option>
+<option value="leonardo">Prompt Leonardo</option>
+<option value="veo">Prompt Veo</option>
 </select>
+
+<br><br>
 
 <textarea id="prompt" placeholder="Tulis perintah..."></textarea>
 
+<br>
+
 <button onclick="sendPrompt()">Kirim</button>
 
-<div id="result" class="result"></div>
+<div class="chat" id="chat"></div>
 
 </div>
 
 <script>
 
+let lastText="";
+
+function addBubble(text,type){
+
+const div=document.createElement("div");
+
+div.className="bubble "+type;
+
+div.innerText=text;
+
+document.getElementById("chat").appendChild(div);
+
+}
+
 async function sendPrompt(){
 
-const prompt = document.getElementById("prompt").value;
-const mode = document.getElementById("mode").value;
+const prompt=document.getElementById("prompt").value;
 
-document.getElementById("result").innerText = "Memproses...";
+const mode=document.getElementById("mode").value;
 
-const res = await fetch("https://thriving-harmony-production-76ec.up.railway.app/api/gemini-chat",{
+addBubble(prompt,"user");
+
+const res=await fetch("https://thriving-harmony-production-76ec.up.railway.app/api/gemini-chat",{
+
 method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
+
+headers:{"Content-Type":"application/json"},
+
 body:JSON.stringify({
-message:prompt,
-mode:mode
+
+message:`Mode:${mode}\nPrompt:${prompt}`
+
 })
+
 });
 
-const data = await res.json();
+const data=await res.json();
 
-const text = data.result?.text || data.reply || data.result || data.text || JSON.stringify(data,null,2);
+const text=
 
-document.getElementById("result").innerHTML =
-text +
-'<br><br><button onclick="copyText()">Salin</button>' +
-'<button onclick="downloadTxt()">Download TXT</button>';
+data.result?.text ||
 
-window.lastResult = text;
-}
+data.reply ||
 
-<script>
+data.message ||
 
-async function sendPrompt(){
-  ...
-}
+data.text ||
 
-function copyText(){
-navigator.clipboard.writeText(window.lastResult);
-alert("Teks berhasil disalin!");
-}
+JSON.stringify(data,null,2);
 
-function downloadTxt(){
-const blob = new Blob([window.lastResult], {type:"text/plain"});
-const a = document.createElement("a");
-a.href = URL.createObjectURL(blob);
-a.download = "hasil-ai.txt";
-a.click();
+lastText=text;
+
+addBubble(text,"ai");
+
 }
 
 </script>
 
-}
-}
 </body>
 </html>
