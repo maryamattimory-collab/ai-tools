@@ -53,6 +53,14 @@ white-space:pre-wrap;
 
 <h2>AI Studio Pro Chat</h2>
 
+  <select id="mode">
+<option value="infographic">Infografis</option>
+<option value="video">Script Video</option>
+<option value="veo">Prompt Veo</option>
+<option value="leonardo">Prompt Leonardo</option>
+<option value="tiktok">TikTok Carousel</option>
+</select>
+
 <textarea id="prompt" placeholder="Tulis perintah..."></textarea>
 
 <button onclick="sendPrompt()">Kirim</button>
@@ -66,6 +74,7 @@ white-space:pre-wrap;
 async function sendPrompt(){
 
 const prompt = document.getElementById("prompt").value;
+const mode = document.getElementById("mode").value;
 
 document.getElementById("result").innerText = "Memproses...";
 
@@ -74,7 +83,10 @@ method:"POST",
 headers:{
 "Content-Type":"application/json"
 },
-body:JSON.stringify({message:prompt})
+body:JSON.stringify({
+message:prompt,
+mode:mode
+})
 });
 
 const data = await res.json();
@@ -82,17 +94,35 @@ const data = await res.json();
 const text = data.result?.text || data.reply || data.result || data.text || JSON.stringify(data,null,2);
 
 document.getElementById("result").innerHTML =
-text + '<br><br><button onclick="copyText()">Salin</button>';
+text +
+'<br><br><button onclick="copyText()">Salin</button>' +
+'<button onclick="downloadTxt()">Download TXT</button>';
 
 window.lastResult = text;
+}
+
+<script>
+
+async function sendPrompt(){
+  ...
 }
 
 function copyText(){
 navigator.clipboard.writeText(window.lastResult);
 alert("Teks berhasil disalin!");
 }
+
+function downloadTxt(){
+const blob = new Blob([window.lastResult], {type:"text/plain"});
+const a = document.createElement("a");
+a.href = URL.createObjectURL(blob);
+a.download = "hasil-ai.txt";
+a.click();
+}
+
 </script>
 
+}
 }
 </body>
 </html>
