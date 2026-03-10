@@ -74,7 +74,7 @@ method:"POST",
 headers:{
 "Content-Type":"application/json"
 },
-body:JSON.stringify({prompt:prompt})
+body:JSON.stringify({message:prompt})
 });
 
 const data = await res.json();
