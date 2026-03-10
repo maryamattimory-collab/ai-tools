@@ -79,8 +79,9 @@ body:JSON.stringify({prompt:prompt})
 
 const data = await res.json();
 
-document.getElementById("result").innerText = data.reply;
-
+document.getElementById("result").innerText =
+data.reply || data.result || data.text || JSON.stringify(data,null,2);
+  
 }
 
 </script>
