@@ -120,7 +120,13 @@ headers:{"Content-Type":"application/json"},
 
 body:JSON.stringify({
 
-message:`Mode:${mode}\nPrompt:${prompt}`
+message:`Mode:${mode}
+Topik:${prompt}
+
+Jika mode veo gunakan tool generate_veo_prompt
+Jika mode leonardo gunakan tool generate_leonardo_prompt
+Jika mode tiktok gunakan tool generate_tiktok_carousel
+Jika mode infographic gunakan tool generate_infographic`
 
 })
 
