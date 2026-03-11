@@ -1,128 +1,204 @@
-<!DOCTYPE html><html lang="id">
+<!DOCTYPE html>
+<html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Studio Pro</title><style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Studio Pro</title>
 
-body{
-background:#0f172a;
-color:white;
-font-family:Arial;
-margin:0;
-padding:20px;
-}
+  <style>
+    body{
+      margin:0;
+      padding:20px;
+      font-family:Arial,sans-serif;
+      background:#0f172a;
+      color:white;
+    }
 
-.container{
-max-width:900px;
-margin:auto;
-}
+    .container{
+      max-width:900px;
+      margin:auto;
+    }
 
-h1{
-margin-bottom:6px;
-}
+    h1{
+      margin-bottom:6px;
+    }
 
-.sub{
-color:#cbd5e1;
-margin-bottom:20px;
-}
+    .sub{
+      color:#cbd5e1;
+      margin-bottom:20px;
+    }
 
-.panel{
-background:#1e293b;
-padding:16px;
-border-radius:14px;
-margin-bottom:16px;
-}
+    .panel{
+      background:#1e293b;
+      padding:16px;
+      border-radius:14px;
+      margin-bottom:16px;
+    }
 
-.row{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-bottom:10px;
-}
+    .row{
+      margin-bottom:12px;
+    }
 
-select,input,textarea{
-width:100%;
-padding:10px;
-border-radius:8px;
-border:none;
-}
+    select,
+    textarea,
+    input,
+    button{
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:10px;
+      box-sizing:border-box;
+      font-size:14px;
+    }
 
-textarea{
-min-height:110px;
-}
+    select,
+    textarea,
+    input{
+      background:#f8fafc;
+      color:#111827;
+    }
 
-button{
-padding:10px 14px;
-border:none;
-border-radius:8px;
-background:#38bdf8;
-color:white;
-cursor:pointer;
-}
+    textarea{
+      min-height:120px;
+      resize:vertical;
+    }
 
-.chat{
-background:#020617;
-padding:16px;
-border-radius:14px;
-min-height:280px;
-}
+    button{
+      width:auto;
+      background:#38bdf8;
+      color:white;
+      cursor:pointer;
+      font-weight:bold;
+      padding:10px 16px;
+    }
 
-.bubble{
-padding:14px;
-border-radius:12px;
-margin-top:10px;
-white-space:pre-wrap;
-line-height:1.5;
-}
+    .chat{
+      background:#020617;
+      padding:16px;
+      border-radius:14px;
+      min-height:280px;
+    }
 
-.user{
-background:#2563eb;
-text-align:right;
-margin-left:auto;
-max-width:80%;
-}
+    .bubble{
+      padding:14px;
+      border-radius:12px;
+      margin-top:10px;
+      white-space:pre-wrap;
+      line-height:1.5;
+      max-width:80%;
+    }
 
-.ai{
-background:#1e293b;
-margin-right:auto;
-max-width:80%;
-}
+    .user{
+      background:#2563eb;
+      margin-left:auto;
+      text-align:right;
+    }
 
-.tools{
-margin-top:10px;
-}
+    .ai{
+      background:#1e293b;
+      margin-right:auto;
+    }
 
-.tools button{
-margin-right:8px;
-margin-top:6px;
-}
+    .tools{
+      margin-top:10px;
+    }
 
-</style></head><body><div class="container"><h1>AI Studio Pro</h1>
-<div class="sub">Infografis • TikTok Carousel • Leonardo Prompt • Veo Prompt • Analyze Video • Gabungkan Foto</div><div class="panel"><div class="row">
+    .tools button{
+      margin-right:8px;
+      margin-top:6px;
+    }
+
+    label{
+      display:block;
+      margin-bottom:6px;
+      color:#cbd5e1;
+      font-size:14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <h1>AI Studio Pro</h1>
+
+<div class="sub">
+Infografis • TikTok Carousel • Leonardo Prompt • Veo Prompt • Analyze Video • Gabungkan Foto
+</div>
+
+<div class="panel">
+
+<div class="row">
+<label>Pilih Mode</label>
+
 <select id="mode">
-  <option value="infographic">Infografis</option>
-  <option value="tiktok">TikTok Carousel</option>
-  <option value="leonardo">Prompt Leonardo</option>
-  <option value="veo">Prompt Veo</option>
-  <option value="analyze_video">Analyze Video</option>
-  <option value="combine_photos">Gabungkan Foto</option>
+<option value="infographic">Infografis</option>
+<option value="tiktok">TikTok Carousel</option>
+<option value="leonardo">Prompt Leonardo</option>
+<option value="veo">Prompt Veo</option>
+<option value="analyze_video">Analyze Video</option>
+<option value="combine_photos">Gabungkan Foto</option>
 </select>
 
-</div><div class="row">
+</div>
+
+<div class="row">
 <textarea id="prompt" placeholder="Tulis topik atau perintah..."></textarea>
-</div><div class="row">
+</div>
+
+<div id="videoUpload" style="display:none;margin-top:10px;">
+<label>Upload Video Referensi</label>
+<input type="file" id="videoFile" accept="video/*">
+</div>
+
+<div id="photoUpload" style="display:none;margin-top:10px;">
+<label>Upload Foto (bisa pilih beberapa)</label>
+<input type="file" id="photoFiles" accept="image/*" multiple>
+</div>
+
+<div class="row">
 <button onclick="sendPrompt()">Generate</button>
-</div></div><div class="chat" id="chatBox"></div></div><script>
+</div>
+
+</div>
+
+<div class="chat" id="chatBox"></div>
+
+</div>
+
+<script>
 
 let lastText=""
 let lastJSON=null
+
+const modeSelect=document.getElementById("mode")
+const videoUpload=document.getElementById("videoUpload")
+const photoUpload=document.getElementById("photoUpload")
+
+function updateUpload(){
+
+videoUpload.style.display="none"
+photoUpload.style.display="none"
+
+let mode=modeSelect.value
+
+if(mode==="analyze_video"){
+videoUpload.style.display="block"
+}
+
+if(mode==="combine_photos"){
+photoUpload.style.display="block"
+}
+
+}
+
+modeSelect.addEventListener("change",updateUpload)
 
 function addBubble(role,text){
 
 const chat=document.getElementById("chatBox")
 
 const bubble=document.createElement("div")
-
 bubble.className="bubble "+(role==="user"?"user":"ai")
 
 bubble.innerText=text
@@ -137,8 +213,8 @@ return bubble
 
 async function sendPrompt(){
 
-const mode=document.getElementById("mode").value
-const prompt=document.getElementById("prompt").value.trim()
+let mode=document.getElementById("mode").value
+let prompt=document.getElementById("prompt").value.trim()
 
 if(!prompt){
 alert("Prompt kosong")
@@ -147,69 +223,42 @@ return
 
 addBubble("user",prompt)
 
-const aiBubble=addBubble("ai","Memproses...")
+let aiBubble=addBubble("ai","Memproses...")
 
 try{
 
-const res = await fetch("https://thriving-harmony-production-76ec.up.railway.app/api/gemini-chat",{
+let res=await fetch("/api/gemini-chat",{
 method:"POST",
-
 headers:{
 "Content-Type":"application/json"
 },
-
-body: JSON.stringify({
-  message:
-`Mode: ${mode}
-Topic: ${prompt}
-Style: ${style}
-Platform: ${platform}
-Duration: ${duration || "-"}
-
-Gunakan tool yang sesuai berdasarkan mode:
-- infographic -> generate_infographic
-- tiktok -> generate_tiktok_carousel
-- leonardo -> generate_leonardo_prompt
-- veo -> generate_veo_prompt
-- analyze_video -> analyze_video
-- combine_photos -> combine_photos`
+body:JSON.stringify({
+message:prompt,
+mode:mode
+})
 })
 
-message:`Mode:${mode}
-
-Topik:${prompt}
-
-Gunakan tool yang sesuai dengan mode.`
-
-})
-
-})
-
-const data=await res.json()
+let data=await res.json()
 
 lastJSON=data
 
-const output=
-
+let output=
 data.result?.text ||
 data.result?.message ||
-data.result?.result ||
 data.message ||
 JSON.stringify(data,null,2)
 
 lastText=output
 
 aiBubble.innerHTML=
-
-escapeHtml(output).replace(/\n/g,"<br>") +
-
-`<div class="tools">
-
+output.replace(/\n/g,"<br>")+
+`
+<div class="tools">
 <button onclick="copyText()">Salin</button>
 <button onclick="downloadTxt()">Download TXT</button>
 <button onclick="downloadJson()">Download JSON</button>
-
-</div>`
+</div>
+`
 
 }catch(err){
 
@@ -255,14 +304,7 @@ a.click()
 
 }
 
-function escapeHtml(str){
+</script>
 
-return str
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-
-}
-
-</script></body>
+</body>
 </html>
