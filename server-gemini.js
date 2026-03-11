@@ -1,18 +1,20 @@
-const express = require("express");
-const cors = require("cors");
-require("dotenv").config();
+import express from "express";
+import cors from "cors";
+import fetch from "node-fetch";
 
 const app = express();
 
-const PORT = process.env.PORT || 8081;
-const API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-const MAIN_TOOL_URL =
-  process.env.MAIN_TOOL_URL || "https://ai-tools-production-5cad.up.railway.app";
-
 app.use(cors());
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+app.use(express.json());
+
+const PORT = process.env.PORT || 8080;
+
+const API_KEY = process.env.GEMINI_API_KEY;
+const MODEL = "gemini-2.5-flash";
+
+const MAIN_TOOL_URL =
+  process.env.MAIN_TOOL_URL ||
+  "https://ai-tools-production-5cad.up.railway.app";
 
 async function callGeminiWithTools(message) {
   const response = await fetch(
@@ -20,239 +22,211 @@ async function callGeminiWithTools(message) {
     {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         contents: [
           {
             role: "user",
-            parts: [{ text: message }],
-          },
+            parts: [
+              {
+                text: message
+              }
+            ]
+          }
         ],
         tools: [
           {
             functionDeclarations: [
               {
                 name: "generate_infographic",
-                description: "Buat konsep infografis dari sebuah topik.",
+                description: "Generate infographic content",
                 parameters: {
                   type: "object",
                   properties: {
-                    topic: {
-                      type: "string",
-                      description: "Topik infografis",
-                    },
-                    platform: {
-                      type: "string",
-                      description: "Platform output, misalnya Instagram",
-                    },
-                    style: {
-                      type: "string",
-                      description: "Gaya desain, misalnya Modern",
-                    },
-                    extraPrompt: {
-                      type: "string",
-                      description: "Instruksi tambahan",
-                    },
+                    topic: { type: "string" }
                   },
-                  required: ["topic"],
-                },
+                  required: ["topic"]
+                }
+              },
+              {
+                name: "generate_tiktok_carousel",
+                description: "Generate TikTok carousel",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    topic: { type: "string" }
+                  },
+                  required: ["topic"]
+                }
+              },
+              {
+                name: "generate_leonardo_prompt",
+                description: "Generate Leonardo AI prompt",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    topic: { type: "string" }
+                  },
+                  required: ["topic"]
+                }
+              },
+              {
+                name: "generate_veo_prompt",
+                description: "Generate Veo cinematic prompt",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    topic: { type: "string" }
+                  },
+                  required: ["topic"]
+                }
               },
               {
                 name: "analyze_video",
-                description: "Analisa video referensi menjadi scene-by-scene prompt.",
+                description: "Analyze reference video",
                 parameters: {
                   type: "object",
                   properties: {
-                    prompt: {
-                      type: "string",
-                      description: "Instruksi analisa video",
-                    },
-                    language: {
-                      type: "string",
-                      description: "Bahasa output",
-                    },
-                    style: {
-                      type: "string",
-                      description: "Style visual",
-                    },
-                  },
-                },
-              },
-              {
-                name: "merge_photos",
-                description: "Gabungkan beberapa foto menjadi satu konsep visual cinematic.",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    userPrompt: {
-                      type: "string",
-                      description: "Instruksi visual tambahan",
-                    },
-                  },
-                },
-              },
-            ],
-          },
-        ],
-      }),
+                    prompt: { type: "string" }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      })
     }
   );
 
   const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data?.error?.message || "Gemini API Error");
-  }
-
   return data;
 }
 
 async function runTool(functionCall) {
+
   let fn = functionCall.name;
   const args = functionCall.args || {};
-const mode = args.mode || "";
+  const mode = args.mode || "";
 
-if(mode === "veo"){
-  fn = "generate_veo_prompt";
-}
+  if (mode === "veo") fn = "generate_veo_prompt";
+  if (mode === "leonardo") fn = "generate_leonardo_prompt";
+  if (mode === "tiktok") fn = "generate_tiktok_carousel";
+  if (mode === "infographic") fn = "generate_infographic";
 
-if(mode === "leonardo"){
-  fn = "generate_leonardo_prompt";
-}
-
-if(mode === "tiktok"){
-  fn = "generate_tiktok_carousel";
-}
-
-if(mode === "infographic"){
-  fn = "generate_infographic";
-}
   if (fn === "generate_infographic") {
- 
-  if (fn === "generate_veo_prompt") {
-  const res = await fetch(`${MAIN_TOOL_URL}/api/generate-veo-prompt`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      topic: args.topic || args.prompt || "",
-      style: args.style || "Cinematic",
-      duration: args.duration || "8 detik",
-      extraPrompt: args.extraPrompt || ""
-    })
-  });
-
-  return await res.json();
-}
- if (fn === "generate_leonardo_prompt") {
-  const res = await fetch(`${MAIN_TOOL_URL}/api/generate-leonardo-prompt`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      topic: args.topic || args.prompt || "",
-      style: args.style || "Cinematic",
-      extraPrompt: args.extraPrompt || ""
-    })
-  });
-
-  return await res.json();
-}
-    
     const res = await fetch(`${MAIN_TOOL_URL}/api/generate-infographic`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        topic: args.topic || "",
-        platform: args.platform || "Instagram",
-        style: args.style || "Modern",
-        extraPrompt: args.extraPrompt || "",
-      }),
+        topic: args.topic || args.prompt || ""
+      })
+    });
+
+    return await res.json();
+  }
+
+  if (fn === "generate_tiktok_carousel") {
+    const res = await fetch(`${MAIN_TOOL_URL}/api/generate-tiktok-carousel`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        topic: args.topic || args.prompt || ""
+      })
+    });
+
+    return await res.json();
+  }
+
+  if (fn === "generate_leonardo_prompt") {
+    const res = await fetch(`${MAIN_TOOL_URL}/api/generate-leonardo-prompt`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        topic: args.topic || args.prompt || ""
+      })
+    });
+
+    return await res.json();
+  }
+
+  if (fn === "generate_veo_prompt") {
+    const res = await fetch(`${MAIN_TOOL_URL}/api/generate-veo-prompt`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        topic: args.topic || args.prompt || ""
+      })
     });
 
     return await res.json();
   }
 
   if (fn === "analyze_video") {
-    return {
-      success: false,
-      message:
-        "Fitur analyze_video butuh upload video file, jadi belum cocok untuk chat text-only.",
-    };
-  }
+    const res = await fetch(`${MAIN_TOOL_URL}/api/analyze-video`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        prompt: args.prompt || ""
+      })
+    });
 
-  if (fn === "merge_photos") {
-    return {
-      success: false,
-      message:
-        "Fitur merge_photos butuh upload gambar, jadi belum cocok untuk chat text-only.",
-    };
+    return await res.json();
   }
 
   return {
     success: false,
-    message: `Tool ${fn} tidak dikenali.`,
+    message: `Tool ${fn} tidak dikenali`
   };
 }
 
-app.get("/", (req, res) => {
-  res.json({
-    success: true,
-    message: "AI Studio Pro Gemini Bridge Aktif",
-    model: MODEL,
-    apiKey: API_KEY ? "Terkonfigurasi" : "Belum ada",
-    mainToolUrl: MAIN_TOOL_URL,
-  });
-});
-
 app.post("/api/gemini-chat", async (req, res) => {
+
   try {
+
     const { message } = req.body;
 
-    if (!message || !message.trim()) {
-      return res.status(400).json({ error: "Message kosong." });
-    }
-
-    if (!API_KEY) {
-      return res.status(500).json({ error: "GEMINI_API_KEY tidak ditemukan." });
-    }
-
     const firstPass = await callGeminiWithTools(message);
-    const part = firstPass?.candidates?.[0]?.content?.parts?.[0];
 
-    if (!part?.functionCall) {
-      const normalText =
-        firstPass?.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("\n") ||
-        "Tidak ada hasil.";
+    const part =
+      firstPass?.candidates?.[0]?.content?.parts?.[0];
+
+    if (!part) {
       return res.json({
-        success: true,
-        mode: "normal",
-        result: normalText,
+        success: false,
+        result: "Tidak ada respon"
       });
     }
 
-    const toolResult = await runTool(part.functionCall);
+    if (part.functionCall) {
+
+      const toolResult = await runTool(part.functionCall);
+
+      return res.json({
+        success: true,
+        tool: part.functionCall.name,
+        result: toolResult
+      });
+
+    }
 
     return res.json({
       success: true,
-      mode: "tool",
-      tool: part.functionCall.name,
-      args: part.functionCall.args || {},
-      result: toolResult,
+      result: part.text
     });
+
   } catch (err) {
-    console.error("Gemini Bridge Error:", err.message);
-    res.status(500).json({ error: err.message });
+
+    res.status(500).json({
+      error: err.message
+    });
+
   }
+
 });
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Gemini Bridge berjalan di port ${PORT}`);
-  console.log(`Model: ${MODEL}`);
-  console.log(`Main Tool URL: ${MAIN_TOOL_URL}`);
+app.listen(PORT, () => {
+
+  console.log("Gemini bridge running on port", PORT);
+
 });
