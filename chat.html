@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Studio Pro</title>
-
   <style>
     body{
       margin:0;
@@ -70,6 +69,14 @@
       cursor:pointer;
       font-weight:bold;
       padding:10px 16px;
+      margin-right:8px;
+      margin-top:6px;
+    }
+
+    .small-btn{
+      background:#334155;
+      font-size:13px;
+      padding:8px 12px;
     }
 
     .chat{
@@ -103,9 +110,11 @@
       margin-top:10px;
     }
 
-    .tools button{
-      margin-right:8px;
-      margin-top:6px;
+    .prompt-tools{
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
     }
 
     label{
@@ -121,200 +130,236 @@
   <div class="container">
 
     <h1>AI Studio Pro</h1>
-
-<div class="sub">
-Infografis • TikTok Carousel • Leonardo Prompt • Veo Prompt • Analyze Video • Gabungkan Foto
-</div>
-
-<div class="panel">
-
-<div class="row">
-<label>Pilih Mode</label>
-
-<select id="mode">
-<option value="infographic">Infografis</option>
-<option value="tiktok">TikTok Carousel</option>
-<option value="leonardo">Prompt Leonardo</option>
-<option value="veo">Prompt Veo</option>
-<option value="analyze_video">Analyze Video</option>
-<option value="combine_photos">Gabungkan Foto</option>
-</select>
-
-</div>
-
-<div class="row">
-<textarea id="prompt" placeholder="Tulis topik atau perintah..."></textarea>
-</div>
-
-<button id="autoPromptBtn" type="button" style="display:none;margin-top:10px;">
-✨ Buat Prompt Otomatis
-</button>  
-
-  <div id="videoUpload" style="display:none;margin-top:10px;">
-<label>Upload Video Referensi</label>
-<input type="file" id="videoFile" accept="video/*">
-</div>
-
-<div id="photoUpload" style="display:none;margin-top:10px;">
-<label>Upload Foto (bisa pilih beberapa)</label>
-<input type="file" id="photoFiles" accept="image/*" multiple>
-</div>
-
-<div class="row">
-<button onclick="sendPrompt()">Generate</button>
-</div>
-
-</div>
-
-<div class="chat" id="chatBox"></div>
-
-</div>
-
-<script>
-
-let lastText=""
-let lastJSON=null
-
-const modeSelect=document.getElementById("mode")
-const videoUpload=document.getElementById("videoUpload")
-const photoUpload=document.getElementById("photoUpload")
-const autoPromptBtn = document.getElementById("autoPromptBtn")
-
-function updateUpload(){
-
-videoUpload.style.display="none"
-photoUpload.style.display="none"
-autoPromptBtn.style.display="none"
-
-let mode = modeSelect.value
-
-if(mode === "analyze_video"){
-  videoUpload.style.display = "block"
-  autoPromptBtn.style.display = "inline-block"
-}
-
-if(mode === "combine_photos"){
-  photoUpload.style.display = "block"
-  autoPromptBtn.style.display = "inline-block"
-}
-
-}
-
-}
-
-modeSelect.addEventListener("change",updateUpload)
-
-function addBubble(role,text){
-
-const chat=document.getElementById("chatBox")
-
-const bubble=document.createElement("div")
-bubble.className="bubble "+(role==="user"?"user":"ai")
-
-bubble.innerText=text
-
-chat.appendChild(bubble)
-
-chat.scrollTop=chat.scrollHeight
-
-return bubble
-
-}
-
-async function sendPrompt(){
-
-let mode=document.getElementById("mode").value
-let prompt=document.getElementById("prompt").value.trim()
-
-if(!prompt){
-alert("Prompt kosong")
-return
-}
-
-addBubble("user",prompt)
-
-let aiBubble=addBubble("ai","Memproses...")
-
-try{
-
-let res=await fetch("/api/gemini-chat",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-message:prompt,
-mode:mode
-})
-})
-
-let data=await res.json()
-
-lastJSON=data
-
-let output=
-data.result?.text ||
-data.result?.message ||
-data.message ||
-JSON.stringify(data,null,2)
-
-lastText=output
-
-aiBubble.innerHTML=
-output.replace(/\n/g,"<br>")+
-`
-<div class="tools">
-<button onclick="copyText()">Salin</button>
-<button onclick="downloadTxt()">Download TXT</button>
-<button onclick="downloadJson()">Download JSON</button>
-</div>
-`
-
-}catch(err){
-
-aiBubble.innerText="Error: "+err.message
-
-}
-
-}
-
-function copyText(){
-
-navigator.clipboard.writeText(lastText)
-
-alert("Teks disalin")
-
-}
-
-function downloadTxt(){
-
-const blob=new Blob([lastText],{type:"text/plain"})
-
-const a=document.createElement("a")
-
-a.href=URL.createObjectURL(blob)
-
-a.download="hasil-ai.txt"
-
-a.click()
-
-}
-
-function downloadJson(){
-
-const blob=new Blob([JSON.stringify(lastJSON,null,2)],{type:"application/json"})
-
-const a=document.createElement("a")
-
-a.href=URL.createObjectURL(blob)
-
-a.download="hasil-ai.json"
-
-a.click()
-
-}
-
-</script>
+    <div class="sub">
+      Infografis • TikTok Carousel • Leonardo Prompt • Veo Prompt • Analyze Video • Gabungkan Foto
+    </div>
+
+    <div class="panel">
+
+      <div class="row">
+        <label for="mode">Pilih Mode</label>
+        <select id="mode">
+          <option value="infographic">Infografis</option>
+          <option value="tiktok">TikTok Carousel</option>
+          <option value="leonardo">Prompt Leonardo</option>
+          <option value="veo">Prompt Veo</option>
+          <option value="analyze_video">Analyze Video</option>
+          <option value="combine_photos">Gabungkan Foto</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label for="prompt">Topik / Perintah</label>
+        <textarea id="prompt" placeholder="Tulis topik atau perintah..."></textarea>
+      </div>
+
+      <div class="row" id="videoPromptTools" style="display:none;">
+        <label>Prompt Otomatis Analyze Video</label>
+        <div class="prompt-tools">
+          <button type="button" class="small-btn" onclick="setAnalyzePrompt('Analisa video ini menjadi scene by scene prompt cinematic untuk Veo')">Scene by scene Veo</button>
+          <button type="button" class="small-btn" onclick="setAnalyzePrompt('Analisa video ini lalu buat deskripsi angle kamera, lighting, dan mood per scene')">Kamera + lighting</button>
+          <button type="button" class="small-btn" onclick="setAnalyzePrompt('Analisa video ini dan ubah menjadi storyboard singkat + prompt Leonardo per scene')">Storyboard + Leonardo</button>
+        </div>
+      </div>
+
+      <div class="row" id="photoPromptTools" style="display:none;">
+        <label>Prompt Otomatis Gabungkan Foto</label>
+        <div class="prompt-tools">
+          <button type="button" class="small-btn" onclick="setPhotoPrompt('Gabungkan foto-foto ini menjadi satu konsep visual cinematic yang harmonis')">Gabung cinematic</button>
+          <button type="button" class="small-btn" onclick="setPhotoPrompt('Gabungkan foto-foto ini menjadi prompt Leonardo AI yang detail')">Jadi prompt Leonardo</button>
+          <button type="button" class="small-btn" onclick="setPhotoPrompt('Gabungkan foto-foto ini menjadi konsep poster atau thumbnail yang rapi')">Poster / thumbnail</button>
+        </div>
+      </div>
+
+      <div class="row" id="videoUpload" style="display:none;">
+        <label for="videoFile">Upload Video Referensi</label>
+        <input type="file" id="videoFile" accept="video/*">
+      </div>
+
+      <div class="row" id="photoUpload" style="display:none;">
+        <label for="photoFiles">Upload Foto (bisa pilih beberapa)</label>
+        <input type="file" id="photoFiles" accept="image/*" multiple>
+      </div>
+
+      <div class="row">
+        <button type="button" onclick="sendPrompt()">Generate</button>
+      </div>
+
+    </div>
+
+    <div class="chat" id="chatBox"></div>
+
+  </div>
+
+  <script>
+    let lastText = "";
+    let lastJSON = null;
+
+    const modeSelect = document.getElementById("mode");
+    const videoUpload = document.getElementById("videoUpload");
+    const photoUpload = document.getElementById("photoUpload");
+    const videoPromptTools = document.getElementById("videoPromptTools");
+    const photoPromptTools = document.getElementById("photoPromptTools");
+
+    function updateUploadUI(){
+      const mode = modeSelect.value;
+
+      videoUpload.style.display = "none";
+      photoUpload.style.display = "none";
+      videoPromptTools.style.display = "none";
+      photoPromptTools.style.display = "none";
+
+      if(mode === "analyze_video"){
+        videoUpload.style.display = "block";
+        videoPromptTools.style.display = "block";
+      }
+
+      if(mode === "combine_photos"){
+        photoUpload.style.display = "block";
+        photoPromptTools.style.display = "block";
+      }
+    }
+
+    modeSelect.addEventListener("change", updateUploadUI);
+    updateUploadUI();
+
+    function setAnalyzePrompt(text){
+      document.getElementById("prompt").value = text;
+    }
+
+    function setPhotoPrompt(text){
+      document.getElementById("prompt").value = text;
+    }
+
+    function addBubble(role, text){
+      const chat = document.getElementById("chatBox");
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble " + (role === "user" ? "user" : "ai");
+      bubble.innerText = text;
+
+      chat.appendChild(bubble);
+      chat.scrollTop = chat.scrollHeight;
+
+      return bubble;
+    }
+
+    async function sendPrompt(){
+      const mode = document.getElementById("mode").value;
+      const prompt = document.getElementById("prompt").value.trim();
+
+      if(!prompt){
+        alert("Prompt kosong");
+        return;
+      }
+
+      let extraInfo = "";
+
+      if(mode === "analyze_video"){
+        const videoFile = document.getElementById("videoFile").files[0];
+        extraInfo = videoFile
+          ? `Video file: ${videoFile.name}`
+          : "Tidak ada video yang diupload.";
+      }
+
+      if(mode === "combine_photos"){
+        const files = document.getElementById("photoFiles").files;
+        extraInfo = files.length > 0
+          ? `Jumlah foto: ${files.length}`
+          : "Tidak ada foto yang diupload.";
+      }
+
+      addBubble("user", prompt);
+      const aiBubble = addBubble("ai", "Memproses...");
+
+      try{
+        const res = await fetch("https://thriving-harmony-production-76ec.up.railway.app/api/gemini-chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message:
+`Mode: ${mode}
+Prompt: ${prompt}
+${extraInfo}
+
+Gunakan tool yang sesuai berdasarkan mode:
+- infographic -> generate_infographic
+- tiktok -> generate_tiktok_carousel
+- leonardo -> generate_leonardo_prompt
+- veo -> generate_veo_prompt
+- analyze_video -> analyze_video
+- combine_photos -> combine_photos`
+          })
+        });
+
+        const data = await res.json();
+        lastJSON = data;
+
+        const output =
+          data.result?.text ||
+          data.result?.message ||
+          data.result?.result ||
+          data.message ||
+          data.text ||
+          JSON.stringify(data, null, 2);
+
+        lastText = output;
+
+        aiBubble.innerHTML =
+          escapeHtml(output).replace(/\n/g, "<br>") +
+          `<div class="tools">
+            <button onclick="copyText()">Salin</button>
+            <button onclick="downloadTxt()">Download TXT</button>
+            <button onclick="downloadJson()">Download JSON</button>
+          </div>`;
+
+      } catch (err){
+        aiBubble.innerText = "Error: " + err.message;
+      }
+    }
+
+    function copyText(){
+      if(!lastText){
+        alert("Belum ada hasil.");
+        return;
+      }
+      navigator.clipboard.writeText(lastText);
+      alert("Teks disalin");
+    }
+
+    function downloadTxt(){
+      if(!lastText){
+        alert("Belum ada hasil.");
+        return;
+      }
+      const blob = new Blob([lastText], { type:"text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "hasil-ai.txt";
+      a.click();
+    }
+
+    function downloadJson(){
+      if(!lastJSON){
+        alert("Belum ada hasil.");
+        return;
+      }
+      const blob = new Blob([JSON.stringify(lastJSON, null, 2)], { type:"application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "hasil-ai.json";
+      a.click();
+    }
+
+    function escapeHtml(str){
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+  </script>
 
 </body>
 </html>
