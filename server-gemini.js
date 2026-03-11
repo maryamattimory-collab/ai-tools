@@ -115,6 +115,7 @@ if (mode === "tiktok") fn = "generate_tiktok_carousel";
 if (mode === "infographic") fn = "generate_infographic";
 if (mode === "analyze_video") fn = "analyze_video";
 if (mode === "combine_photos") fn = "combine_photos";
+ 
   if (fn === "generate_infographic") {
     const res = await fetch(`${MAIN_TOOL_URL}/api/generate-infographic`, {
       method: "POST",
