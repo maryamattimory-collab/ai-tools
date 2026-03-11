@@ -146,7 +146,11 @@ Infografis • TikTok Carousel • Leonardo Prompt • Veo Prompt • Analyze Vi
 <textarea id="prompt" placeholder="Tulis topik atau perintah..."></textarea>
 </div>
 
-<div id="videoUpload" style="display:none;margin-top:10px;">
+<button id="autoPromptBtn" type="button" style="display:none;margin-top:10px;">
+✨ Buat Prompt Otomatis
+</button>  
+
+  <div id="videoUpload" style="display:none;margin-top:10px;">
 <label>Upload Video Referensi</label>
 <input type="file" id="videoFile" accept="video/*">
 </div>
@@ -174,20 +178,26 @@ let lastJSON=null
 const modeSelect=document.getElementById("mode")
 const videoUpload=document.getElementById("videoUpload")
 const photoUpload=document.getElementById("photoUpload")
+const autoPromptBtn = document.getElementById("autoPromptBtn")
 
 function updateUpload(){
 
 videoUpload.style.display="none"
 photoUpload.style.display="none"
+autoPromptBtn.style.display="none"
 
-let mode=modeSelect.value
+let mode = modeSelect.value
 
-if(mode==="analyze_video"){
-videoUpload.style.display="block"
+if(mode === "analyze_video"){
+  videoUpload.style.display = "block"
+  autoPromptBtn.style.display = "inline-block"
 }
 
-if(mode==="combine_photos"){
-photoUpload.style.display="block"
+if(mode === "combine_photos"){
+  photoUpload.style.display = "block"
+  autoPromptBtn.style.display = "inline-block"
+}
+
 }
 
 }
