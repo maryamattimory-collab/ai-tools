@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Studio Pro</title>
   <style>
+    *{
+      box-sizing:border-box;
+    }
+
     body{
       margin:0;
       padding:20px;
@@ -12,72 +16,184 @@
       background:#0f172a;
       color:white;
     }
-    .container{max-width:900px;margin:auto;}
-    .panel{background:#1e293b;padding:16px;border-radius:14px;margin-bottom:16px;}
-    .row{margin-bottom:12px;}
-    select, textarea, input, button{
+
+    .container{
+      max-width:1000px;
+      margin:auto;
+    }
+
+    h1{
+      margin:0 0 6px 0;
+      font-size:30px;
+    }
+
+    .sub{
+      color:#cbd5e1;
+      margin-bottom:20px;
+      line-height:1.5;
+    }
+
+    .panel{
+      background:#1e293b;
+      padding:18px;
+      border-radius:16px;
+      margin-bottom:16px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .row{
+      margin-bottom:14px;
+    }
+
+    label{
+      display:block;
+      margin-bottom:7px;
+      color:#cbd5e1;
+      font-size:14px;
+      font-weight:bold;
+    }
+
+    select,
+    textarea,
+    input{
       width:100%;
       padding:12px;
       border:none;
       border-radius:10px;
       box-sizing:border-box;
       font-size:14px;
-    }
-    select, textarea, input{
       background:#f8fafc;
       color:#111827;
     }
-    textarea{min-height:120px;resize:vertical;}
+
+    textarea{
+      min-height:130px;
+      resize:vertical;
+    }
+
+    .button-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:8px;
+    }
+
     button{
-      width:auto;
-      background:#38bdf8;
-      color:white;
-      cursor:pointer;
-      font-weight:bold;
+      border:none;
+      border-radius:10px;
       padding:10px 16px;
-      margin-top:6px;
+      font-size:14px;
+      font-weight:bold;
+      cursor:pointer;
+      color:white;
+      background:#38bdf8;
     }
-    .chat{
-      background:#020617;
-      padding:16px;
-      border-radius:14px;
-      min-height:280px;
+
+    button:hover{
+      opacity:0.95;
     }
-    .bubble{
-      padding:14px;
-      border-radius:12px;
-      margin-top:10px;
-      white-space:pre-wrap;
-      line-height:1.5;
-      max-width:80%;
+
+    .secondary{
+      background:#334155;
     }
-    .user{background:#2563eb;margin-left:auto;text-align:right;}
-    .ai{background:#1e293b;margin-right:auto;}
+
+    .danger{
+      background:#ef4444;
+    }
+
     .small-btn{
       background:#334155;
       font-size:13px;
       padding:8px 12px;
-      margin-right:8px;
-      margin-top:6px;
     }
+
     .prompt-tools{
       display:flex;
       flex-wrap:wrap;
       gap:8px;
     }
-    label{
-      display:block;
-      margin-bottom:6px;
-      color:#cbd5e1;
-      font-size:14px;
+
+    .chat{
+      background:#020617;
+      padding:16px;
+      border-radius:16px;
+      min-height:320px;
+      border:1px solid rgba(255,255,255,0.06);
+    }
+
+    .bubble{
+      padding:14px;
+      border-radius:12px;
+      margin-top:12px;
+      white-space:pre-wrap;
+      line-height:1.6;
+      max-width:88%;
+      word-wrap:break-word;
+    }
+
+    .user{
+      background:#2563eb;
+      margin-left:auto;
+      text-align:right;
+    }
+
+    .ai{
+      background:#1e293b;
+      margin-right:auto;
+    }
+
+    .tool-actions{
+      margin-top:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .tool-actions button{
+      background:#475569;
+      padding:8px 12px;
+      font-size:13px;
+    }
+
+    .status{
+      margin-top:10px;
+      font-size:13px;
+      color:#93c5fd;
+    }
+
+    .footer-note{
+      margin-top:10px;
+      color:#94a3b8;
+      font-size:12px;
+      line-height:1.5;
+    }
+
+    @media (max-width:700px){
+      .bubble{
+        max-width:100%;
+      }
+
+      .button-row{
+        flex-direction:column;
+      }
+
+      .button-row button{
+        width:100%;
+      }
     }
   </style>
 </head>
 <body>
+
   <div class="container">
+
     <h1>AI Studio Pro</h1>
+    <div class="sub">
+      Infografis • TikTok Carousel • Leonardo Prompt • Veo Prompt • Analyze Video • Gabungkan Foto
+    </div>
 
     <div class="panel">
+
       <div class="row">
         <label for="mode">Pilih Mode</label>
         <select id="mode">
@@ -95,7 +211,7 @@
         <textarea id="prompt" placeholder="Tulis topik atau perintah..."></textarea>
       </div>
 
-      <div class="row" id="videoTools" style="display:none;">
+      <div class="row" id="videoPromptTools" style="display:none;">
         <label>Prompt Otomatis Analyze Video</label>
         <div class="prompt-tools">
           <button type="button" class="small-btn" onclick="setPrompt('Analisa video ini menjadi scene by scene prompt cinematic untuk Veo')">Scene by scene Veo</button>
@@ -104,7 +220,7 @@
         </div>
       </div>
 
-      <div class="row" id="photoTools" style="display:none;">
+      <div class="row" id="photoPromptTools" style="display:none;">
         <label>Prompt Otomatis Gabungkan Foto</label>
         <div class="prompt-tools">
           <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini menjadi satu konsep visual cinematic yang harmonis')">Gabung cinematic</button>
@@ -119,16 +235,25 @@
       </div>
 
       <div class="row" id="photoUpload" style="display:none;">
-        <label for="photoFiles">Upload Foto</label>
+        <label for="photoFiles">Upload Foto (bisa pilih beberapa)</label>
         <input type="file" id="photoFiles" accept="image/*" multiple>
       </div>
 
-      <div class="row">
+      <div class="button-row">
         <button type="button" onclick="sendPrompt()">Generate</button>
+        <button type="button" class="secondary" onclick="clearPrompt()">Clear Prompt</button>
+        <button type="button" class="danger" onclick="clearChat()">Clear Chat</button>
       </div>
+
+      <div class="status" id="statusText"></div>
+      <div class="footer-note">
+        Catatan: mode Analyze Video saat ini mengirim file video asli ke endpoint video. Mode Gabungkan Foto saat ini masih memakai instruksi teks + jumlah file.
+      </div>
+
     </div>
 
     <div class="chat" id="chatBox"></div>
+
   </div>
 
   <script>
@@ -138,25 +263,26 @@
     const modeSelect = document.getElementById("mode");
     const videoUpload = document.getElementById("videoUpload");
     const photoUpload = document.getElementById("photoUpload");
-    const videoTools = document.getElementById("videoTools");
-    const photoTools = document.getElementById("photoTools");
+    const videoPromptTools = document.getElementById("videoPromptTools");
+    const photoPromptTools = document.getElementById("photoPromptTools");
+    const statusText = document.getElementById("statusText");
 
     function updateUploadUI(){
       const mode = modeSelect.value;
 
       videoUpload.style.display = "none";
       photoUpload.style.display = "none";
-      videoTools.style.display = "none";
-      photoTools.style.display = "none";
+      videoPromptTools.style.display = "none";
+      photoPromptTools.style.display = "none";
 
       if(mode === "analyze_video"){
         videoUpload.style.display = "block";
-        videoTools.style.display = "block";
+        videoPromptTools.style.display = "block";
       }
 
       if(mode === "combine_photos"){
         photoUpload.style.display = "block";
-        photoTools.style.display = "block";
+        photoPromptTools.style.display = "block";
       }
     }
 
@@ -167,83 +293,172 @@
       document.getElementById("prompt").value = text;
     }
 
+    function clearPrompt(){
+      document.getElementById("prompt").value = "";
+      statusText.innerText = "";
+    }
+
+    function clearChat(){
+      document.getElementById("chatBox").innerHTML = "";
+      statusText.innerText = "Chat dibersihkan.";
+      lastText = "";
+      lastJSON = null;
+    }
+
     function addBubble(role, text){
       const chat = document.getElementById("chatBox");
+
       const bubble = document.createElement("div");
       bubble.className = "bubble " + (role === "user" ? "user" : "ai");
       bubble.innerText = text;
+
       chat.appendChild(bubble);
       chat.scrollTop = chat.scrollHeight;
+
       return bubble;
     }
 
+    function escapeHtml(str){
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function renderAiOutput(aiBubble, output){
+      aiBubble.innerHTML =
+        escapeHtml(output).replace(/\n/g, "<br>") +
+        `<div class="tool-actions">
+          <button onclick="copyLastText()">Salin</button>
+          <button onclick="downloadTxt()">Download TXT</button>
+          <button onclick="downloadJson()">Download JSON</button>
+        </div>`;
+    }
+
     async function sendPrompt(){
-  const mode = document.getElementById("mode").value;
-  const prompt = document.getElementById("prompt").value.trim();
+      const mode = document.getElementById("mode").value;
+      const prompt = document.getElementById("prompt").value.trim();
 
-  if(!prompt){
-    alert("Prompt kosong");
-    return;
-  }
-
-  addBubble("user", prompt);
-  const aiBubble = addBubble("ai", "Memproses...");
-
-  try {
-    let res;
-
-    if (mode === "analyze_video") {
-      const videoFile = document.getElementById("videoFile").files[0];
-
-      if (!videoFile) {
-        aiBubble.innerText = "Upload video dulu.";
+      if(!prompt){
+        alert("Prompt kosong");
         return;
       }
 
-      const formData = new FormData();
-      formData.append("video", videoFile);
-      formData.append("prompt", prompt);
-      formData.append("mode", mode);
+      addBubble("user", prompt);
+      const aiBubble = addBubble("ai", "Memproses...");
+      statusText.innerText = "Mengirim request ke server...";
 
-      res = await fetch("/api/analyze-video", {
-        method: "POST",
-        body: formData
-      });
-    } else {
-      let extraInfo = "";
+      try {
+        let res;
 
-      if(mode === "combine_photos"){
-        const files = document.getElementById("photoFiles").files;
-        extraInfo = files.length > 0
-          ? `Jumlah foto: ${files.length}`
-          : "Tidak ada foto yang diupload.";
+        if (mode === "analyze_video") {
+          const videoFile = document.getElementById("videoFile").files[0];
+
+          if (!videoFile) {
+            aiBubble.innerText = "Upload video dulu.";
+            statusText.innerText = "Belum ada video yang diupload.";
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("video", videoFile);
+          formData.append("prompt", prompt);
+          formData.append("mode", mode);
+
+          statusText.innerText = "Mengupload video dan meminta Gemini menganalisa isi video...";
+
+          res = await fetch("/api/analyze-video", {
+            method: "POST",
+            body: formData
+          });
+
+        } else {
+          let extraInfo = "";
+
+          if(mode === "combine_photos"){
+            const files = document.getElementById("photoFiles").files;
+            extraInfo = files.length > 0
+              ? `Jumlah foto yang diupload: ${files.length}`
+              : "Tidak ada foto yang diupload.";
+          }
+
+          statusText.innerText = "Mengirim prompt ke Gemini...";
+
+          res = await fetch("/api/gemini-chat", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              message: prompt + (extraInfo ? "\n" + extraInfo : ""),
+              mode: mode
+            })
+          });
+        }
+
+        const data = await res.json();
+        lastJSON = data;
+
+        const output =
+          data.text ||
+          data.error ||
+          JSON.stringify(data, null, 2);
+
+        lastText = output;
+
+        renderAiOutput(aiBubble, output);
+
+        statusText.innerText = "Selesai.";
+
+      } catch (err) {
+        aiBubble.innerText = "Error: " + err.message;
+        statusText.innerText = "Terjadi error saat memanggil server.";
       }
-
-      res = await fetch("/api/gemini-chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: prompt + (extraInfo ? "\n" + extraInfo : ""),
-          mode: mode
-        })
-      });
     }
 
-    const data = await res.json();
+    function copyLastText(){
+      if(!lastText){
+        alert("Belum ada hasil.");
+        return;
+      }
 
-    const output =
-      data.text ||
-      data.error ||
-      JSON.stringify(data, null, 2);
+      navigator.clipboard.writeText(lastText)
+        .then(() => {
+          alert("Teks berhasil disalin");
+        })
+        .catch(() => {
+          alert("Gagal menyalin teks");
+        });
+    }
 
-    aiBubble.innerText = output;
+    function downloadTxt(){
+      if(!lastText){
+        alert("Belum ada hasil.");
+        return;
+      }
 
-  } catch (err) {
-    aiBubble.innerText = "Error: " + err.message;
-  }
-}
+      const blob = new Blob([lastText], { type:"text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "hasil-ai.txt";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function downloadJson(){
+      if(!lastJSON){
+        alert("Belum ada hasil.");
+        return;
+      }
+
+      const blob = new Blob([JSON.stringify(lastJSON, null, 2)], { type:"application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "hasil-ai.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
   </script>
+
 </body>
 </html>
