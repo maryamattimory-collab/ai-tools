@@ -336,9 +336,9 @@
         <div class="row" id="photoPromptTools" style="display:none;">
           <label>Prompt Otomatis Gabungkan Foto</label>
           <div class="prompt-tools">
-            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini menjadi satu konsep visual cinematic yang harmonis')">Gabung cinematic</button>
-            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini menjadi prompt Leonardo AI yang detail')">Jadi prompt Leonardo</button>
-            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini menjadi konsep poster atau thumbnail yang rapi')">Poster / thumbnail</button>
+            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini menjadi satu hasil gabungan yang rapi')">Gabung rapi</button>
+            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini dalam layout collage 2x2')">Layout 2x2</button>
+            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini menjadi satu gambar kompak')">Collage kompak</button>
           </div>
         </div>
 
@@ -363,13 +363,13 @@
         <div class="helper">
           <strong>Tips</strong>
           <p>
-            Gunakan mode <b>Auto</b> untuk permintaan umum. Gunakan <b>Analyze Video</b>
-            jika kamu ingin AI membaca isi video asli yang diupload.
+            Gunakan <b>Analyze Video</b> untuk membaca isi video asli. Gunakan
+            <b>Gabungkan Foto</b> untuk membuat collage gambar, bukan teks.
           </p>
         </div>
 
         <div class="footer-note">
-          Catatan: Analyze Video mengirim video asli ke endpoint video. Gabungkan Foto saat ini masih berbasis instruksi teks + jumlah file.
+          Catatan: Analyze Video mengirim video asli ke endpoint video. Gabungkan Foto menghasilkan gambar gabungan/collage.
         </div>
       </div>
 
@@ -391,8 +391,8 @@
 
   <script>
     let lastText = "";
-let lastJSON = null;
-let lastImageUrl = "";
+    let lastJSON = null;
+    let lastImageUrl = "";
 
     const modeSelect = document.getElementById("mode");
     const videoUpload = document.getElementById("videoUpload");
@@ -443,6 +443,7 @@ let lastImageUrl = "";
       statusText.innerText = "Chat dibersihkan.";
       lastText = "";
       lastJSON = null;
+      lastImageUrl = "";
     }
 
     function addBubble(role, text){
@@ -517,32 +518,89 @@ let lastImageUrl = "";
             body: formData
           });
 
-        } else {
-          let extraInfo = "";
+          const data = await res.json();
+          lastJSON = data;
+          lastImageUrl = "";
 
-          if(mode === "combine_photos"){
-            const files = document.getElementById("photoFiles").files;
-            extraInfo = files.length > 0
-              ? `Jumlah foto yang diupload: ${files.length}`
-              : "Tidak ada foto yang diupload.";
+          const selectedMode = data.selectedMode ? `\n\nMode terpilih: ${data.selectedMode}` : "";
+          const output =
+            (data.text || data.error || JSON.stringify(data, null, 2)) + selectedMode;
+
+          lastText = output;
+          renderAiOutput(aiBubble, output);
+          statusText.innerText = "Selesai.";
+          return;
+        }
+
+        if (mode === "combine_photos") {
+          const files = document.getElementById("photoFiles").files;
+
+          if (!files || files.length < 2) {
+            aiBubble.innerText = "Upload minimal 2 foto.";
+            statusText.innerText = "Minimal upload 2 foto.";
+            return;
           }
 
-          statusText.innerText = "Mengirim prompt ke Gemini...";
+          const formData = new FormData();
+          for (let i = 0; i < files.length && i < 4; i++) {
+            formData.append("photos", files[i]);
+          }
+          formData.append("prompt", prompt);
+          formData.append("mode", mode);
 
-          res = await fetch("/api/gemini-chat", {
+          statusText.innerText = "Menggabungkan foto menjadi satu gambar...";
+
+          res = await fetch("/api/combine-photos-image", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              message: prompt + (extraInfo ? "\n" + extraInfo : ""),
-              mode: mode
-            })
+            body: formData
           });
+
+          if (!res.ok) {
+            let errText = "Gagal menggabungkan foto.";
+            try {
+              const errJson = await res.json();
+              errText = errJson.error || errText;
+            } catch (_) {}
+            aiBubble.innerText = errText;
+            statusText.innerText = "Terjadi error saat menggabungkan foto.";
+            return;
+          }
+
+          const blob = await res.blob();
+          const imageUrl = URL.createObjectURL(blob);
+
+          lastImageUrl = imageUrl;
+          lastText = "Gambar gabungan berhasil dibuat.";
+          lastJSON = { success: true, type: "image" };
+
+          aiBubble.innerHTML = `
+            <div style="margin-bottom:12px;">Berikut hasil gabungan foto:</div>
+            <img src="${imageUrl}" alt="Gabungan Foto" style="max-width:100%;border-radius:12px;display:block;">
+            <div class="tool-actions">
+              <button onclick="downloadImage()">Download Image</button>
+            </div>
+          `;
+
+          statusText.innerText = "Selesai.";
+          return;
         }
+
+        statusText.innerText = "Mengirim prompt ke Gemini...";
+
+        res = await fetch("/api/gemini-chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: prompt,
+            mode: mode
+          })
+        });
 
         const data = await res.json();
         lastJSON = data;
+        lastImageUrl = "";
 
         const selectedMode = data.selectedMode ? `\n\nMode terpilih: ${data.selectedMode}` : "";
         const output =
@@ -600,17 +658,18 @@ let lastImageUrl = "";
       a.click();
       URL.revokeObjectURL(a.href);
     }
-    function downloadImage(){
-  if(!lastImageUrl){
-    alert("Belum ada gambar.");
-    return;
-  }
 
-  const a = document.createElement("a");
-  a.href = lastImageUrl;
-  a.download = "gabungan-foto.png";
-  a.click();
-}
+    function downloadImage(){
+      if(!lastImageUrl){
+        alert("Belum ada gambar.");
+        return;
+      }
+
+      const a = document.createElement("a");
+      a.href = lastImageUrl;
+      a.download = "gabungan-foto.png";
+      a.click();
+    }
   </script>
 </body>
 </html>
