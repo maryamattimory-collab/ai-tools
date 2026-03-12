@@ -1,71 +1,22 @@
 import express from "express";
 import cors from "cors";
+import fetch from "node-fetch";
 import path from "path";
-import multer from "multer";
-import sharp from "sharp";
 import { fileURLToPath } from "url";
 
 const app = express();
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 20 * 1024 * 1024
-  }
-});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use(cors());
-app.use(express.json({ limit: "20mb" }));
+app.use(express.json());
 app.use(express.static(__dirname));
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const MODEL = "gemini-2.5-flash";
 
-/* ===========================
-   GEMINI HELPERS
-=========================== */
-
-async function callGeminiText(prompt) {
-  if (!GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY belum diisi di Railway Variables");
-  }
-
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: prompt }]
-          }
-        ]
-      })
-    }
-  );
-
-  const data = await response.json();
-
-  if (data.error) {
-    throw new Error(data.error.message || "Error dari Gemini");
-  }
-
-  return data?.candidates?.[0]?.content?.parts?.[0]?.text || "Tidak ada respon dari Gemini.";
-}
-
-async function callGeminiWithVideo(videoBuffer, mimeType, prompt) {
-  if (!GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY belum diisi di Railway Variables");
-  }
-
-  const base64Video = videoBuffer.toString("base64");
+async function callGemini(prompt){
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`,
@@ -79,15 +30,7 @@ async function callGeminiWithVideo(videoBuffer, mimeType, prompt) {
           {
             role: "user",
             parts: [
-              {
-                inlineData: {
-                  mimeType: mimeType,
-                  data: base64Video
-                }
-              },
-              {
-                text: prompt
-              }
+              { text: prompt }
             ]
           }
         ]
@@ -97,441 +40,114 @@ async function callGeminiWithVideo(videoBuffer, mimeType, prompt) {
 
   const data = await response.json();
 
-  if (data.error) {
-    throw new Error(data.error.message || "Error dari Gemini");
-  }
-
-  return data?.candidates?.[0]?.content?.parts?.[0]?.text || "Tidak ada respon dari Gemini.";
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text || JSON.stringify(data);
 }
 
-async function detectBestMode(message) {
-  const modePrompt = `
-Tentukan mode tool terbaik untuk permintaan user berikut.
+app.post("/api/generate", async (req,res)=>{
 
-Pilihan mode yang valid hanya salah satu dari:
-- infographic
-- tiktok
-- leonardo
-- veo
-- analyze_video
-- combine_photos
-- scene_composite
+  try{
 
-Aturan:
-- Jika user meminta konten carousel infografis → infographic
-- Jika user meminta carousel TikTok / slide storytelling → tiktok
-- Jika user meminta prompt gambar Leonardo → leonardo
-- Jika user meminta prompt video Veo → veo
-- Jika user meminta analisa video → analyze_video
-- Jika user meminta collage / satukan beberapa foto berdampingan → combine_photos
-- Jika user meminta gabungkan orang + produk + background dalam satu foto → scene_composite
+    const {mode,prompt} = req.body;
 
-Balas HANYA dengan salah satu nama mode di atas.
-Jangan beri penjelasan tambahan.
+    let fullPrompt="";
 
-Permintaan user:
-${message}
-`;
-
-  const result = await callGeminiText(modePrompt);
-  return result.trim().toLowerCase();
-}
-
-function buildPromptByMode(mode, message) {
-  if (mode === "infographic") {
-    return `Buat konsep infografis carousel.
+    if(mode==="infographic"){
+      fullPrompt=`
+Buat konsep infografis Instagram carousel.
 
 Topik:
-${message}
+${prompt}
 
 Format:
+
 JUDUL
 SLIDE 1
 SLIDE 2
 SLIDE 3
 SLIDE 4
 SLIDE 5
-CTA`;
-  }
+CTA
+`;
+    }
 
-  if (mode === "tiktok") {
-    return `Buat TikTok carousel storytelling.
-
-Topik:
-${message}
-
-Format:
-HOOK
-SLIDE 1
-SLIDE 2
-SLIDE 3
-SLIDE 4
-SLIDE 5
-CLOSING`;
-  }
-
-  if (mode === "leonardo") {
-    return `Buat prompt Leonardo AI.
+    else if(mode==="tiktok"){
+      fullPrompt=`
+Buat TikTok carousel storytelling.
 
 Topik:
-${message}
+${prompt}
 
 Format:
+
+Hook
+Slide 1
+Slide 2
+Slide 3
+Slide 4
+Slide 5
+Closing
+`;
+    }
+
+    else if(mode==="leonardo"){
+      fullPrompt=`
+Buat prompt gambar Leonardo AI.
+
+Topik:
+${prompt}
+
+Format:
+
 PROMPT
 NEGATIVE PROMPT
-STYLE NOTES`;
-  }
+STYLE
+`;
+    }
 
-  if (mode === "veo") {
-    return `Buat prompt cinematic untuk Veo.
+    else if(mode==="veo"){
+      fullPrompt=`
+Buat prompt video cinematic untuk generator video seperti Veo.
 
 Topik:
-${message}
+${prompt}
 
-Format:
+Output format:
+
 JUDUL VIDEO
+
 SCENE 1
 SCENE 2
 SCENE 3
 SCENE 4
+
+STYLE
 CAMERA
 LIGHTING
 MOOD
-NEGATIVE PROMPT`;
-  }
-
-  if (mode === "combine_photos") {
-    return `Gabungkan beberapa foto berikut menjadi konsep visual.
-
-Instruksi user:
-${message}
-
-Buat output:
-1. Konsep visual utama
-2. Komposisi
-3. Lighting
-4. Mood
-5. Prompt Leonardo AI
-6. Caption`;
-  }
-
-  return message;
-}
-
-/* ===========================
-   PHOTO COLLAGE HELPER
-=========================== */
-
-async function createPhotoCollage(files) {
-  const count = files.length;
-
-  if (count < 2) {
-    throw new Error("Minimal upload 2 foto.");
-  }
-
-  const tileWidth = 512;
-  const tileHeight = 512;
-
-  let columns = 2;
-  let rows = Math.ceil(count / columns);
-
-  if (count === 2) {
-    columns = 2;
-    rows = 1;
-  }
-
-  if (count === 3 || count === 4) {
-    columns = 2;
-    rows = 2;
-  }
-
-  const canvasWidth = columns * tileWidth;
-  const canvasHeight = rows * tileHeight;
-
-  const composites = [];
-
-  for (let i = 0; i < count; i++) {
-    const file = files[i];
-
-    const resized = await sharp(file.buffer)
-      .resize(tileWidth, tileHeight, {
-        fit: "cover",
-        position: "centre"
-      })
-      .png()
-      .toBuffer();
-
-    const left = (i % columns) * tileWidth;
-    const top = Math.floor(i / columns) * tileHeight;
-
-    composites.push({
-      input: resized,
-      left,
-      top
-    });
-  }
-
-  const output = await sharp({
-    create: {
-      width: canvasWidth,
-      height: canvasHeight,
-      channels: 3,
-      background: { r: 255, g: 255, b: 255 }
-    }
-  })
-    .composite(composites)
-    .png()
-    .toBuffer();
-
-  return output;
-}
-
-/* ===========================
-   SCENE COMPOSITE HELPER
-   CATATAN:
-   - Orang dan produk terbaik jika PNG transparan
-   - Background bisa JPG / PNG
-=========================== */
-
-async function createSceneComposite(personFile, productFile, backgroundFile) {
-  const canvasWidth = 1024;
-  const canvasHeight = 1365;
-
-  const bg = await sharp(backgroundFile.buffer)
-    .resize(canvasWidth, canvasHeight, {
-      fit: "cover",
-      position: "centre"
-    })
-    .png()
-    .toBuffer();
-
-  const person = await sharp(personFile.buffer)
-    .resize({
-      width: 520,
-      height: 950,
-      fit: "inside"
-    })
-    .png()
-    .toBuffer();
-
-  const product = await sharp(productFile.buffer)
-    .resize({
-      width: 280,
-      height: 280,
-      fit: "inside"
-    })
-    .png()
-    .toBuffer();
-
-  const shadowPerson = await sharp({
-    create: {
-      width: 540,
-      height: 960,
-      channels: 4,
-      background: { r: 0, g: 0, b: 0, alpha: 0.18 }
-    }
-  })
-    .png()
-    .toBuffer();
-
-  const shadowProduct = await sharp({
-    create: {
-      width: 300,
-      height: 300,
-      channels: 4,
-      background: { r: 0, g: 0, b: 0, alpha: 0.18 }
-    }
-  })
-    .png()
-    .toBuffer();
-
-  const composed = await sharp(bg)
-    .composite([
-      { input: shadowPerson, left: 170, top: 285 },
-      { input: person, left: 160, top: 260 },
-
-      { input: shadowProduct, left: 650, top: 835 },
-      { input: product, left: 640, top: 820 }
-    ])
-    .png()
-    .toBuffer();
-
-  return composed;
-}
-
-/* ===========================
-   ROUTES
-=========================== */
-
-app.get("/", (req, res) => {
-  res.send("AI Studio Pro aktif");
-});
-
-app.post("/api/gemini-chat", async (req, res) => {
-  try {
-    const { message, mode } = req.body;
-
-    if (!message || !message.trim()) {
-      return res.status(400).json({
-        success: false,
-        error: "Prompt kosong"
-      });
-    }
-
-    let finalMode = mode;
-
-    if (!finalMode || finalMode === "auto") {
-      finalMode = await detectBestMode(message);
-    }
-
-    if (finalMode === "analyze_video") {
-      return res.json({
-        success: true,
-        selectedMode: finalMode,
-        text: "Mode analyze_video membutuhkan upload video asli. Silakan pilih mode Analyze Video dan upload file video."
-      });
-    }
-
-    if (finalMode === "combine_photos") {
-      return res.json({
-        success: true,
-        selectedMode: finalMode,
-        text: "Mode combine_photos membutuhkan upload minimal 2 foto. Silakan pilih mode Gabungkan Foto lalu upload file."
-      });
-    }
-
-    if (finalMode === "scene_composite") {
-      return res.json({
-        success: true,
-        selectedMode: finalMode,
-        text: "Mode scene_composite membutuhkan upload foto orang, foto produk, dan foto background."
-      });
-    }
-
-    const finalPrompt = buildPromptByMode(finalMode, message);
-    const text = await callGeminiText(finalPrompt);
-
-    res.json({
-      success: true,
-      selectedMode: finalMode,
-      text
-    });
-  } catch (err) {
-    console.error("SERVER ERROR /api/gemini-chat:", err);
-    res.status(500).json({
-      success: false,
-      error: err.message
-    });
-  }
-});
-
-app.post("/api/analyze-video", upload.single("video"), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        error: "File video tidak ditemukan."
-      });
-    }
-
-    const prompt = req.body.prompt || "Analisa video ini scene by scene.";
-
-    const finalPrompt = `
-Analisa video ini berdasarkan isi visual aslinya.
-
-Instruksi user:
-${prompt}
-
-Buat output:
-1. Ringkasan isi video
-2. Storyboard per scene
-3. Prompt Veo cinematic per scene
-4. Angle kamera, lighting, dan mood per scene
-5. Caption TikTok
+NEGATIVE PROMPT
 `;
+    }
 
-    const text = await callGeminiWithVideo(
-      req.file.buffer,
-      req.file.mimetype,
-      finalPrompt
-    );
+    const text = await callGemini(fullPrompt);
 
     res.json({
-      success: true,
-      selectedMode: "analyze_video",
+      success:true,
       text
     });
-  } catch (err) {
-    console.error("SERVER ERROR /api/analyze-video:", err);
+
+  }catch(err){
+
     res.status(500).json({
-      success: false,
-      error: err.message
+      success:false,
+      error:err.message
     });
+
   }
+
 });
-
-app.post("/api/combine-photos-image", upload.array("photos", 4), async (req, res) => {
-  try {
-    if (!req.files || req.files.length < 2) {
-      return res.status(400).json({
-        success: false,
-        error: "Minimal upload 2 foto."
-      });
-    }
-
-    const imageBuffer = await createPhotoCollage(req.files);
-
-    res.set("Content-Type", "image/png");
-    res.send(imageBuffer);
-  } catch (err) {
-    console.error("SERVER ERROR /api/combine-photos-image:", err);
-    res.status(500).json({
-      success: false,
-      error: err.message
-    });
-  }
-});
-
-app.post("/api/scene-composite", upload.fields([
-  { name: "personImage", maxCount: 1 },
-  { name: "productImage", maxCount: 1 },
-  { name: "backgroundImage", maxCount: 1 }
-]), async (req, res) => {
-  try {
-    const personImage = req.files?.personImage?.[0];
-    const productImage = req.files?.productImage?.[0];
-    const backgroundImage = req.files?.backgroundImage?.[0];
-
-    if (!personImage || !productImage || !backgroundImage) {
-      return res.status(400).json({
-        success: false,
-        error: "Upload foto orang, produk, dan background terlebih dahulu."
-      });
-    }
-
-    const output = await createSceneComposite(
-      personImage,
-      productImage,
-      backgroundImage
-    );
-
-    res.set("Content-Type", "image/png");
-    res.send(output);
-  } catch (err) {
-    console.error("SERVER ERROR /api/scene-composite:", err);
-    res.status(500).json({
-      success: false,
-      error: err.message
-    });
-  }
-});
-
-/* ===========================
-   SERVER START
-=========================== */
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`AI Studio Pro API aktif di port ${PORT}`);
+app.listen(PORT,()=>{
+  console.log("AI Studio Pro aktif di port",PORT);
 });
