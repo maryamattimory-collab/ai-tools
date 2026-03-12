@@ -1,9 +1,11 @@
 import express from "express";
 import cors from "cors";
 import path from "path";
+import multer from "multer";
 import { fileURLToPath } from "url";
 
 const app = express();
+const upload = multer({ storage: multer.memoryStorage() });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,9 +15,9 @@ app.use(express.json({ limit: "20mb" }));
 app.use(express.static(__dirname));
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = "gemini-2.5-flash";
+const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
-async function callGemini(prompt) {
+async function callGeminiText(prompt) {
   if (!GEMINI_API_KEY) {
     throw new Error("GEMINI_API_KEY belum diisi di Railway Variables");
   }
@@ -47,6 +49,50 @@ async function callGemini(prompt) {
   return data?.candidates?.[0]?.content?.parts?.[0]?.text || "Tidak ada respon dari Gemini.";
 }
 
+async function callGeminiWithVideo(videoBuffer, mimeType, prompt) {
+  if (!GEMINI_API_KEY) {
+    throw new Error("GEMINI_API_KEY belum diisi di Railway Variables");
+  }
+
+  const base64Video = videoBuffer.toString("base64");
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                inlineData: {
+                  mimeType: mimeType,
+                  data: base64Video
+                }
+              },
+              {
+                text: prompt
+              }
+            ]
+          }
+        ]
+      })
+    }
+  );
+
+  const data = await response.json();
+
+  if (data.error) {
+    throw new Error(data.error.message || "Error dari Gemini");
+  }
+
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text || "Tidak ada respon dari Gemini.";
+}
+
 app.get("/", (req, res) => {
   res.send("AI Studio Pro aktif");
 });
@@ -59,7 +105,7 @@ app.post("/api/gemini-chat", async (req, res) => {
       return res.status(400).json({ error: "Prompt kosong" });
     }
 
-    let finalPrompt = "";
+    let finalPrompt = message;
 
     if (mode === "infographic") {
       finalPrompt = `Buat konsep infografis carousel.
@@ -115,18 +161,6 @@ CAMERA
 LIGHTING
 MOOD
 NEGATIVE PROMPT`;
-    } else if (mode === "analyze_video") {
-      finalPrompt = `Analisa video referensi berikut.
-
-Instruksi user:
-${message}
-
-Buat output:
-1. Ringkasan isi video
-2. Storyboard per scene
-3. Prompt Veo cinematic per scene
-4. Angle kamera, lighting, dan mood per scene
-5. Caption TikTok`;
     } else if (mode === "combine_photos") {
       finalPrompt = `Gabungkan beberapa foto berikut menjadi konsep visual.
 
@@ -140,18 +174,60 @@ Buat output:
 4. Mood
 5. Prompt Leonardo AI
 6. Caption`;
-    } else {
-      finalPrompt = message;
     }
 
-    const text = await callGemini(finalPrompt);
+    const text = await callGeminiText(finalPrompt);
 
     res.json({
       success: true,
       text
     });
   } catch (err) {
-    console.error("SERVER ERROR:", err);
+    console.error("SERVER ERROR /api/gemini-chat:", err);
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
+app.post("/api/analyze-video", upload.single("video"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: "File video tidak ditemukan."
+      });
+    }
+
+    const prompt = req.body.prompt || "Analisa video ini scene by scene.";
+
+    const finalPrompt = `
+Analisa video ini berdasarkan isi visual aslinya.
+
+Instruksi user:
+${prompt}
+
+Buat output:
+1. Ringkasan isi video
+2. Storyboard per scene
+3. Prompt Veo cinematic per scene
+4. Angle kamera, lighting, dan mood per scene
+5. Caption TikTok
+`;
+
+    const text = await callGeminiWithVideo(
+      req.file.buffer,
+      req.file.mimetype,
+      finalPrompt
+    );
+
+    res.json({
+      success: true,
+      text
+    });
+  } catch (err) {
+    console.error("SERVER ERROR /api/analyze-video:", err);
     res.status(500).json({
       success: false,
       error: err.message
