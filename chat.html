@@ -1,150 +1,481 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-<title>AI Studio Pro</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Studio Pro</title>
+  <style>
+    *{
+      box-sizing:border-box;
+    }
 
-<style>
+    body{
+      margin:0;
+      font-family:Arial,sans-serif;
+      background:#0f172a;
+      color:#e5e7eb;
+    }
 
-body{
-font-family:Arial;
-background:#0f172a;
-color:white;
-margin:0;
-}
+    .container{
+      max-width:1100px;
+      margin:auto;
+      padding:24px 16px 40px;
+    }
 
-.container{
-max-width:1100px;
-margin:auto;
-padding:20px;
-display:grid;
-grid-template-columns:350px 1fr;
-gap:20px;
-}
+    .topbar{
+      margin-bottom:20px;
+    }
 
-.panel{
-background:#111827;
-padding:20px;
-border-radius:12px;
-}
+    .badge{
+      display:inline-block;
+      padding:6px 12px;
+      border-radius:999px;
+      background:#1e293b;
+      color:#93c5fd;
+      font-size:12px;
+      font-weight:bold;
+      margin-bottom:12px;
+      border:1px solid rgba(255,255,255,0.06);
+    }
 
-textarea,select{
-width:100%;
-padding:10px;
-border-radius:8px;
-border:none;
-margin-top:5px;
-}
+    h1{
+      margin:0 0 10px;
+      font-size:32px;
+      color:white;
+    }
 
-button{
-padding:10px 14px;
-border:none;
-border-radius:8px;
-background:#3b82f6;
-color:white;
-cursor:pointer;
-margin-top:10px;
-}
+    .subtitle{
+      margin:0;
+      color:#94a3b8;
+      line-height:1.7;
+      font-size:15px;
+      max-width:760px;
+    }
 
-.chat{
-background:#020617;
-padding:20px;
-border-radius:12px;
-min-height:500px;
-overflow:auto;
-}
+    .layout{
+      display:grid;
+      grid-template-columns:380px 1fr;
+      gap:18px;
+      align-items:start;
+    }
 
-.bubble{
-margin-top:10px;
-padding:10px;
-border-radius:10px;
-}
+    .panel{
+      background:#111827;
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:18px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.2);
+    }
 
-.user{
-background:#2563eb;
-text-align:right;
-}
+    .left-panel{
+      padding:18px;
+      position:sticky;
+      top:18px;
+    }
 
-.ai{
-background:#1e293b;
-}
+    .right-panel{
+      padding:18px;
+    }
 
-</style>
+    .section-title{
+      margin:0 0 14px;
+      font-size:18px;
+      color:white;
+    }
 
+    .row{
+      margin-bottom:14px;
+    }
+
+    label{
+      display:block;
+      margin-bottom:7px;
+      font-size:14px;
+      font-weight:bold;
+      color:#cbd5e1;
+    }
+
+    select,
+    textarea{
+      width:100%;
+      padding:12px 14px;
+      border:none;
+      border-radius:12px;
+      font-size:14px;
+      background:#f8fafc;
+      color:#111827;
+    }
+
+    textarea{
+      min-height:180px;
+      resize:vertical;
+      line-height:1.5;
+    }
+
+    button{
+      border:none;
+      border-radius:12px;
+      padding:10px 14px;
+      font-size:14px;
+      font-weight:bold;
+      cursor:pointer;
+      color:white;
+      background:#38bdf8;
+      transition:0.2s ease;
+    }
+
+    button:hover{
+      opacity:0.96;
+    }
+
+    .secondary{
+      background:#334155;
+    }
+
+    .danger{
+      background:#ef4444;
+    }
+
+    .button-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .helper{
+      background:#0b1220;
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:14px;
+      padding:14px;
+      margin-top:16px;
+    }
+
+    .helper strong{
+      display:block;
+      margin-bottom:8px;
+      color:#e2e8f0;
+      font-size:14px;
+    }
+
+    .helper p{
+      margin:0;
+      color:#94a3b8;
+      font-size:13px;
+      line-height:1.7;
+    }
+
+    .status{
+      margin-top:12px;
+      min-height:18px;
+      font-size:13px;
+      color:#93c5fd;
+    }
+
+    .chat-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .chat-header h2{
+      margin:0;
+      font-size:18px;
+      color:white;
+    }
+
+    .chat{
+      background:#020617;
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:16px;
+      min-height:520px;
+      max-height:78vh;
+      overflow:auto;
+      padding:16px;
+    }
+
+    .chat-empty{
+      text-align:center;
+      color:#94a3b8;
+      font-size:14px;
+      line-height:1.8;
+      padding:70px 20px;
+    }
+
+    .bubble{
+      max-width:88%;
+      padding:14px;
+      border-radius:14px;
+      margin-top:12px;
+      white-space:pre-wrap;
+      line-height:1.65;
+      word-wrap:break-word;
+    }
+
+    .user{
+      margin-left:auto;
+      background:#2563eb;
+      color:white;
+      text-align:right;
+    }
+
+    .ai{
+      margin-right:auto;
+      background:#1e293b;
+      color:#f8fafc;
+    }
+
+    .tool-actions{
+      margin-top:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .tool-actions button{
+      background:#475569;
+      padding:8px 12px;
+      font-size:12px;
+    }
+
+    @media (max-width:900px){
+      .layout{
+        grid-template-columns:1fr;
+      }
+
+      .left-panel{
+        position:static;
+      }
+    }
+
+    @media (max-width:640px){
+      h1{
+        font-size:28px;
+      }
+
+      .button-row{
+        flex-direction:column;
+      }
+
+      .button-row button{
+        width:100%;
+      }
+
+      .bubble{
+        max-width:100%;
+      }
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="container">
+  <div class="container">
 
-<div class="panel">
+    <div class="topbar">
+      <div class="badge">AI CONTENT TOOL</div>
+      <h1>AI Studio Pro</h1>
+      <p class="subtitle">
+        Buat infografis, TikTok carousel, prompt Leonardo, dan prompt Veo dalam satu workspace yang ringan dan stabil.
+      </p>
+    </div>
 
-<h2>AI Studio Pro</h2>
+    <div class="layout">
 
-<label>Mode</label>
+      <div class="panel left-panel">
+        <h2 class="section-title">Workspace</h2>
 
-<select id="mode">
-<option value="infographic">Infografis</option>
-<option value="tiktok">TikTok Carousel</option>
-<option value="leonardo">Leonardo Prompt</option>
-<option value="veo">Veo Video Prompt</option>
-</select>
+        <div class="row">
+          <label for="mode">Pilih Mode</label>
+          <select id="mode">
+            <option value="infographic">Infografis</option>
+            <option value="tiktok">TikTok Carousel</option>
+            <option value="leonardo">Prompt Leonardo</option>
+            <option value="veo">Prompt Veo</option>
+          </select>
+        </div>
 
-<label>Topik</label>
+        <div class="row">
+          <label for="prompt">Topik / Perintah</label>
+          <textarea id="prompt" placeholder="Tulis topik atau perintah di sini..."></textarea>
+        </div>
 
-<textarea id="prompt" rows="6"></textarea>
+        <div class="button-row">
+          <button type="button" onclick="sendPrompt()">Generate</button>
+          <button type="button" class="secondary" onclick="clearPrompt()">Clear Prompt</button>
+          <button type="button" class="danger" onclick="clearChat()">Clear Chat</button>
+        </div>
 
-<button onclick="sendPrompt()">Generate</button>
+        <div class="status" id="statusText"></div>
 
-</div>
+        <div class="helper">
+          <strong>Tips</strong>
+          <p>
+            Pilih mode sesuai kebutuhan, lalu masukkan topik. Hasil akan muncul di panel kanan dan bisa disalin atau diunduh.
+          </p>
+        </div>
+      </div>
 
+      <div class="panel right-panel">
+        <div class="chat-header">
+          <h2>Hasil AI</h2>
+        </div>
 
-<div class="panel">
+        <div class="chat" id="chatBox">
+          <div class="chat-empty">
+            Hasil AI akan muncul di sini.<br><br>
+            Pilih mode, isi prompt, lalu klik <strong>Generate</strong>.
+          </div>
+        </div>
+      </div>
 
-<div class="chat" id="chat"></div>
+    </div>
+  </div>
 
-</div>
+  <script>
+    let lastText = "";
+    let lastJSON = null;
 
-</div>
+    const statusText = document.getElementById("statusText");
 
-<script>
+    function clearPrompt(){
+      document.getElementById("prompt").value = "";
+      statusText.innerText = "";
+    }
 
-async function sendPrompt(){
+    function clearChat(){
+      const chat = document.getElementById("chatBox");
+      chat.innerHTML = `
+        <div class="chat-empty">
+          Hasil AI akan muncul di sini.<br><br>
+          Pilih mode, isi prompt, lalu klik <strong>Generate</strong>.
+        </div>
+      `;
+      statusText.innerText = "Chat dibersihkan.";
+      lastText = "";
+      lastJSON = null;
+    }
 
-const mode=document.getElementById("mode").value;
-const prompt=document.getElementById("prompt").value;
+    function addBubble(role, text){
+      const chat = document.getElementById("chatBox");
 
-const chat=document.getElementById("chat");
+      const empty = chat.querySelector(".chat-empty");
+      if(empty){
+        empty.remove();
+      }
 
-const user=document.createElement("div");
-user.className="bubble user";
-user.innerText=prompt;
-chat.appendChild(user);
+      const bubble = document.createElement("div");
+      bubble.className = "bubble " + (role === "user" ? "user" : "ai");
+      bubble.innerText = text;
 
-const ai=document.createElement("div");
-ai.className="bubble ai";
-ai.innerText="Memproses...";
-chat.appendChild(ai);
+      chat.appendChild(bubble);
+      chat.scrollTop = chat.scrollHeight;
 
-const res=await fetch("/api/generate",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-mode,
-prompt
-})
-});
+      return bubble;
+    }
 
-const data=await res.json();
+    function escapeHtml(str){
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
 
-ai.innerText=data.text;
+    function renderAiOutput(aiBubble, output){
+      aiBubble.innerHTML =
+        escapeHtml(output).replace(/\n/g, "<br>") +
+        `<div class="tool-actions">
+          <button onclick="copyLastText()">Salin</button>
+          <button onclick="downloadTxt()">Download TXT</button>
+          <button onclick="downloadJson()">Download JSON</button>
+        </div>`;
+    }
 
-chat.scrollTop=chat.scrollHeight;
+    async function sendPrompt(){
+      const mode = document.getElementById("mode").value;
+      const prompt = document.getElementById("prompt").value.trim();
 
-}
+      if(!prompt){
+        alert("Prompt kosong");
+        return;
+      }
 
-</script>
+      addBubble("user", prompt);
+      const aiBubble = addBubble("ai", "Memproses...");
+      statusText.innerText = "Mengirim request ke server...";
 
+      try {
+        const res = await fetch("/api/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            mode,
+            prompt
+          })
+        });
+
+        const data = await res.json();
+        lastJSON = data;
+
+        const output =
+          data.text ||
+          data.error ||
+          JSON.stringify(data, null, 2);
+
+        lastText = output;
+        renderAiOutput(aiBubble, output);
+        statusText.innerText = "Selesai.";
+
+      } catch (err) {
+        aiBubble.innerText = "Error: " + err.message;
+        statusText.innerText = "Terjadi error saat memanggil server.";
+      }
+    }
+
+    function copyLastText(){
+      if(!lastText){
+        alert("Belum ada hasil.");
+        return;
+      }
+
+      navigator.clipboard.writeText(lastText)
+        .then(() => {
+          alert("Teks berhasil disalin");
+        })
+        .catch(() => {
+          alert("Gagal menyalin teks");
+        });
+    }
+
+    function downloadTxt(){
+      if(!lastText){
+        alert("Belum ada hasil.");
+        return;
+      }
+
+      const blob = new Blob([lastText], { type:"text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "hasil-ai.txt";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function downloadJson(){
+      if(!lastJSON){
+        alert("Belum ada hasil.");
+        return;
+      }
+
+      const blob = new Blob([JSON.stringify(lastJSON, null, 2)], { type:"application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "hasil-ai.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+  </script>
 </body>
 </html>
