@@ -2,6 +2,7 @@
   "name": "ai-studio-pro-backend",
   "version": "1.0.0",
   "description": "Backend sederhana untuk AI Studio Pro",
+  "type": "module"
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -14,3 +15,4 @@
     "node-fetch": "^3.3.2"
   }
 }
+
