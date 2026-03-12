@@ -297,7 +297,7 @@
       <h1>AI Studio Pro</h1>
       <p class="subtitle">
         Buat prompt Veo, prompt Leonardo, storyboard, infografis, TikTok carousel,
-        analisa video, dan gabungkan beberapa foto menjadi satu gambar dalam satu workspace.
+        analisa video, collage foto, dan gabungkan orang + produk + background menjadi satu foto.
       </p>
     </div>
 
@@ -316,6 +316,7 @@
             <option value="veo">Prompt Veo</option>
             <option value="analyze_video">Analyze Video</option>
             <option value="combine_photos">Gabungkan Foto</option>
+            <option value="scene_composite">Gabungkan Orang + Produk + Background</option>
           </select>
         </div>
 
@@ -342,6 +343,15 @@
           </div>
         </div>
 
+        <div class="row" id="scenePromptTools" style="display:none;">
+          <label>Prompt Otomatis Gabungkan Scene</label>
+          <div class="prompt-tools">
+            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan orang, produk, dan background menjadi satu foto promosi yang rapi')">Foto promosi</button>
+            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan orang, produk, dan background menjadi satu scene iklan sederhana')">Scene iklan</button>
+            <button type="button" class="small-btn" onclick="setPrompt('Satukan orang, produk, dan background menjadi satu komposisi visual')">Komposisi visual</button>
+          </div>
+        </div>
+
         <div class="row" id="videoUpload" style="display:none;">
           <label for="videoFile">Upload Video Referensi</label>
           <input type="file" id="videoFile" accept="video/*">
@@ -350,6 +360,21 @@
         <div class="row" id="photoUpload" style="display:none;">
           <label for="photoFiles">Upload Foto</label>
           <input type="file" id="photoFiles" accept="image/*" multiple>
+        </div>
+
+        <div class="row" id="sceneUpload" style="display:none;">
+          <label for="personImageFile">Upload Foto Orang</label>
+          <input type="file" id="personImageFile" accept="image/*">
+
+          <div style="height:10px;"></div>
+
+          <label for="productImageFile">Upload Foto Produk</label>
+          <input type="file" id="productImageFile" accept="image/*">
+
+          <div style="height:10px;"></div>
+
+          <label for="backgroundImageFile">Upload Foto Background</label>
+          <input type="file" id="backgroundImageFile" accept="image/*">
         </div>
 
         <div class="button-row">
@@ -363,13 +388,12 @@
         <div class="helper">
           <strong>Tips</strong>
           <p>
-            Gunakan <b>Analyze Video</b> untuk membaca isi video asli.
-            Gunakan <b>Gabungkan Foto</b> untuk membuat collage dari 2–4 foto.
+            Untuk mode <b>Gabungkan Orang + Produk + Background</b>, hasil terbaik didapat jika foto orang dan produk memakai background transparan / PNG.
           </p>
         </div>
 
         <div class="footer-note">
-          Catatan: Analyze Video mengirim video asli ke endpoint video. Gabungkan Foto menghasilkan satu gambar collage.
+          Catatan: mode scene composite adalah compositing gratis, bukan AI generatif penuh. Jadi hasil paling rapi jika objek utama sudah bersih.
         </div>
       </div>
 
@@ -397,8 +421,10 @@
     const modeSelect = document.getElementById("mode");
     const videoUpload = document.getElementById("videoUpload");
     const photoUpload = document.getElementById("photoUpload");
+    const sceneUpload = document.getElementById("sceneUpload");
     const videoPromptTools = document.getElementById("videoPromptTools");
     const photoPromptTools = document.getElementById("photoPromptTools");
+    const scenePromptTools = document.getElementById("scenePromptTools");
     const statusText = document.getElementById("statusText");
 
     function updateUploadUI(){
@@ -406,8 +432,10 @@
 
       videoUpload.style.display = "none";
       photoUpload.style.display = "none";
+      sceneUpload.style.display = "none";
       videoPromptTools.style.display = "none";
       photoPromptTools.style.display = "none";
+      scenePromptTools.style.display = "none";
 
       if(mode === "analyze_video"){
         videoUpload.style.display = "block";
@@ -417,6 +445,11 @@
       if(mode === "combine_photos"){
         photoUpload.style.display = "block";
         photoPromptTools.style.display = "block";
+      }
+
+      if(mode === "scene_composite"){
+        sceneUpload.style.display = "block";
+        scenePromptTools.style.display = "block";
       }
     }
 
@@ -585,6 +618,61 @@
           return;
         }
 
+        if (mode === "scene_composite") {
+          const personImageFile = document.getElementById("personImageFile").files[0];
+          const productImageFile = document.getElementById("productImageFile").files[0];
+          const backgroundImageFile = document.getElementById("backgroundImageFile").files[0];
+
+          if (!personImageFile || !productImageFile || !backgroundImageFile) {
+            aiBubble.innerText = "Upload foto orang, foto produk, dan foto background terlebih dahulu.";
+            statusText.innerText = "Semua file wajib diupload.";
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("personImage", personImageFile);
+          formData.append("productImage", productImageFile);
+          formData.append("backgroundImage", backgroundImageFile);
+          formData.append("prompt", prompt);
+          formData.append("mode", mode);
+
+          statusText.innerText = "Menggabungkan orang, produk, dan background...";
+
+          res = await fetch("/api/scene-composite", {
+            method: "POST",
+            body: formData
+          });
+
+          if (!res.ok) {
+            let errText = "Gagal menggabungkan scene.";
+            try {
+              const errJson = await res.json();
+              errText = errJson.error || errText;
+            } catch (_) {}
+            aiBubble.innerText = errText;
+            statusText.innerText = "Terjadi error saat menggabungkan scene.";
+            return;
+          }
+
+          const blob = await res.blob();
+          const imageUrl = URL.createObjectURL(blob);
+
+          lastImageUrl = imageUrl;
+          lastText = "Scene gabungan berhasil dibuat.";
+          lastJSON = { success: true, type: "image" };
+
+          aiBubble.innerHTML = `
+            <div style="margin-bottom:12px;">Berikut hasil gabungan orang + produk + background:</div>
+            <img src="${imageUrl}" alt="Scene Composite" style="max-width:100%;border-radius:12px;display:block;">
+            <div class="tool-actions">
+              <button onclick="downloadImage()">Download Image</button>
+            </div>
+          `;
+
+          statusText.innerText = "Selesai.";
+          return;
+        }
+
         statusText.innerText = "Mengirim prompt ke Gemini...";
 
         res = await fetch("/api/gemini-chat", {
@@ -667,7 +755,7 @@
 
       const a = document.createElement("a");
       a.href = lastImageUrl;
-      a.download = "gabungan-foto.png";
+      a.download = "hasil-gambar.png";
       a.click();
     }
   </script>
