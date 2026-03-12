@@ -249,7 +249,7 @@ const prompt=document.getElementById("videoPrompt").value
 const language=document.getElementById("videoLanguage").value
 const style=document.getElementById("videoStyle").value
 
-const res=await fetch("/api/analyze-video",{
+const res=await fetch("https://thriving-harmony-production-76ec.up.railway.app/api/xxx")
 method:"POST",
 headers:{
 "Content-Type":"application/json"
@@ -319,3 +319,4 @@ result.innerText="Error: "+err.message
 
 </body>
 </html>
+
