@@ -14,57 +14,47 @@ app.use(express.json());
 app.use(express.static(__dirname));
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = "gemini-2.5-flash";
+const MODEL = "gemini-1.5-flash";
 
-async function callGemini(parts) {
+async function callGemini(prompt){
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts
-          }
-        ]
-      })
-    }
-  );
+`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+contents:[
+{
+role:"user",
+parts:[{text:prompt}]
+}
+]
+})
+}
+)
 
-  const data = await response.json();
+const data=await response.json()
 
-  return data?.candidates?.[0]?.content?.parts?.[0]?.text || JSON.stringify(data);
+return data?.candidates?.[0]?.content?.parts?.[0]?.text || JSON.stringify(data)
+
 }
 
+app.post("/api/generate-infographic", async (req,res)=>{
 
+try{
 
+const {topic}=req.body
 
-
-
-/* ===========================
-   INFOGRAPHIC GENERATOR
-=========================== */
-
-app.post("/api/generate-infographic", async (req, res) => {
-
-  try {
-
-    const { topic } = req.body;
-
-    const result = await callGemini([
-      {
-        text: `
+const result=await callGemini(`
 Buat konsep infografis Instagram carousel.
 
 Topik:
 ${topic}
 
-Output harus berisi:
+Format:
 
 JUDUL
 SLIDE 1
@@ -73,46 +63,25 @@ SLIDE 3
 SLIDE 4
 SLIDE 5
 CTA
+`)
 
-Gunakan bahasa Indonesia.
-        `
-      }
-    ]);
+res.json({success:true,text:result})
 
-    res.json({
-      success: true,
-      text: result
-    });
+}catch(err){
 
-  } catch (err) {
+res.status(500).json({error:err.message})
 
-    res.status(500).json({
-      error: err.message
-    });
+}
 
-  }
+})
 
-});
+app.post("/api/generate-tiktok-carousel", async (req,res)=>{
 
+try{
 
+const {topic}=req.body
 
-
-
-
-
-/* ===========================
-   TIKTOK CAROUSEL GENERATOR
-=========================== */
-
-app.post("/api/generate-tiktok-carousel", async (req, res) => {
-
-  try {
-
-    const { topic } = req.body;
-
-    const result = await callGemini([
-      {
-        text: `
+const result=await callGemini(`
 Buat TikTok carousel storytelling.
 
 Topik:
@@ -127,174 +96,131 @@ Slide 3
 Slide 4
 Slide 5
 Closing
+`)
 
-Gunakan bahasa santai.
-        `
-      }
-    ]);
+res.json({success:true,text:result})
 
-    res.json({
-      success: true,
-      text: result
-    });
+}catch(err){
 
-  } catch (err) {
+res.status(500).json({error:err.message})
 
-    res.status(500).json({
-      error: err.message
-    });
+}
 
-  }
+})
 
-});
+app.post("/api/generate-leonardo-prompt", async (req,res)=>{
 
+try{
 
+const {topic}=req.body
 
-
-
-
-
-/* ===========================
-   LEONARDO PROMPT GENERATOR
-=========================== */
-
-app.post("/api/generate-leonardo-prompt", async (req, res) => {
-
-  try {
-
-    const { topic } = req.body;
-
-    const result = await callGemini([
-      {
-        text: `
-Buat prompt gambar Leonardo AI.
+const result=await callGemini(`
+Buat prompt Leonardo AI.
 
 Topik:
 ${topic}
 
-Gunakan gaya:
+Style:
+soft pastel 3D cartoon semi chibi cinematic lighting
+`)
 
-soft pastel
-3D cartoon
-semi chibi
-cinematic lighting
-Pixar style
+res.json({success:true,text:result})
 
-Format:
+}catch(err){
 
-PROMPT
-NEGATIVE PROMPT
-STYLE
-        `
-      }
-    ]);
+res.status(500).json({error:err.message})
 
-    res.json({
-      success: true,
-      text: result
-    });
+}
 
-  } catch (err) {
+})
 
-    res.status(500).json({
-      error: err.message
-    });
+app.post("/api/generate-veo-prompt", async (req,res)=>{
 
-  }
+try{
 
-});
+const {topic}=req.body
 
-
-
-
-
-
-
-/* ===========================
-   VEO VIDEO PROMPT GENERATOR
-=========================== */
-
-app.post("/api/generate-veo-prompt", async (req, res) => {
-
-  try {
-
-    const { topic } = req.body;
-
-    const result = await callGemini([
-      {
-        text: `
-Buat prompt video cinematic untuk generator video seperti Veo.
+const result=await callGemini(`
+Buat prompt video cinematic untuk Veo.
 
 Topik:
 ${topic}
+`)
 
-Output format:
+res.json({success:true,text:result})
 
-JUDUL VIDEO
+}catch(err){
 
-SCENE 1
-SCENE 2
-SCENE 3
-SCENE 4
+res.status(500).json({error:err.message})
 
-STYLE
-CAMERA
-LIGHTING
-MOOD
-NEGATIVE PROMPT
-        `
-      }
-    ]);
+}
 
-    res.json({
-      success: true,
-      text: result
-    });
+})
 
-  } catch (err) {
+app.post("/api/merge-photos", async (req,res)=>{
 
-    res.status(500).json({
-      error: err.message
-    });
+try{
 
-  }
+const {userPrompt}=req.body
 
-});
+const result=await callGemini(`
+User mengupload beberapa foto.
 
+Instruksi:
+${userPrompt}
 
+Buat:
+1 konsep visual
+2 komposisi
+3 lighting
+4 mood
+5 prompt leonardo
+`)
 
+res.json({success:true,text:result})
 
+}catch(err){
 
+res.status(500).json({error:err.message})
 
+}
 
-/* ===========================
-   ANALYZE VIDEO
-=========================== */
+})
 
-app.post("/api/analyze-video", async (req, res) => {
+app.post("/api/analyze-video", async (req,res)=>{
 
-  res.json({
-    success: false,
-    message: "Analyze video membutuhkan upload video."
-  });
+try{
 
-});
+const {prompt}=req.body
 
+const result=await callGemini(`
+Analisa video.
 
+Instruksi:
+${prompt}
 
+Buat:
+1 ringkasan video
+2 storyboard scene
+3 prompt leonardo
+4 prompt veo
+5 voice over
+`)
 
+res.json({success:true,text:result})
 
+}catch(err){
 
+res.status(500).json({error:err.message})
 
-/* ===========================
-   SERVER START
-=========================== */
+}
 
-const PORT = process.env.PORT || 3000;
+})
 
-app.listen(PORT, () => {
+const PORT=process.env.PORT||3000
 
-  console.log("AI Studio Pro API aktif di port", PORT);
+app.listen(PORT,()=>{
 
-});
+console.log("AI Studio Pro running on port",PORT)
 
+})
