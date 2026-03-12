@@ -14,213 +14,155 @@ app.use(express.json());
 app.use(express.static(__dirname));
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = "gemini-1.5-flash";
+const MODEL = "gemini-2.5-flash";
 
 async function callGemini(prompt){
 
   const response = await fetch(
-`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-contents:[
-{
-role:"user",
-parts:[{text:prompt}]
+    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        contents:[
+          {
+            role:"user",
+            parts:[
+              { text: prompt }
+            ]
+          }
+        ]
+      })
+    }
+  );
+
+  const data = await response.json();
+
+  if(data.error){
+    console.log(data.error);
+    return "Error dari Gemini: " + data.error.message;
+  }
+
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text || "Tidak ada respon dari Gemini.";
 }
-]
-})
-}
-)
 
-const data=await response.json()
+app.post("/api/gemini-chat", async (req,res)=>{
 
-return data?.candidates?.[0]?.content?.parts?.[0]?.text || JSON.stringify(data)
+  try{
 
-}
+    const {message,mode} = req.body;
 
-app.post("/api/generate-infographic", async (req,res)=>{
+    if(!message){
+      return res.json({text:"Prompt kosong"});
+    }
 
-try{
+    let finalPrompt = "";
 
-const {topic}=req.body
+    if(mode === "infographic"){
+      finalPrompt = `Buat konsep infografis carousel:
 
-const result=await callGemini(`
-Buat konsep infografis Instagram carousel.
-
-Topik:
-${topic}
+${message}
 
 Format:
+Judul
+Slide 1
+Slide 2
+Slide 3
+Slide 4
+Slide 5
+CTA`;
+    }
 
-JUDUL
-SLIDE 1
-SLIDE 2
-SLIDE 3
-SLIDE 4
-SLIDE 5
-CTA
-`)
+    else if(mode === "tiktok"){
+      finalPrompt = `Buat TikTok carousel storytelling:
 
-res.json({success:true,text:result})
-
-}catch(err){
-
-res.status(500).json({error:err.message})
-
-}
-
-})
-
-app.post("/api/generate-tiktok-carousel", async (req,res)=>{
-
-try{
-
-const {topic}=req.body
-
-const result=await callGemini(`
-Buat TikTok carousel storytelling.
-
-Topik:
-${topic}
+${message}
 
 Format:
-
 Hook
 Slide 1
 Slide 2
 Slide 3
 Slide 4
 Slide 5
-Closing
-`)
+Closing`;
+    }
 
-res.json({success:true,text:result})
+    else if(mode === "leonardo"){
+      finalPrompt = `Buat prompt Leonardo AI:
 
-}catch(err){
-
-res.status(500).json({error:err.message})
-
-}
-
-})
-
-app.post("/api/generate-leonardo-prompt", async (req,res)=>{
-
-try{
-
-const {topic}=req.body
-
-const result=await callGemini(`
-Buat prompt Leonardo AI.
-
-Topik:
-${topic}
+${message}
 
 Style:
-soft pastel 3D cartoon semi chibi cinematic lighting
-`)
+soft pastel
+3D cartoon
+cinematic lighting
 
-res.json({success:true,text:result})
+Format:
+PROMPT
+NEGATIVE PROMPT`;
+    }
 
-}catch(err){
+    else if(mode === "veo"){
+      finalPrompt = `Buat prompt video cinematic Veo:
 
-res.status(500).json({error:err.message})
+${message}
 
-}
+Format:
+Scene 1
+Scene 2
+Scene 3
+Scene 4
+Camera
+Lighting
+Mood`;
+    }
 
-})
+    else if(mode === "analyze_video"){
+      finalPrompt = `Analisa video berikut:
 
-app.post("/api/generate-veo-prompt", async (req,res)=>{
-
-try{
-
-const {topic}=req.body
-
-const result=await callGemini(`
-Buat prompt video cinematic untuk Veo.
-
-Topik:
-${topic}
-`)
-
-res.json({success:true,text:result})
-
-}catch(err){
-
-res.status(500).json({error:err.message})
-
-}
-
-})
-
-app.post("/api/merge-photos", async (req,res)=>{
-
-try{
-
-const {userPrompt}=req.body
-
-const result=await callGemini(`
-User mengupload beberapa foto.
-
-Instruksi:
-${userPrompt}
+${message}
 
 Buat:
-1 konsep visual
-2 komposisi
-3 lighting
-4 mood
-5 prompt leonardo
-`)
+1 Ringkasan
+2 Scene by scene
+3 Prompt Veo
+4 Kamera + lighting`;
+    }
 
-res.json({success:true,text:result})
+    else if(mode === "combine_photos"){
+      finalPrompt = `Gabungkan foto berikut menjadi konsep visual:
 
-}catch(err){
-
-res.status(500).json({error:err.message})
-
-}
-
-})
-
-app.post("/api/analyze-video", async (req,res)=>{
-
-try{
-
-const {prompt}=req.body
-
-const result=await callGemini(`
-Analisa video.
-
-Instruksi:
-${prompt}
+${message}
 
 Buat:
-1 ringkasan video
-2 storyboard scene
-3 prompt leonardo
-4 prompt veo
-5 voice over
-`)
+1 Konsep visual
+2 Lighting
+3 Prompt Leonardo
+4 Caption`;
+    }
 
-res.json({success:true,text:result})
+    const result = await callGemini(finalPrompt);
 
-}catch(err){
+    res.json({
+      success:true,
+      text:result
+    });
 
-res.status(500).json({error:err.message})
+  }catch(err){
 
-}
+    res.status(500).json({
+      error:err.message
+    });
 
-})
+  }
 
-const PORT=process.env.PORT||3000
+});
+
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT,()=>{
-
-console.log("AI Studio Pro running on port",PORT)
-
-})
+  console.log("Server aktif di port",PORT);
+});
