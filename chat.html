@@ -11,34 +11,180 @@
 
     body{
       margin:0;
-      padding:20px;
       font-family:Arial,sans-serif;
-      background:#0f172a;
+      background:
+        radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(99,102,241,0.16), transparent 28%),
+        #0f172a;
       color:white;
     }
 
     .container{
-      max-width:1000px;
+      max-width:1150px;
       margin:auto;
+      padding:24px 18px 40px;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.3fr 1fr;
+      gap:18px;
+      margin-bottom:18px;
+    }
+
+    .hero-card,
+    .side-card,
+    .main-panel,
+    .chat-panel,
+    .tool-card{
+      background:rgba(30,41,59,0.92);
+      border:1px solid rgba(255,255,255,0.08);
+      box-shadow:0 12px 30px rgba(0,0,0,0.22);
+      border-radius:20px;
+    }
+
+    .hero-card{
+      padding:24px;
+    }
+
+    .hero-badge{
+      display:inline-block;
+      padding:7px 12px;
+      border-radius:999px;
+      background:rgba(56,189,248,0.15);
+      color:#7dd3fc;
+      font-size:12px;
+      font-weight:bold;
+      margin-bottom:14px;
     }
 
     h1{
-      margin:0 0 6px 0;
-      font-size:30px;
+      margin:0 0 10px;
+      font-size:34px;
+      line-height:1.15;
     }
 
-    .sub{
+    .hero-desc{
       color:#cbd5e1;
-      margin-bottom:20px;
-      line-height:1.5;
+      line-height:1.7;
+      font-size:15px;
+      margin-bottom:18px;
     }
 
-    .panel{
-      background:#1e293b;
+    .hero-points{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .chip{
+      background:#0f172a;
+      border:1px solid rgba(255,255,255,0.08);
+      color:#cbd5e1;
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:13px;
+    }
+
+    .side-card{
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:14px;
+    }
+
+    .side-title{
+      font-size:18px;
+      font-weight:bold;
+      margin-bottom:8px;
+    }
+
+    .side-desc{
+      color:#cbd5e1;
+      line-height:1.7;
+      font-size:14px;
+    }
+
+    .side-mini-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .mini-box{
+      background:#0b1220;
+      border:1px solid rgba(255,255,255,0.06);
+      padding:12px;
+      border-radius:14px;
+    }
+
+    .mini-box strong{
+      display:block;
+      font-size:14px;
+      margin-bottom:6px;
+    }
+
+    .mini-box span{
+      font-size:12px;
+      color:#94a3b8;
+      line-height:1.5;
+      display:block;
+    }
+
+    .tool-grid{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:14px;
+      margin-bottom:18px;
+    }
+
+    .tool-card{
+      padding:16px;
+      cursor:pointer;
+      transition:0.2s ease;
+    }
+
+    .tool-card:hover{
+      transform:translateY(-2px);
+      border-color:rgba(56,189,248,0.45);
+    }
+
+    .tool-card.active{
+      border-color:#38bdf8;
+      box-shadow:0 0 0 1px rgba(56,189,248,0.3) inset;
+    }
+
+    .tool-title{
+      font-size:16px;
+      font-weight:bold;
+      margin-bottom:8px;
+    }
+
+    .tool-text{
+      color:#cbd5e1;
+      line-height:1.6;
+      font-size:13px;
+    }
+
+    .workspace{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .main-panel{
       padding:18px;
-      border-radius:16px;
-      margin-bottom:16px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .chat-panel{
+      padding:18px;
+    }
+
+    .section-title{
+      margin:0 0 14px;
+      font-size:20px;
     }
 
     .row{
@@ -59,7 +205,7 @@
       width:100%;
       padding:12px;
       border:none;
-      border-radius:10px;
+      border-radius:12px;
       box-sizing:border-box;
       font-size:14px;
       background:#f8fafc;
@@ -67,30 +213,31 @@
     }
 
     textarea{
-      min-height:130px;
+      min-height:150px;
       resize:vertical;
     }
 
-    .button-row{
+    .prompt-tools{
       display:flex;
       flex-wrap:wrap;
-      gap:10px;
-      margin-top:8px;
+      gap:8px;
     }
 
     button{
       border:none;
-      border-radius:10px;
+      border-radius:12px;
       padding:10px 16px;
       font-size:14px;
       font-weight:bold;
       cursor:pointer;
       color:white;
       background:#38bdf8;
+      transition:0.2s ease;
     }
 
     button:hover{
-      opacity:0.95;
+      opacity:0.96;
+      transform:translateY(-1px);
     }
 
     .secondary{
@@ -107,27 +254,58 @@
       padding:8px 12px;
     }
 
-    .prompt-tools{
+    .button-row{
       display:flex;
       flex-wrap:wrap;
-      gap:8px;
+      gap:10px;
+      margin-top:8px;
+    }
+
+    .status{
+      margin-top:12px;
+      font-size:13px;
+      color:#93c5fd;
+      min-height:18px;
+    }
+
+    .helper-box{
+      background:#0b1220;
+      border:1px solid rgba(255,255,255,0.06);
+      padding:14px;
+      border-radius:14px;
+      margin-top:14px;
+    }
+
+    .helper-title{
+      font-size:14px;
+      font-weight:bold;
+      margin-bottom:8px;
+      color:#e2e8f0;
+    }
+
+    .helper-list{
+      color:#94a3b8;
+      font-size:13px;
+      line-height:1.7;
     }
 
     .chat{
       background:#020617;
       padding:16px;
       border-radius:16px;
-      min-height:320px;
+      min-height:500px;
+      max-height:760px;
+      overflow:auto;
       border:1px solid rgba(255,255,255,0.06);
     }
 
     .bubble{
       padding:14px;
-      border-radius:12px;
+      border-radius:14px;
       margin-top:12px;
       white-space:pre-wrap;
-      line-height:1.6;
-      max-width:88%;
+      line-height:1.65;
+      max-width:90%;
       word-wrap:break-word;
     }
 
@@ -155,22 +333,35 @@
       font-size:13px;
     }
 
-    .status{
-      margin-top:10px;
-      font-size:13px;
-      color:#93c5fd;
+    .chat-empty{
+      color:#94a3b8;
+      font-size:14px;
+      line-height:1.7;
+      text-align:center;
+      padding:60px 20px;
     }
 
     .footer-note{
-      margin-top:10px;
+      margin-top:14px;
       color:#94a3b8;
       font-size:12px;
-      line-height:1.5;
+      line-height:1.6;
     }
 
-    @media (max-width:700px){
-      .bubble{
-        max-width:100%;
+    @media (max-width:960px){
+      .hero,
+      .workspace{
+        grid-template-columns:1fr;
+      }
+
+      .tool-grid{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+
+    @media (max-width:640px){
+      .tool-grid{
+        grid-template-columns:1fr;
       }
 
       .button-row{
@@ -180,6 +371,10 @@
       .button-row button{
         width:100%;
       }
+
+      h1{
+        font-size:28px;
+      }
     }
   </style>
 </head>
@@ -187,73 +382,173 @@
 
   <div class="container">
 
-    <h1>AI Studio Pro</h1>
-    <div class="sub">
-      Infografis • TikTok Carousel • Leonardo Prompt • Veo Prompt • Analyze Video • Gabungkan Foto
-    </div>
+    <section class="hero">
+      <div class="hero-card">
+        <div class="hero-badge">AI CONTENT WORKFLOW</div>
+        <h1>AI Studio Pro</h1>
+        <div class="hero-desc">
+          Satu workspace untuk mengubah ide, video, dan konsep visual menjadi
+          prompt Veo, prompt Leonardo, storyboard, infografis, carousel TikTok,
+          dan output kreatif yang siap dipakai.
+        </div>
 
-    <div class="panel">
-
-      <div class="row">
-        <label for="mode">Pilih Mode</label>
-        <select id="mode">
-  <option value="auto">Auto (Gemini pilih tool)</option>
-  <option value="infographic">Infografis</option>
-  <option value="tiktok">TikTok Carousel</option>
-  <option value="leonardo">Prompt Leonardo</option>
-  <option value="veo">Prompt Veo</option>
-  <option value="analyze_video">Analyze Video</option>
-  <option value="combine_photos">Gabungkan Foto</option>
-</select>
-      </div>
-
-      <div class="row">
-        <label for="prompt">Topik / Perintah</label>
-        <textarea id="prompt" placeholder="Tulis topik atau perintah..."></textarea>
-      </div>
-
-      <div class="row" id="videoPromptTools" style="display:none;">
-        <label>Prompt Otomatis Analyze Video</label>
-        <div class="prompt-tools">
-          <button type="button" class="small-btn" onclick="setPrompt('Analisa video ini menjadi scene by scene prompt cinematic untuk Veo')">Scene by scene Veo</button>
-          <button type="button" class="small-btn" onclick="setPrompt('Analisa video ini lalu buat deskripsi angle kamera, lighting, dan mood per scene')">Kamera + lighting</button>
-          <button type="button" class="small-btn" onclick="setPrompt('Analisa video ini dan ubah menjadi storyboard singkat + prompt Leonardo per scene')">Storyboard + Leonardo</button>
+        <div class="hero-points">
+          <div class="chip">Analyze Video</div>
+          <div class="chip">Prompt Veo</div>
+          <div class="chip">Prompt Leonardo</div>
+          <div class="chip">Infografis</div>
+          <div class="chip">TikTok Carousel</div>
+          <div class="chip">Visual Workflow</div>
         </div>
       </div>
 
-      <div class="row" id="photoPromptTools" style="display:none;">
-        <label>Prompt Otomatis Gabungkan Foto</label>
-        <div class="prompt-tools">
-          <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini menjadi satu konsep visual cinematic yang harmonis')">Gabung cinematic</button>
-          <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini menjadi prompt Leonardo AI yang detail')">Jadi prompt Leonardo</button>
-          <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini menjadi konsep poster atau thumbnail yang rapi')">Poster / thumbnail</button>
+      <div class="side-card">
+        <div>
+          <div class="side-title">Creative AI Workspace</div>
+          <div class="side-desc">
+            Gunakan mode yang sesuai, upload referensi bila perlu, lalu hasilkan
+            output yang lebih rapi, lebih cepat, dan lebih konsisten untuk kebutuhan kontenmu.
+          </div>
+        </div>
+
+        <div class="side-mini-grid">
+          <div class="mini-box">
+            <strong>Video to Prompt</strong>
+            <span>Ubah video referensi menjadi storyboard + prompt cinematic.</span>
+          </div>
+          <div class="mini-box">
+            <strong>Image Prompt</strong>
+            <span>Buat prompt Leonardo yang detail untuk visual AI.</span>
+          </div>
+          <div class="mini-box">
+            <strong>Carousel Builder</strong>
+            <span>Buat struktur slide infografis dan TikTok carousel.</span>
+          </div>
+          <div class="mini-box">
+            <strong>Fast Export</strong>
+            <span>Salin atau download hasil dengan sekali klik.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tool-grid">
+      <div class="tool-card active" onclick="selectModeCard('auto', this)">
+        <div class="tool-title">Auto Mode</div>
+        <div class="tool-text">Biarkan sistem memilih workflow terbaik berdasarkan prompt yang kamu masukkan.</div>
+      </div>
+
+      <div class="tool-card" onclick="selectModeCard('infographic', this)">
+        <div class="tool-title">Infografis</div>
+        <div class="tool-text">Ubah topik menjadi struktur carousel informatif lengkap dengan CTA.</div>
+      </div>
+
+      <div class="tool-card" onclick="selectModeCard('tiktok', this)">
+        <div class="tool-title">TikTok Carousel</div>
+        <div class="tool-text">Buat storytelling carousel dengan hook, alur slide, dan closing.</div>
+      </div>
+
+      <div class="tool-card" onclick="selectModeCard('leonardo', this)">
+        <div class="tool-title">Prompt Leonardo</div>
+        <div class="tool-text">Hasilkan prompt visual detail lengkap dengan negative prompt dan style notes.</div>
+      </div>
+
+      <div class="tool-card" onclick="selectModeCard('veo', this)">
+        <div class="tool-title">Prompt Veo</div>
+        <div class="tool-text">Bangun prompt cinematic video dengan scene, kamera, lighting, dan mood.</div>
+      </div>
+
+      <div class="tool-card" onclick="selectModeCard('analyze_video', this)">
+        <div class="tool-title">Analyze Video</div>
+        <div class="tool-text">Upload video referensi lalu ubah menjadi breakdown scene-by-scene.</div>
+      </div>
+    </section>
+
+    <section class="workspace">
+
+      <div class="main-panel">
+        <h2 class="section-title">Workspace</h2>
+
+        <div class="row">
+          <label for="mode">Pilih Mode</label>
+          <select id="mode">
+            <option value="auto">Auto (Gemini pilih tool)</option>
+            <option value="infographic">Infografis</option>
+            <option value="tiktok">TikTok Carousel</option>
+            <option value="leonardo">Prompt Leonardo</option>
+            <option value="veo">Prompt Veo</option>
+            <option value="analyze_video">Analyze Video</option>
+            <option value="combine_photos">Gabungkan Foto</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="prompt">Topik / Perintah</label>
+          <textarea id="prompt" placeholder="Contoh: Analisa video ini menjadi scene by scene prompt cinematic untuk Veo"></textarea>
+        </div>
+
+        <div class="row" id="videoPromptTools" style="display:none;">
+          <label>Prompt Otomatis Analyze Video</label>
+          <div class="prompt-tools">
+            <button type="button" class="small-btn" onclick="setPrompt('Analisa video ini menjadi scene by scene prompt cinematic untuk Veo')">Scene by scene Veo</button>
+            <button type="button" class="small-btn" onclick="setPrompt('Analisa video ini lalu buat deskripsi angle kamera, lighting, dan mood per scene')">Kamera + lighting</button>
+            <button type="button" class="small-btn" onclick="setPrompt('Analisa video ini dan ubah menjadi storyboard singkat + prompt Leonardo per scene')">Storyboard + Leonardo</button>
+          </div>
+        </div>
+
+        <div class="row" id="photoPromptTools" style="display:none;">
+          <label>Prompt Otomatis Gabungkan Foto</label>
+          <div class="prompt-tools">
+            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini menjadi satu konsep visual cinematic yang harmonis')">Gabung cinematic</button>
+            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini menjadi prompt Leonardo AI yang detail')">Jadi prompt Leonardo</button>
+            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini menjadi konsep poster atau thumbnail yang rapi')">Poster / thumbnail</button>
+          </div>
+        </div>
+
+        <div class="row" id="videoUpload" style="display:none;">
+          <label for="videoFile">Upload Video Referensi</label>
+          <input type="file" id="videoFile" accept="video/*">
+        </div>
+
+        <div class="row" id="photoUpload" style="display:none;">
+          <label for="photoFiles">Upload Foto (bisa pilih beberapa)</label>
+          <input type="file" id="photoFiles" accept="image/*" multiple>
+        </div>
+
+        <div class="button-row">
+          <button type="button" onclick="sendPrompt()">Generate</button>
+          <button type="button" class="secondary" onclick="clearPrompt()">Clear Prompt</button>
+          <button type="button" class="danger" onclick="clearChat()">Clear Chat</button>
+        </div>
+
+        <div class="status" id="statusText"></div>
+
+        <div class="helper-box">
+          <div class="helper-title">Saran penggunaan</div>
+          <div class="helper-list">
+            • Gunakan <strong>Auto</strong> untuk prompt umum.<br>
+            • Gunakan <strong>Analyze Video</strong> jika kamu ingin sistem membaca isi video asli.<br>
+            • Gunakan <strong>Prompt Veo</strong> untuk output video cinematic.<br>
+            • Gunakan <strong>Prompt Leonardo</strong> untuk kebutuhan visual / image generation.
+          </div>
+        </div>
+
+        <div class="footer-note">
+          Catatan: Analyze Video mengirim file video asli ke endpoint video. Gabungkan Foto saat ini masih berbasis instruksi teks + jumlah file.
         </div>
       </div>
 
-      <div class="row" id="videoUpload" style="display:none;">
-        <label for="videoFile">Upload Video Referensi</label>
-        <input type="file" id="videoFile" accept="video/*">
+      <div class="chat-panel">
+        <h2 class="section-title">Hasil AI</h2>
+        <div class="chat" id="chatBox">
+          <div class="chat-empty">
+            Hasil AI akan muncul di sini.<br><br>
+            Mulai dengan memilih mode, menulis prompt, lalu klik <strong>Generate</strong>.
+          </div>
+        </div>
       </div>
 
-      <div class="row" id="photoUpload" style="display:none;">
-        <label for="photoFiles">Upload Foto (bisa pilih beberapa)</label>
-        <input type="file" id="photoFiles" accept="image/*" multiple>
-      </div>
-
-      <div class="button-row">
-        <button type="button" onclick="sendPrompt()">Generate</button>
-        <button type="button" class="secondary" onclick="clearPrompt()">Clear Prompt</button>
-        <button type="button" class="danger" onclick="clearChat()">Clear Chat</button>
-      </div>
-
-      <div class="status" id="statusText"></div>
-      <div class="footer-note">
-        Catatan: mode Analyze Video saat ini mengirim file video asli ke endpoint video. Mode Gabungkan Foto saat ini masih memakai instruksi teks + jumlah file.
-      </div>
-
-    </div>
-
-    <div class="chat" id="chatBox"></div>
+    </section>
 
   </div>
 
@@ -267,6 +562,33 @@
     const videoPromptTools = document.getElementById("videoPromptTools");
     const photoPromptTools = document.getElementById("photoPromptTools");
     const statusText = document.getElementById("statusText");
+
+    function selectModeCard(mode, el){
+      modeSelect.value = mode;
+      updateUploadUI();
+
+      document.querySelectorAll(".tool-card").forEach(card => {
+        card.classList.remove("active");
+      });
+
+      if(el){
+        el.classList.add("active");
+      }
+    }
+
+    function syncCardWithDropdown(){
+      const mode = modeSelect.value;
+      const cards = document.querySelectorAll(".tool-card");
+
+      cards.forEach(card => card.classList.remove("active"));
+
+      if(mode === "auto" && cards[0]) cards[0].classList.add("active");
+      if(mode === "infographic" && cards[1]) cards[1].classList.add("active");
+      if(mode === "tiktok" && cards[2]) cards[2].classList.add("active");
+      if(mode === "leonardo" && cards[3]) cards[3].classList.add("active");
+      if(mode === "veo" && cards[4]) cards[4].classList.add("active");
+      if(mode === "analyze_video" && cards[5]) cards[5].classList.add("active");
+    }
 
     function updateUploadUI(){
       const mode = modeSelect.value;
@@ -285,6 +607,8 @@
         photoUpload.style.display = "block";
         photoPromptTools.style.display = "block";
       }
+
+      syncCardWithDropdown();
     }
 
     modeSelect.addEventListener("change", updateUploadUI);
@@ -300,7 +624,13 @@
     }
 
     function clearChat(){
-      document.getElementById("chatBox").innerHTML = "";
+      const chat = document.getElementById("chatBox");
+      chat.innerHTML = `
+        <div class="chat-empty">
+          Hasil AI akan muncul di sini.<br><br>
+          Mulai dengan memilih mode, menulis prompt, lalu klik <strong>Generate</strong>.
+        </div>
+      `;
       statusText.innerText = "Chat dibersihkan.";
       lastText = "";
       lastJSON = null;
@@ -308,6 +638,11 @@
 
     function addBubble(role, text){
       const chat = document.getElementById("chatBox");
+
+      const empty = chat.querySelector(".chat-empty");
+      if(empty){
+        empty.remove();
+      }
 
       const bubble = document.createElement("div");
       bubble.className = "bubble " + (role === "user" ? "user" : "ai");
@@ -400,10 +735,9 @@
         const data = await res.json();
         lastJSON = data;
 
+        const selectedMode = data.selectedMode ? `\n\nMode terpilih: ${data.selectedMode}` : "";
         const output =
-          data.text ||
-          data.error ||
-          JSON.stringify(data, null, 2);
+          (data.text || data.error || JSON.stringify(data, null, 2)) + selectedMode;
 
         lastText = output;
 
