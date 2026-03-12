@@ -391,7 +391,8 @@
 
   <script>
     let lastText = "";
-    let lastJSON = null;
+let lastJSON = null;
+let lastImageUrl = "";
 
     const modeSelect = document.getElementById("mode");
     const videoUpload = document.getElementById("videoUpload");
@@ -599,6 +600,17 @@
       a.click();
       URL.revokeObjectURL(a.href);
     }
+    function downloadImage(){
+  if(!lastImageUrl){
+    alert("Belum ada gambar.");
+    return;
+  }
+
+  const a = document.createElement("a");
+  a.href = lastImageUrl;
+  a.download = "gabungan-foto.png";
+  a.click();
+}
   </script>
 </body>
 </html>
