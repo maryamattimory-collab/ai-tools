@@ -297,7 +297,7 @@
       <h1>AI Studio Pro</h1>
       <p class="subtitle">
         Buat prompt Veo, prompt Leonardo, storyboard, infografis, TikTok carousel,
-        dan analisa video dalam satu workspace yang lebih rapi dan nyaman dipakai.
+        analisa video, collage foto, dan foto iklan model + produk cinematic dalam satu workspace.
       </p>
     </div>
 
@@ -316,6 +316,7 @@
             <option value="veo">Prompt Veo</option>
             <option value="analyze_video">Analyze Video</option>
             <option value="combine_photos">Gabungkan Foto</option>
+            <option value="model_product_cinematic">Model + Produk Cinematic</option>
           </select>
         </div>
 
@@ -342,6 +343,15 @@
           </div>
         </div>
 
+        <div class="row" id="modelProductPromptTools" style="display:none;">
+          <label>Prompt Otomatis Model + Produk</label>
+          <div class="prompt-tools">
+            <button type="button" class="small-btn" onclick="setPrompt('Create a premium cinematic advertising photo. Put the model and the product naturally in one elegant composition. Luxury lighting, realistic commercial photography.')">Luxury cinematic</button>
+            <button type="button" class="small-btn" onclick="setPrompt('Create a modern beauty ad photo with the model holding the product. Clean premium background, soft rim light, polished advertising look.')">Beauty ad</button>
+            <button type="button" class="small-btn" onclick="setPrompt('Create a fashion commercial shot. The model interacts naturally with the product. Dramatic cinematic light, professional ad photography.')">Fashion ad</button>
+          </div>
+        </div>
+
         <div class="row" id="videoUpload" style="display:none;">
           <label for="videoFile">Upload Video Referensi</label>
           <input type="file" id="videoFile" accept="video/*">
@@ -350,6 +360,16 @@
         <div class="row" id="photoUpload" style="display:none;">
           <label for="photoFiles">Upload Foto</label>
           <input type="file" id="photoFiles" accept="image/*" multiple>
+        </div>
+
+        <div class="row" id="modelProductUpload" style="display:none;">
+          <label for="modelImageFile">Upload Foto Model</label>
+          <input type="file" id="modelImageFile" accept="image/*">
+
+          <div style="height:10px;"></div>
+
+          <label for="productImageFile">Upload Foto Produk</label>
+          <input type="file" id="productImageFile" accept="image/*">
         </div>
 
         <div class="button-row">
@@ -363,13 +383,14 @@
         <div class="helper">
           <strong>Tips</strong>
           <p>
-            Gunakan <b>Analyze Video</b> untuk membaca isi video asli. Gunakan
-            <b>Gabungkan Foto</b> untuk membuat collage gambar, bukan teks.
+            Gunakan <b>Analyze Video</b> untuk membaca isi video asli.
+            Gunakan <b>Gabungkan Foto</b> untuk collage.
+            Gunakan <b>Model + Produk Cinematic</b> untuk membuat foto iklan baru dari foto model dan produk.
           </p>
         </div>
 
         <div class="footer-note">
-          Catatan: Analyze Video mengirim video asli ke endpoint video. Gabungkan Foto menghasilkan gambar gabungan/collage.
+          Catatan: mode Model + Produk Cinematic memakai Replicate sebagai engine gambar. Mode Gemini lainnya tetap memakai Gemini API.
         </div>
       </div>
 
@@ -397,8 +418,10 @@
     const modeSelect = document.getElementById("mode");
     const videoUpload = document.getElementById("videoUpload");
     const photoUpload = document.getElementById("photoUpload");
+    const modelProductUpload = document.getElementById("modelProductUpload");
     const videoPromptTools = document.getElementById("videoPromptTools");
     const photoPromptTools = document.getElementById("photoPromptTools");
+    const modelProductPromptTools = document.getElementById("modelProductPromptTools");
     const statusText = document.getElementById("statusText");
 
     function updateUploadUI(){
@@ -406,8 +429,10 @@
 
       videoUpload.style.display = "none";
       photoUpload.style.display = "none";
+      modelProductUpload.style.display = "none";
       videoPromptTools.style.display = "none";
       photoPromptTools.style.display = "none";
+      modelProductPromptTools.style.display = "none";
 
       if(mode === "analyze_video"){
         videoUpload.style.display = "block";
@@ -417,6 +442,11 @@
       if(mode === "combine_photos"){
         photoUpload.style.display = "block";
         photoPromptTools.style.display = "block";
+      }
+
+      if(mode === "model_product_cinematic"){
+        modelProductUpload.style.display = "block";
+        modelProductPromptTools.style.display = "block";
       }
     }
 
@@ -585,6 +615,53 @@
           return;
         }
 
+        if (mode === "model_product_cinematic") {
+          const modelImageFile = document.getElementById("modelImageFile").files[0];
+          const productImageFile = document.getElementById("productImageFile").files[0];
+
+          if (!modelImageFile || !productImageFile) {
+            aiBubble.innerText = "Upload foto model dan foto produk terlebih dahulu.";
+            statusText.innerText = "Foto model dan produk wajib diupload.";
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("modelImage", modelImageFile);
+          formData.append("productImage", productImageFile);
+          formData.append("prompt", prompt);
+          formData.append("mode", mode);
+
+          statusText.innerText = "Membuat foto model + produk cinematic...";
+
+          res = await fetch("/api/model-product-cinematic", {
+            method: "POST",
+            body: formData
+          });
+
+          const data = await res.json();
+
+          if (!res.ok || !data.success) {
+            aiBubble.innerText = data.error || "Gagal membuat gambar cinematic.";
+            statusText.innerText = "Terjadi error saat memproses gambar.";
+            return;
+          }
+
+          lastImageUrl = data.imageUrl;
+          lastText = "Gambar model + produk cinematic berhasil dibuat.";
+          lastJSON = data;
+
+          aiBubble.innerHTML = `
+            <div style="margin-bottom:12px;">Berikut hasil model + produk cinematic:</div>
+            <img src="${data.imageUrl}" alt="Model Product Cinematic" style="max-width:100%;border-radius:12px;display:block;">
+            <div class="tool-actions">
+              <button onclick="downloadImage()">Download Image</button>
+            </div>
+          `;
+
+          statusText.innerText = "Selesai.";
+          return;
+        }
+
         statusText.innerText = "Mengirim prompt ke Gemini...";
 
         res = await fetch("/api/gemini-chat", {
@@ -667,7 +744,8 @@
 
       const a = document.createElement("a");
       a.href = lastImageUrl;
-      a.download = "gabungan-foto.png";
+      a.download = "hasil-gambar.png";
+      a.target = "_blank";
       a.click();
     }
   </script>
