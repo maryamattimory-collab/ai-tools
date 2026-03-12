@@ -1,763 +1,150 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Studio Pro</title>
-  <style>
-    *{
-      box-sizing:border-box;
-    }
+<title>AI Studio Pro</title>
 
-    body{
-      margin:0;
-      font-family:Arial,sans-serif;
-      background:#0f172a;
-      color:#e5e7eb;
-    }
+<style>
 
-    .container{
-      max-width:1100px;
-      margin:auto;
-      padding:24px 16px 40px;
-    }
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+margin:0;
+}
 
-    .topbar{
-      margin-bottom:20px;
-    }
+.container{
+max-width:1100px;
+margin:auto;
+padding:20px;
+display:grid;
+grid-template-columns:350px 1fr;
+gap:20px;
+}
 
-    .badge{
-      display:inline-block;
-      padding:6px 12px;
-      border-radius:999px;
-      background:#1e293b;
-      color:#93c5fd;
-      font-size:12px;
-      font-weight:bold;
-      margin-bottom:12px;
-      border:1px solid rgba(255,255,255,0.06);
-    }
+.panel{
+background:#111827;
+padding:20px;
+border-radius:12px;
+}
 
-    h1{
-      margin:0 0 10px;
-      font-size:32px;
-      color:white;
-    }
+textarea,select{
+width:100%;
+padding:10px;
+border-radius:8px;
+border:none;
+margin-top:5px;
+}
 
-    .subtitle{
-      margin:0;
-      color:#94a3b8;
-      line-height:1.7;
-      font-size:15px;
-      max-width:760px;
-    }
+button{
+padding:10px 14px;
+border:none;
+border-radius:8px;
+background:#3b82f6;
+color:white;
+cursor:pointer;
+margin-top:10px;
+}
 
-    .layout{
-      display:grid;
-      grid-template-columns:380px 1fr;
-      gap:18px;
-      align-items:start;
-    }
+.chat{
+background:#020617;
+padding:20px;
+border-radius:12px;
+min-height:500px;
+overflow:auto;
+}
 
-    .panel{
-      background:#111827;
-      border:1px solid rgba(255,255,255,0.06);
-      border-radius:18px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.2);
-    }
+.bubble{
+margin-top:10px;
+padding:10px;
+border-radius:10px;
+}
 
-    .left-panel{
-      padding:18px;
-      position:sticky;
-      top:18px;
-    }
+.user{
+background:#2563eb;
+text-align:right;
+}
 
-    .right-panel{
-      padding:18px;
-    }
+.ai{
+background:#1e293b;
+}
 
-    .section-title{
-      margin:0 0 14px;
-      font-size:18px;
-      color:white;
-    }
+</style>
 
-    .row{
-      margin-bottom:14px;
-    }
-
-    label{
-      display:block;
-      margin-bottom:7px;
-      font-size:14px;
-      font-weight:bold;
-      color:#cbd5e1;
-    }
-
-    select,
-    textarea,
-    input{
-      width:100%;
-      padding:12px 14px;
-      border:none;
-      border-radius:12px;
-      font-size:14px;
-      background:#f8fafc;
-      color:#111827;
-    }
-
-    textarea{
-      min-height:150px;
-      resize:vertical;
-      line-height:1.5;
-    }
-
-    .prompt-tools{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-
-    button{
-      border:none;
-      border-radius:12px;
-      padding:10px 14px;
-      font-size:14px;
-      font-weight:bold;
-      cursor:pointer;
-      color:white;
-      background:#38bdf8;
-      transition:0.2s ease;
-    }
-
-    button:hover{
-      opacity:0.96;
-    }
-
-    .secondary{
-      background:#334155;
-    }
-
-    .danger{
-      background:#ef4444;
-    }
-
-    .small-btn{
-      background:#334155;
-      font-size:12px;
-      padding:8px 11px;
-    }
-
-    .button-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-top:10px;
-    }
-
-    .helper{
-      background:#0b1220;
-      border:1px solid rgba(255,255,255,0.06);
-      border-radius:14px;
-      padding:14px;
-      margin-top:16px;
-    }
-
-    .helper strong{
-      display:block;
-      margin-bottom:8px;
-      color:#e2e8f0;
-      font-size:14px;
-    }
-
-    .helper p{
-      margin:0;
-      color:#94a3b8;
-      font-size:13px;
-      line-height:1.7;
-    }
-
-    .status{
-      margin-top:12px;
-      min-height:18px;
-      font-size:13px;
-      color:#93c5fd;
-    }
-
-    .chat-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-bottom:14px;
-    }
-
-    .chat-header h2{
-      margin:0;
-      font-size:18px;
-      color:white;
-    }
-
-    .chat{
-      background:#020617;
-      border:1px solid rgba(255,255,255,0.06);
-      border-radius:16px;
-      min-height:520px;
-      max-height:78vh;
-      overflow:auto;
-      padding:16px;
-    }
-
-    .chat-empty{
-      text-align:center;
-      color:#94a3b8;
-      font-size:14px;
-      line-height:1.8;
-      padding:70px 20px;
-    }
-
-    .bubble{
-      max-width:88%;
-      padding:14px;
-      border-radius:14px;
-      margin-top:12px;
-      white-space:pre-wrap;
-      line-height:1.65;
-      word-wrap:break-word;
-    }
-
-    .user{
-      margin-left:auto;
-      background:#2563eb;
-      color:white;
-      text-align:right;
-    }
-
-    .ai{
-      margin-right:auto;
-      background:#1e293b;
-      color:#f8fafc;
-    }
-
-    .tool-actions{
-      margin-top:12px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-
-    .tool-actions button{
-      background:#475569;
-      padding:8px 12px;
-      font-size:12px;
-    }
-
-    .footer-note{
-      margin-top:14px;
-      color:#64748b;
-      font-size:12px;
-      line-height:1.7;
-    }
-
-    @media (max-width:900px){
-      .layout{
-        grid-template-columns:1fr;
-      }
-
-      .left-panel{
-        position:static;
-      }
-    }
-
-    @media (max-width:640px){
-      h1{
-        font-size:28px;
-      }
-
-      .button-row{
-        flex-direction:column;
-      }
-
-      .button-row button{
-        width:100%;
-      }
-
-      .bubble{
-        max-width:100%;
-      }
-    }
-  </style>
 </head>
+
 <body>
 
-  <div class="container">
-
-    <div class="topbar">
-      <div class="badge">AI CONTENT TOOL</div>
-      <h1>AI Studio Pro</h1>
-      <p class="subtitle">
-        Buat prompt Veo, prompt Leonardo, storyboard, infografis, TikTok carousel,
-        analisa video, collage foto, dan gabungkan orang + produk + background menjadi satu foto.
-      </p>
-    </div>
-
-    <div class="layout">
-
-      <div class="panel left-panel">
-        <h2 class="section-title">Workspace</h2>
-
-        <div class="row">
-          <label for="mode">Pilih Mode</label>
-          <select id="mode">
-            <option value="auto">Auto (Gemini pilih tool)</option>
-            <option value="infographic">Infografis</option>
-            <option value="tiktok">TikTok Carousel</option>
-            <option value="leonardo">Prompt Leonardo</option>
-            <option value="veo">Prompt Veo</option>
-            <option value="analyze_video">Analyze Video</option>
-            <option value="combine_photos">Gabungkan Foto</option>
-            <option value="scene_composite">Gabungkan Orang + Produk + Background</option>
-          </select>
-        </div>
-
-        <div class="row">
-          <label for="prompt">Topik / Perintah</label>
-          <textarea id="prompt" placeholder="Tulis topik atau perintah di sini..."></textarea>
-        </div>
-
-        <div class="row" id="videoPromptTools" style="display:none;">
-          <label>Prompt Otomatis Analyze Video</label>
-          <div class="prompt-tools">
-            <button type="button" class="small-btn" onclick="setPrompt('Analisa video ini menjadi scene by scene prompt cinematic untuk Veo')">Scene by scene Veo</button>
-            <button type="button" class="small-btn" onclick="setPrompt('Analisa video ini lalu buat deskripsi angle kamera, lighting, dan mood per scene')">Kamera + lighting</button>
-            <button type="button" class="small-btn" onclick="setPrompt('Analisa video ini dan ubah menjadi storyboard singkat + prompt Leonardo per scene')">Storyboard + Leonardo</button>
-          </div>
-        </div>
-
-        <div class="row" id="photoPromptTools" style="display:none;">
-          <label>Prompt Otomatis Gabungkan Foto</label>
-          <div class="prompt-tools">
-            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini menjadi satu hasil gabungan yang rapi')">Gabung rapi</button>
-            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini dalam layout collage 2x2')">Layout 2x2</button>
-            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan foto-foto ini menjadi satu gambar kompak')">Collage kompak</button>
-          </div>
-        </div>
-
-        <div class="row" id="scenePromptTools" style="display:none;">
-          <label>Prompt Otomatis Gabungkan Scene</label>
-          <div class="prompt-tools">
-            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan orang, produk, dan background menjadi satu foto promosi yang rapi')">Foto promosi</button>
-            <button type="button" class="small-btn" onclick="setPrompt('Gabungkan orang, produk, dan background menjadi satu scene iklan sederhana')">Scene iklan</button>
-            <button type="button" class="small-btn" onclick="setPrompt('Satukan orang, produk, dan background menjadi satu komposisi visual')">Komposisi visual</button>
-          </div>
-        </div>
-
-        <div class="row" id="videoUpload" style="display:none;">
-          <label for="videoFile">Upload Video Referensi</label>
-          <input type="file" id="videoFile" accept="video/*">
-        </div>
-
-        <div class="row" id="photoUpload" style="display:none;">
-          <label for="photoFiles">Upload Foto</label>
-          <input type="file" id="photoFiles" accept="image/*" multiple>
-        </div>
-
-        <div class="row" id="sceneUpload" style="display:none;">
-          <label for="personImageFile">Upload Foto Orang</label>
-          <input type="file" id="personImageFile" accept="image/*">
-
-          <div style="height:10px;"></div>
-
-          <label for="productImageFile">Upload Foto Produk</label>
-          <input type="file" id="productImageFile" accept="image/*">
-
-          <div style="height:10px;"></div>
-
-          <label for="backgroundImageFile">Upload Foto Background</label>
-          <input type="file" id="backgroundImageFile" accept="image/*">
-        </div>
-
-        <div class="button-row">
-          <button type="button" onclick="sendPrompt()">Generate</button>
-          <button type="button" class="secondary" onclick="clearPrompt()">Clear Prompt</button>
-          <button type="button" class="danger" onclick="clearChat()">Clear Chat</button>
-        </div>
-
-        <div class="status" id="statusText"></div>
-
-        <div class="helper">
-          <strong>Tips</strong>
-          <p>
-            Untuk mode <b>Gabungkan Orang + Produk + Background</b>, hasil terbaik didapat jika foto orang dan produk memakai background transparan / PNG.
-          </p>
-        </div>
-
-        <div class="footer-note">
-          Catatan: mode scene composite adalah compositing gratis, bukan AI generatif penuh. Jadi hasil paling rapi jika objek utama sudah bersih.
-        </div>
-      </div>
-
-      <div class="panel right-panel">
-        <div class="chat-header">
-          <h2>Hasil AI</h2>
-        </div>
-
-        <div class="chat" id="chatBox">
-          <div class="chat-empty">
-            Hasil AI akan muncul di sini.<br><br>
-            Pilih mode, isi prompt, lalu klik <strong>Generate</strong>.
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <script>
-    let lastText = "";
-    let lastJSON = null;
-    let lastImageUrl = "";
-
-    const modeSelect = document.getElementById("mode");
-    const videoUpload = document.getElementById("videoUpload");
-    const photoUpload = document.getElementById("photoUpload");
-    const sceneUpload = document.getElementById("sceneUpload");
-    const videoPromptTools = document.getElementById("videoPromptTools");
-    const photoPromptTools = document.getElementById("photoPromptTools");
-    const scenePromptTools = document.getElementById("scenePromptTools");
-    const statusText = document.getElementById("statusText");
-
-    function updateUploadUI(){
-      const mode = modeSelect.value;
-
-      videoUpload.style.display = "none";
-      photoUpload.style.display = "none";
-      sceneUpload.style.display = "none";
-      videoPromptTools.style.display = "none";
-      photoPromptTools.style.display = "none";
-      scenePromptTools.style.display = "none";
-
-      if(mode === "analyze_video"){
-        videoUpload.style.display = "block";
-        videoPromptTools.style.display = "block";
-      }
-
-      if(mode === "combine_photos"){
-        photoUpload.style.display = "block";
-        photoPromptTools.style.display = "block";
-      }
-
-      if(mode === "scene_composite"){
-        sceneUpload.style.display = "block";
-        scenePromptTools.style.display = "block";
-      }
-    }
-
-    modeSelect.addEventListener("change", updateUploadUI);
-    updateUploadUI();
-
-    function setPrompt(text){
-      document.getElementById("prompt").value = text;
-    }
-
-    function clearPrompt(){
-      document.getElementById("prompt").value = "";
-      statusText.innerText = "";
-    }
-
-    function clearChat(){
-      const chat = document.getElementById("chatBox");
-      chat.innerHTML = `
-        <div class="chat-empty">
-          Hasil AI akan muncul di sini.<br><br>
-          Pilih mode, isi prompt, lalu klik <strong>Generate</strong>.
-        </div>
-      `;
-      statusText.innerText = "Chat dibersihkan.";
-      lastText = "";
-      lastJSON = null;
-      lastImageUrl = "";
-    }
-
-    function addBubble(role, text){
-      const chat = document.getElementById("chatBox");
-
-      const empty = chat.querySelector(".chat-empty");
-      if(empty){
-        empty.remove();
-      }
-
-      const bubble = document.createElement("div");
-      bubble.className = "bubble " + (role === "user" ? "user" : "ai");
-      bubble.innerText = text;
-
-      chat.appendChild(bubble);
-      chat.scrollTop = chat.scrollHeight;
-
-      return bubble;
-    }
-
-    function escapeHtml(str){
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
-
-    function renderAiOutput(aiBubble, output){
-      aiBubble.innerHTML =
-        escapeHtml(output).replace(/\n/g, "<br>") +
-        `<div class="tool-actions">
-          <button onclick="copyLastText()">Salin</button>
-          <button onclick="downloadTxt()">Download TXT</button>
-          <button onclick="downloadJson()">Download JSON</button>
-        </div>`;
-    }
-
-    async function sendPrompt(){
-      const mode = document.getElementById("mode").value;
-      const prompt = document.getElementById("prompt").value.trim();
-
-      if(!prompt){
-        alert("Prompt kosong");
-        return;
-      }
-
-      addBubble("user", prompt);
-      const aiBubble = addBubble("ai", "Memproses...");
-      statusText.innerText = "Mengirim request ke server...";
-
-      try {
-        let res;
-
-        if (mode === "analyze_video") {
-          const videoFile = document.getElementById("videoFile").files[0];
-
-          if (!videoFile) {
-            aiBubble.innerText = "Upload video dulu.";
-            statusText.innerText = "Belum ada video yang diupload.";
-            return;
-          }
-
-          const formData = new FormData();
-          formData.append("video", videoFile);
-          formData.append("prompt", prompt);
-          formData.append("mode", mode);
-
-          statusText.innerText = "Mengupload video dan meminta Gemini menganalisa isi video...";
-
-          res = await fetch("/api/analyze-video", {
-            method: "POST",
-            body: formData
-          });
-
-          const data = await res.json();
-          lastJSON = data;
-          lastImageUrl = "";
-
-          const selectedMode = data.selectedMode ? `\n\nMode terpilih: ${data.selectedMode}` : "";
-          const output =
-            (data.text || data.error || JSON.stringify(data, null, 2)) + selectedMode;
-
-          lastText = output;
-          renderAiOutput(aiBubble, output);
-          statusText.innerText = "Selesai.";
-          return;
-        }
-
-        if (mode === "combine_photos") {
-          const files = document.getElementById("photoFiles").files;
-
-          if (!files || files.length < 2) {
-            aiBubble.innerText = "Upload minimal 2 foto.";
-            statusText.innerText = "Minimal upload 2 foto.";
-            return;
-          }
-
-          const formData = new FormData();
-          for (let i = 0; i < files.length && i < 4; i++) {
-            formData.append("photos", files[i]);
-          }
-          formData.append("prompt", prompt);
-          formData.append("mode", mode);
-
-          statusText.innerText = "Menggabungkan foto menjadi satu gambar...";
-
-          res = await fetch("/api/combine-photos-image", {
-            method: "POST",
-            body: formData
-          });
-
-          if (!res.ok) {
-            let errText = "Gagal menggabungkan foto.";
-            try {
-              const errJson = await res.json();
-              errText = errJson.error || errText;
-            } catch (_) {}
-            aiBubble.innerText = errText;
-            statusText.innerText = "Terjadi error saat menggabungkan foto.";
-            return;
-          }
-
-          const blob = await res.blob();
-          const imageUrl = URL.createObjectURL(blob);
-
-          lastImageUrl = imageUrl;
-          lastText = "Gambar gabungan berhasil dibuat.";
-          lastJSON = { success: true, type: "image" };
-
-          aiBubble.innerHTML = `
-            <div style="margin-bottom:12px;">Berikut hasil gabungan foto:</div>
-            <img src="${imageUrl}" alt="Gabungan Foto" style="max-width:100%;border-radius:12px;display:block;">
-            <div class="tool-actions">
-              <button onclick="downloadImage()">Download Image</button>
-            </div>
-          `;
-
-          statusText.innerText = "Selesai.";
-          return;
-        }
-
-        if (mode === "scene_composite") {
-          const personImageFile = document.getElementById("personImageFile").files[0];
-          const productImageFile = document.getElementById("productImageFile").files[0];
-          const backgroundImageFile = document.getElementById("backgroundImageFile").files[0];
-
-          if (!personImageFile || !productImageFile || !backgroundImageFile) {
-            aiBubble.innerText = "Upload foto orang, foto produk, dan foto background terlebih dahulu.";
-            statusText.innerText = "Semua file wajib diupload.";
-            return;
-          }
-
-          const formData = new FormData();
-          formData.append("personImage", personImageFile);
-          formData.append("productImage", productImageFile);
-          formData.append("backgroundImage", backgroundImageFile);
-          formData.append("prompt", prompt);
-          formData.append("mode", mode);
-
-          statusText.innerText = "Menggabungkan orang, produk, dan background...";
-
-          res = await fetch("/api/scene-composite", {
-            method: "POST",
-            body: formData
-          });
-
-          if (!res.ok) {
-            let errText = "Gagal menggabungkan scene.";
-            try {
-              const errJson = await res.json();
-              errText = errJson.error || errText;
-            } catch (_) {}
-            aiBubble.innerText = errText;
-            statusText.innerText = "Terjadi error saat menggabungkan scene.";
-            return;
-          }
-
-          const blob = await res.blob();
-          const imageUrl = URL.createObjectURL(blob);
-
-          lastImageUrl = imageUrl;
-          lastText = "Scene gabungan berhasil dibuat.";
-          lastJSON = { success: true, type: "image" };
-
-          aiBubble.innerHTML = `
-            <div style="margin-bottom:12px;">Berikut hasil gabungan orang + produk + background:</div>
-            <img src="${imageUrl}" alt="Scene Composite" style="max-width:100%;border-radius:12px;display:block;">
-            <div class="tool-actions">
-              <button onclick="downloadImage()">Download Image</button>
-            </div>
-          `;
-
-          statusText.innerText = "Selesai.";
-          return;
-        }
-
-        statusText.innerText = "Mengirim prompt ke Gemini...";
-
-        res = await fetch("/api/gemini-chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            message: prompt,
-            mode: mode
-          })
-        });
-
-        const data = await res.json();
-        lastJSON = data;
-        lastImageUrl = "";
-
-        const selectedMode = data.selectedMode ? `\n\nMode terpilih: ${data.selectedMode}` : "";
-        const output =
-          (data.text || data.error || JSON.stringify(data, null, 2)) + selectedMode;
-
-        lastText = output;
-        renderAiOutput(aiBubble, output);
-        statusText.innerText = "Selesai.";
-
-      } catch (err) {
-        aiBubble.innerText = "Error: " + err.message;
-        statusText.innerText = "Terjadi error saat memanggil server.";
-      }
-    }
-
-    function copyLastText(){
-      if(!lastText){
-        alert("Belum ada hasil.");
-        return;
-      }
-
-      navigator.clipboard.writeText(lastText)
-        .then(() => {
-          alert("Teks berhasil disalin");
-        })
-        .catch(() => {
-          alert("Gagal menyalin teks");
-        });
-    }
-
-    function downloadTxt(){
-      if(!lastText){
-        alert("Belum ada hasil.");
-        return;
-      }
-
-      const blob = new Blob([lastText], { type:"text/plain" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "hasil-ai.txt";
-      a.click();
-      URL.revokeObjectURL(a.href);
-    }
-
-    function downloadJson(){
-      if(!lastJSON){
-        alert("Belum ada hasil.");
-        return;
-      }
-
-      const blob = new Blob([JSON.stringify(lastJSON, null, 2)], { type:"application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "hasil-ai.json";
-      a.click();
-      URL.revokeObjectURL(a.href);
-    }
-
-    function downloadImage(){
-      if(!lastImageUrl){
-        alert("Belum ada gambar.");
-        return;
-      }
-
-      const a = document.createElement("a");
-      a.href = lastImageUrl;
-      a.download = "hasil-gambar.png";
-      a.click();
-    }
-  </script>
+<div class="container">
+
+<div class="panel">
+
+<h2>AI Studio Pro</h2>
+
+<label>Mode</label>
+
+<select id="mode">
+<option value="infographic">Infografis</option>
+<option value="tiktok">TikTok Carousel</option>
+<option value="leonardo">Leonardo Prompt</option>
+<option value="veo">Veo Video Prompt</option>
+</select>
+
+<label>Topik</label>
+
+<textarea id="prompt" rows="6"></textarea>
+
+<button onclick="sendPrompt()">Generate</button>
+
+</div>
+
+
+<div class="panel">
+
+<div class="chat" id="chat"></div>
+
+</div>
+
+</div>
+
+<script>
+
+async function sendPrompt(){
+
+const mode=document.getElementById("mode").value;
+const prompt=document.getElementById("prompt").value;
+
+const chat=document.getElementById("chat");
+
+const user=document.createElement("div");
+user.className="bubble user";
+user.innerText=prompt;
+chat.appendChild(user);
+
+const ai=document.createElement("div");
+ai.className="bubble ai";
+ai.innerText="Memproses...";
+chat.appendChild(ai);
+
+const res=await fetch("/api/generate",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+mode,
+prompt
+})
+});
+
+const data=await res.json();
+
+ai.innerText=data.text;
+
+chat.scrollTop=chat.scrollHeight;
+
+}
+
+</script>
+
 </body>
 </html>
