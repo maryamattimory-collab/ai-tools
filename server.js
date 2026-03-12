@@ -6,10 +6,14 @@ import sharp from "sharp";
 import { fileURLToPath } from "url";
 
 const app = express();
+
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 15 * 1024 * 1024 }
+  limits: {
+    fileSize: 20 * 1024 * 1024
+  }
 });
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -19,6 +23,10 @@ app.use(express.static(__dirname));
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+
+/* ===========================
+   GEMINI HELPERS
+=========================== */
 
 async function callGeminiText(prompt) {
   if (!GEMINI_API_KEY) {
@@ -96,118 +104,6 @@ async function callGeminiWithVideo(videoBuffer, mimeType, prompt) {
   return data?.candidates?.[0]?.content?.parts?.[0]?.text || "Tidak ada respon dari Gemini.";
 }
 
-app.get("/", (req, res) => {
-  res.send("AI Studio Pro aktif");
-});
-
-app.post("/api/gemini-chat", async (req, res) => {
-  try {
-    const { message, mode } = req.body;
-
-    if (!message || !message.trim()) {
-      return res.status(400).json({ error: "Prompt kosong" });
-    }
-
-    let finalMode = mode;
-
-if (!finalMode || finalMode === "auto") {
-  finalMode = await detectBestMode(message);
-}
-
-let finalPrompt = buildPromptByMode(finalMode, message);
-
-if (finalMode === "analyze_video") {
-  finalPrompt = `Mode analyze_video membutuhkan upload video asli. Silakan pilih mode Analyze Video dan upload file video.`;
-}
-
-const text = await callGeminiText(finalPrompt);
-
-res.json({
-  success: true,
-  selectedMode: finalMode,
-  text
-});
-  } catch (err) {
-    console.error("SERVER ERROR /api/gemini-chat:", err);
-    res.status(500).json({
-      success: false,
-      error: err.message
-    });
-  }
-});
-
-app.post("/api/analyze-video", upload.single("video"), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        error: "File video tidak ditemukan."
-      });
-    }
-
-    const prompt = req.body.prompt || "Analisa video ini scene by scene.";
-
-    const finalPrompt = `
-Analisa video ini berdasarkan isi visual aslinya.
-
-Instruksi user:
-${prompt}
-
-Buat output:
-1. Ringkasan isi video
-2. Storyboard per scene
-3. Prompt Veo cinematic per scene
-4. Angle kamera, lighting, dan mood per scene
-5. Caption TikTok
-`;
-
-    const text = await callGeminiWithVideo(
-      req.file.buffer,
-      req.file.mimetype,
-      finalPrompt
-    );
-
-    res.json({
-      success: true,
-      text
-    });
-  } catch (err) {
-    console.error("SERVER ERROR /api/analyze-video:", err);
-    res.status(500).json({
-      success: false,
-      error: err.message
-    });
-  }
-});
-
-app.post("/api/combine-photos-image", upload.array("photos", 4), async (req, res) => {
-  try {
-    if (!req.files || req.files.length < 2) {
-      return res.status(400).json({
-        success: false,
-        error: "Minimal upload 2 foto."
-      });
-    }
-
-    const imageBuffer = await createPhotoCollage(req.files);
-
-    res.set("Content-Type", "image/png");
-    res.send(imageBuffer);
-
-  } catch (err) {
-    console.error("SERVER ERROR /api/combine-photos-image:", err);
-    res.status(500).json({
-      success: false,
-      error: err.message
-    });
-  }
-});
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server aktif di port ${PORT}`);
-});
-
 async function detectBestMode(message) {
   const modePrompt = `
 Tentukan mode tool terbaik untuk permintaan user berikut.
@@ -226,7 +122,7 @@ Aturan:
 - Jika user meminta prompt gambar Leonardo → leonardo
 - Jika user meminta prompt video Veo → veo
 - Jika user meminta analisa video → analyze_video
-- Jika user meminta gabungkan foto / konsep dari beberapa foto → combine_photos
+- Jika user meminta gabungkan foto / collage foto / satukan beberapa foto → combine_photos
 
 Balas HANYA dengan salah satu nama mode di atas.
 Jangan beri penjelasan tambahan.
@@ -238,6 +134,7 @@ ${message}
   const result = await callGeminiText(modePrompt);
   return result.trim().toLowerCase();
 }
+
 function buildPromptByMode(mode, message) {
   if (mode === "infographic") {
     return `Buat konsep infografis carousel.
@@ -319,5 +216,205 @@ Buat output:
   return message;
 }
 
+/* ===========================
+   PHOTO COLLAGE HELPER
+=========================== */
 
+async function createPhotoCollage(files) {
+  const count = files.length;
 
+  if (count < 2) {
+    throw new Error("Minimal upload 2 foto.");
+  }
+
+  const tileWidth = 512;
+  const tileHeight = 512;
+
+  let columns = 2;
+  let rows = Math.ceil(count / columns);
+
+  if (count === 2) {
+    columns = 2;
+    rows = 1;
+  }
+
+  if (count === 3 || count === 4) {
+    columns = 2;
+    rows = 2;
+  }
+
+  const canvasWidth = columns * tileWidth;
+  const canvasHeight = rows * tileHeight;
+
+  const composites = [];
+
+  for (let i = 0; i < count; i++) {
+    const file = files[i];
+
+    const resized = await sharp(file.buffer)
+      .resize(tileWidth, tileHeight, {
+        fit: "cover",
+        position: "centre"
+      })
+      .png()
+      .toBuffer();
+
+    const left = (i % columns) * tileWidth;
+    const top = Math.floor(i / columns) * tileHeight;
+
+    composites.push({
+      input: resized,
+      left,
+      top
+    });
+  }
+
+  const output = await sharp({
+    create: {
+      width: canvasWidth,
+      height: canvasHeight,
+      channels: 3,
+      background: { r: 255, g: 255, b: 255 }
+    }
+  })
+    .composite(composites)
+    .png()
+    .toBuffer();
+
+  return output;
+}
+
+/* ===========================
+   ROUTES
+=========================== */
+
+app.get("/", (req, res) => {
+  res.send("AI Studio Pro aktif");
+});
+
+app.post("/api/gemini-chat", async (req, res) => {
+  try {
+    const { message, mode } = req.body;
+
+    if (!message || !message.trim()) {
+      return res.status(400).json({
+        success: false,
+        error: "Prompt kosong"
+      });
+    }
+
+    let finalMode = mode;
+
+    if (!finalMode || finalMode === "auto") {
+      finalMode = await detectBestMode(message);
+    }
+
+    if (finalMode === "analyze_video") {
+      return res.json({
+        success: true,
+        selectedMode: finalMode,
+        text: "Mode analyze_video membutuhkan upload video asli. Silakan pilih mode Analyze Video dan upload file video."
+      });
+    }
+
+    if (finalMode === "combine_photos") {
+      return res.json({
+        success: true,
+        selectedMode: finalMode,
+        text: "Mode combine_photos membutuhkan upload minimal 2 foto. Silakan pilih mode Gabungkan Foto lalu upload file."
+      });
+    }
+
+    const finalPrompt = buildPromptByMode(finalMode, message);
+    const text = await callGeminiText(finalPrompt);
+
+    res.json({
+      success: true,
+      selectedMode: finalMode,
+      text
+    });
+  } catch (err) {
+    console.error("SERVER ERROR /api/gemini-chat:", err);
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
+app.post("/api/analyze-video", upload.single("video"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: "File video tidak ditemukan."
+      });
+    }
+
+    const prompt = req.body.prompt || "Analisa video ini scene by scene.";
+
+    const finalPrompt = `
+Analisa video ini berdasarkan isi visual aslinya.
+
+Instruksi user:
+${prompt}
+
+Buat output:
+1. Ringkasan isi video
+2. Storyboard per scene
+3. Prompt Veo cinematic per scene
+4. Angle kamera, lighting, dan mood per scene
+5. Caption TikTok
+`;
+
+    const text = await callGeminiWithVideo(
+      req.file.buffer,
+      req.file.mimetype,
+      finalPrompt
+    );
+
+    res.json({
+      success: true,
+      selectedMode: "analyze_video",
+      text
+    });
+  } catch (err) {
+    console.error("SERVER ERROR /api/analyze-video:", err);
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
+app.post("/api/combine-photos-image", upload.array("photos", 4), async (req, res) => {
+  try {
+    if (!req.files || req.files.length < 2) {
+      return res.status(400).json({
+        success: false,
+        error: "Minimal upload 2 foto."
+      });
+    }
+
+    const imageBuffer = await createPhotoCollage(req.files);
+
+    res.set("Content-Type", "image/png");
+    res.send(imageBuffer);
+  } catch (err) {
+    console.error("SERVER ERROR /api/combine-photos-image:", err);
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
+/* ===========================
+   SERVER START
+=========================== */
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`AI Studio Pro API aktif di port ${PORT}`);
+});
