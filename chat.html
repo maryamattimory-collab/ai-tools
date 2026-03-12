@@ -281,7 +281,16 @@
           body:JSON.stringify({
 message:prompt,
 mode:mode
-})
+})const res = await fetch("/api/gemini-chat",{
+  method:"POST",
+  headers:{
+    "Content-Type":"application/json"
+  },
+  body:JSON.stringify({
+    message: prompt + "\n" + extraInfo,
+    mode: mode
+  })
+});
 Prompt: ${prompt}
 ${extraInfo}
 
