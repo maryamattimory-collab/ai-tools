@@ -278,9 +278,10 @@
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            message:
-`Mode: ${mode}
+          body:JSON.stringify({
+message:prompt,
+mode:mode
+})
 Prompt: ${prompt}
 ${extraInfo}
 
