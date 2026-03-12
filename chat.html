@@ -178,55 +178,72 @@
     }
 
     async function sendPrompt(){
-      const mode = document.getElementById("mode").value;
-      const prompt = document.getElementById("prompt").value.trim();
+  const mode = document.getElementById("mode").value;
+  const prompt = document.getElementById("prompt").value.trim();
 
-      if(!prompt){
-        alert("Prompt kosong");
+  if(!prompt){
+    alert("Prompt kosong");
+    return;
+  }
+
+  addBubble("user", prompt);
+  const aiBubble = addBubble("ai", "Memproses...");
+
+  try {
+    let res;
+
+    if (mode === "analyze_video") {
+      const videoFile = document.getElementById("videoFile").files[0];
+
+      if (!videoFile) {
+        aiBubble.innerText = "Upload video dulu.";
         return;
       }
 
-      let extraInfo = "";
+      const formData = new FormData();
+      formData.append("video", videoFile);
+      formData.append("prompt", prompt);
+      formData.append("mode", mode);
 
-      if(mode === "analyze_video"){
-        const videoFile = document.getElementById("videoFile").files[0];
-        if (videoFile) extraInfo = "Nama file video: " + videoFile.name;
-      }
+      res = await fetch("/api/analyze-video", {
+        method: "POST",
+        body: formData
+      });
+    } else {
+      let extraInfo = "";
 
       if(mode === "combine_photos"){
         const files = document.getElementById("photoFiles").files;
-        if (files.length > 0) extraInfo = "Jumlah foto: " + files.length;
+        extraInfo = files.length > 0
+          ? `Jumlah foto: ${files.length}`
+          : "Tidak ada foto yang diupload.";
       }
 
-      addBubble("user", prompt);
-      const aiBubble = addBubble("ai", "Memproses...");
-
-      try {
-        const res = await fetch("/api/gemini-chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            message: prompt + (extraInfo ? "\n" + extraInfo : ""),
-            mode: mode
-          })
-        });
-
-        const data = await res.json();
-        lastJSON = data;
-
-        const output =
-          data.text ||
-          data.error ||
-          JSON.stringify(data, null, 2);
-
-        lastText = output;
-        aiBubble.innerText = output;
-      } catch (err) {
-        aiBubble.innerText = "Error: " + err.message;
-      }
+      res = await fetch("/api/gemini-chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: prompt + (extraInfo ? "\n" + extraInfo : ""),
+          mode: mode
+        })
+      });
     }
+
+    const data = await res.json();
+
+    const output =
+      data.text ||
+      data.error ||
+      JSON.stringify(data, null, 2);
+
+    aiBubble.innerText = output;
+
+  } catch (err) {
+    aiBubble.innerText = "Error: " + err.message;
+  }
+}
   </script>
 </body>
 </html>
