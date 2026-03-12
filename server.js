@@ -23,7 +23,6 @@ app.use(express.static(__dirname));
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-const REPLICATE_API_TOKEN = process.env.REPLICATE_API_TOKEN;
 
 /* ===========================
    GEMINI HELPERS
@@ -116,7 +115,7 @@ Pilihan mode yang valid hanya salah satu dari:
 - veo
 - analyze_video
 - combine_photos
-- model_product_cinematic
+- scene_composite
 
 Aturan:
 - Jika user meminta konten carousel infografis → infographic
@@ -124,8 +123,8 @@ Aturan:
 - Jika user meminta prompt gambar Leonardo → leonardo
 - Jika user meminta prompt video Veo → veo
 - Jika user meminta analisa video → analyze_video
-- Jika user meminta gabungkan foto / collage foto / satukan beberapa foto → combine_photos
-- Jika user meminta gabungkan model dan produk menjadi foto iklan / cinematic / ads / commercial → model_product_cinematic
+- Jika user meminta collage / satukan beberapa foto berdampingan → combine_photos
+- Jika user meminta gabungkan orang + produk + background dalam satu foto → scene_composite
 
 Balas HANYA dengan salah satu nama mode di atas.
 Jangan beri penjelasan tambahan.
@@ -288,66 +287,76 @@ async function createPhotoCollage(files) {
 }
 
 /* ===========================
-   REPLICATE HELPERS
+   SCENE COMPOSITE HELPER
+   CATATAN:
+   - Orang dan produk terbaik jika PNG transparan
+   - Background bisa JPG / PNG
 =========================== */
 
-function fileBufferToDataUrl(buffer, mimeType) {
-  const base64 = buffer.toString("base64");
-  return `data:${mimeType};base64,${base64}`;
-}
+async function createSceneComposite(personFile, productFile, backgroundFile) {
+  const canvasWidth = 1024;
+  const canvasHeight = 1365;
 
-async function runReplicateModelProductCinematic(modelFile, productFile, userPrompt) {
-  if (!REPLICATE_API_TOKEN) {
-    throw new Error("REPLICATE_API_TOKEN belum diisi di Railway Variables");
-  }
+  const bg = await sharp(backgroundFile.buffer)
+    .resize(canvasWidth, canvasHeight, {
+      fit: "cover",
+      position: "centre"
+    })
+    .png()
+    .toBuffer();
 
-  const modelImage = fileBufferToDataUrl(modelFile.buffer, modelFile.mimetype);
-  const productImage = fileBufferToDataUrl(productFile.buffer, productFile.mimetype);
+  const person = await sharp(personFile.buffer)
+    .resize({
+      width: 520,
+      height: 950,
+      fit: "inside"
+    })
+    .png()
+    .toBuffer();
 
-  const prompt = userPrompt && userPrompt.trim()
-    ? userPrompt
-    : "Create a premium cinematic advertising photo. Put the model and the product naturally in one elegant composition. Luxury lighting, high-end commercial photography, realistic skin tones, professional background, clean product presentation.";
+  const product = await sharp(productFile.buffer)
+    .resize({
+      width: 280,
+      height: 280,
+      fit: "inside"
+    })
+    .png()
+    .toBuffer();
 
-  const response = await fetch(
-    "https://api.replicate.com/v1/models/flux-kontext-apps/multi-image-kontext-max/predictions",
-    {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${REPLICATE_API_TOKEN}`,
-        "Content-Type": "application/json",
-        "Prefer": "wait=60"
-      },
-      body: JSON.stringify({
-        input: {
-          prompt: prompt,
-          image_1: modelImage,
-          image_2: productImage
-        }
-      })
+  const shadowPerson = await sharp({
+    create: {
+      width: 540,
+      height: 960,
+      channels: 4,
+      background: { r: 0, g: 0, b: 0, alpha: 0.18 }
     }
-  );
+  })
+    .png()
+    .toBuffer();
 
-  const data = await response.json();
+  const shadowProduct = await sharp({
+    create: {
+      width: 300,
+      height: 300,
+      channels: 4,
+      background: { r: 0, g: 0, b: 0, alpha: 0.18 }
+    }
+  })
+    .png()
+    .toBuffer();
 
-  if (!response.ok) {
-    throw new Error(data?.detail || data?.title || "Gagal memanggil Replicate");
-  }
+  const composed = await sharp(bg)
+    .composite([
+      { input: shadowPerson, left: 170, top: 285 },
+      { input: person, left: 160, top: 260 },
 
-  if (data.status === "failed") {
-    throw new Error(data?.error || "Prediksi Replicate gagal");
-  }
+      { input: shadowProduct, left: 650, top: 835 },
+      { input: product, left: 640, top: 820 }
+    ])
+    .png()
+    .toBuffer();
 
-  const output = data.output;
-
-  if (Array.isArray(output) && output.length > 0) {
-    return output[0];
-  }
-
-  if (typeof output === "string") {
-    return output;
-  }
-
-  throw new Error("Replicate tidak mengembalikan gambar");
+  return composed;
 }
 
 /* ===========================
@@ -391,11 +400,11 @@ app.post("/api/gemini-chat", async (req, res) => {
       });
     }
 
-    if (finalMode === "model_product_cinematic") {
+    if (finalMode === "scene_composite") {
       return res.json({
         success: true,
         selectedMode: finalMode,
-        text: "Mode model_product_cinematic membutuhkan upload foto model dan foto produk. Silakan pilih mode Model + Produk Cinematic lalu upload file."
+        text: "Mode scene_composite membutuhkan upload foto orang, foto produk, dan foto background."
       });
     }
 
@@ -483,35 +492,33 @@ app.post("/api/combine-photos-image", upload.array("photos", 4), async (req, res
   }
 });
 
-app.post("/api/model-product-cinematic", upload.fields([
-  { name: "modelImage", maxCount: 1 },
-  { name: "productImage", maxCount: 1 }
+app.post("/api/scene-composite", upload.fields([
+  { name: "personImage", maxCount: 1 },
+  { name: "productImage", maxCount: 1 },
+  { name: "backgroundImage", maxCount: 1 }
 ]), async (req, res) => {
   try {
-    const modelImage = req.files?.modelImage?.[0];
+    const personImage = req.files?.personImage?.[0];
     const productImage = req.files?.productImage?.[0];
-    const prompt = req.body.prompt || "";
+    const backgroundImage = req.files?.backgroundImage?.[0];
 
-    if (!modelImage || !productImage) {
+    if (!personImage || !productImage || !backgroundImage) {
       return res.status(400).json({
         success: false,
-        error: "Foto model dan foto produk wajib diupload."
+        error: "Upload foto orang, produk, dan background terlebih dahulu."
       });
     }
 
-    const imageUrl = await runReplicateModelProductCinematic(
-      modelImage,
+    const output = await createSceneComposite(
+      personImage,
       productImage,
-      prompt
+      backgroundImage
     );
 
-    res.json({
-      success: true,
-      selectedMode: "model_product_cinematic",
-      imageUrl
-    });
+    res.set("Content-Type", "image/png");
+    res.send(output);
   } catch (err) {
-    console.error("SERVER ERROR /api/model-product-cinematic:", err);
+    console.error("SERVER ERROR /api/scene-composite:", err);
     res.status(500).json({
       success: false,
       error: err.message
