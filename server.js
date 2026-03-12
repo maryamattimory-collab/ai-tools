@@ -105,83 +105,25 @@ app.post("/api/gemini-chat", async (req, res) => {
       return res.status(400).json({ error: "Prompt kosong" });
     }
 
-    let finalPrompt = message;
+    let finalMode = mode;
 
-    if (mode === "infographic") {
-      finalPrompt = `Buat konsep infografis carousel.
+if (!finalMode || finalMode === "auto") {
+  finalMode = await detectBestMode(message);
+}
 
-Topik:
-${message}
+let finalPrompt = buildPromptByMode(finalMode, message);
 
-Format:
-JUDUL
-SLIDE 1
-SLIDE 2
-SLIDE 3
-SLIDE 4
-SLIDE 5
-CTA`;
-    } else if (mode === "tiktok") {
-      finalPrompt = `Buat TikTok carousel storytelling.
+if (finalMode === "analyze_video") {
+  finalPrompt = `Mode analyze_video membutuhkan upload video asli. Silakan pilih mode Analyze Video dan upload file video.`;
+}
 
-Topik:
-${message}
+const text = await callGeminiText(finalPrompt);
 
-Format:
-HOOK
-SLIDE 1
-SLIDE 2
-SLIDE 3
-SLIDE 4
-SLIDE 5
-CLOSING`;
-    } else if (mode === "leonardo") {
-      finalPrompt = `Buat prompt Leonardo AI.
-
-Topik:
-${message}
-
-Format:
-PROMPT
-NEGATIVE PROMPT
-STYLE NOTES`;
-    } else if (mode === "veo") {
-      finalPrompt = `Buat prompt cinematic untuk Veo.
-
-Topik:
-${message}
-
-Format:
-JUDUL VIDEO
-SCENE 1
-SCENE 2
-SCENE 3
-SCENE 4
-CAMERA
-LIGHTING
-MOOD
-NEGATIVE PROMPT`;
-    } else if (mode === "combine_photos") {
-      finalPrompt = `Gabungkan beberapa foto berikut menjadi konsep visual.
-
-Instruksi user:
-${message}
-
-Buat output:
-1. Konsep visual utama
-2. Komposisi
-3. Lighting
-4. Mood
-5. Prompt Leonardo AI
-6. Caption`;
-    }
-
-    const text = await callGeminiText(finalPrompt);
-
-    res.json({
-      success: true,
-      text
-    });
+res.json({
+  success: true,
+  selectedMode: finalMode,
+  text
+});
   } catch (err) {
     console.error("SERVER ERROR /api/gemini-chat:", err);
     res.status(500).json({
@@ -240,3 +182,114 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server aktif di port ${PORT}`);
 });
+
+async function detectBestMode(message) {
+  const modePrompt = `
+Tentukan mode tool terbaik untuk permintaan user berikut.
+
+Pilihan mode yang valid hanya salah satu dari:
+- infographic
+- tiktok
+- leonardo
+- veo
+- analyze_video
+- combine_photos
+
+Aturan:
+- Jika user meminta konten carousel infografis → infographic
+- Jika user meminta carousel TikTok / slide storytelling → tiktok
+- Jika user meminta prompt gambar Leonardo → leonardo
+- Jika user meminta prompt video Veo → veo
+- Jika user meminta analisa video → analyze_video
+- Jika user meminta gabungkan foto / konsep dari beberapa foto → combine_photos
+
+Balas HANYA dengan salah satu nama mode di atas.
+Jangan beri penjelasan tambahan.
+
+Permintaan user:
+${message}
+`;
+
+  const result = await callGeminiText(modePrompt);
+  return result.trim().toLowerCase();
+}
+function buildPromptByMode(mode, message) {
+  if (mode === "infographic") {
+    return `Buat konsep infografis carousel.
+
+Topik:
+${message}
+
+Format:
+JUDUL
+SLIDE 1
+SLIDE 2
+SLIDE 3
+SLIDE 4
+SLIDE 5
+CTA`;
+  }
+
+  if (mode === "tiktok") {
+    return `Buat TikTok carousel storytelling.
+
+Topik:
+${message}
+
+Format:
+HOOK
+SLIDE 1
+SLIDE 2
+SLIDE 3
+SLIDE 4
+SLIDE 5
+CLOSING`;
+  }
+
+  if (mode === "leonardo") {
+    return `Buat prompt Leonardo AI.
+
+Topik:
+${message}
+
+Format:
+PROMPT
+NEGATIVE PROMPT
+STYLE NOTES`;
+  }
+
+  if (mode === "veo") {
+    return `Buat prompt cinematic untuk Veo.
+
+Topik:
+${message}
+
+Format:
+JUDUL VIDEO
+SCENE 1
+SCENE 2
+SCENE 3
+SCENE 4
+CAMERA
+LIGHTING
+MOOD
+NEGATIVE PROMPT`;
+  }
+
+  if (mode === "combine_photos") {
+    return `Gabungkan beberapa foto berikut menjadi konsep visual.
+
+Instruksi user:
+${message}
+
+Buat output:
+1. Konsep visual utama
+2. Komposisi
+3. Lighting
+4. Mood
+5. Prompt Leonardo AI
+6. Caption`;
+  }
+
+  return message;
+}
