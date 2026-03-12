@@ -6,8 +6,10 @@ import sharp from "sharp";
 import { fileURLToPath } from "url";
 
 const app = express();
-const upload = multer({ storage: multer.memoryStorage() });
-
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 15 * 1024 * 1024 }
+});
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -178,6 +180,28 @@ Buat output:
   }
 });
 
+app.post("/api/combine-photos-image", upload.array("photos", 4), async (req, res) => {
+  try {
+    if (!req.files || req.files.length < 2) {
+      return res.status(400).json({
+        success: false,
+        error: "Minimal upload 2 foto."
+      });
+    }
+
+    const imageBuffer = await createPhotoCollage(req.files);
+
+    res.set("Content-Type", "image/png");
+    res.send(imageBuffer);
+
+  } catch (err) {
+    console.error("SERVER ERROR /api/combine-photos-image:", err);
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
@@ -294,5 +318,6 @@ Buat output:
 
   return message;
 }
+
 
 
