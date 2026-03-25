@@ -6,6 +6,9 @@ import { fileURLToPath } from "url";
 
 const app = express();
 
+/* ===========================
+   UPLOAD SETUP
+=========================== */
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -13,20 +16,28 @@ const upload = multer({
   }
 });
 
+/* ===========================
+   PATH SETUP
+=========================== */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/* ===========================
+   MIDDLEWARE
+=========================== */
 app.use(cors());
 app.use(express.json({ limit: "20mb" }));
 app.use(express.static(__dirname));
 
+/* ===========================
+   ENV CONFIG
+=========================== */
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
 /* ===========================
-   GEMINI HELPERS
+   GEMINI TEXT
 =========================== */
-
 async function callGeminiText(prompt) {
   if (!GEMINI_API_KEY) {
     throw new Error("GEMINI_API_KEY belum diisi di Railway Variables");
@@ -43,9 +54,7 @@ async function callGeminiText(prompt) {
         contents: [
           {
             role: "user",
-            parts: [
-              { text: prompt }
-            ]
+            parts: [{ text: prompt }]
           }
         ]
       })
@@ -61,6 +70,9 @@ async function callGeminiText(prompt) {
   return data?.candidates?.[0]?.content?.parts?.[0]?.text || "Tidak ada respon dari Gemini.";
 }
 
+/* ===========================
+   GEMINI VIDEO
+=========================== */
 async function callGeminiWithVideo(videoBuffer, mimeType, prompt) {
   if (!GEMINI_API_KEY) {
     throw new Error("GEMINI_API_KEY belum diisi di Railway Variables");
@@ -105,28 +117,23 @@ async function callGeminiWithVideo(videoBuffer, mimeType, prompt) {
   return data?.candidates?.[0]?.content?.parts?.[0]?.text || "Tidak ada respon dari Gemini.";
 }
 
+/* ===========================
+   AUTO MODE DETECTOR
+=========================== */
 async function detectBestMode(message) {
   const modePrompt = `
 Tentukan mode tool terbaik untuk permintaan user berikut.
 
-Pilihan mode yang valid hanya salah satu dari:
+Pilihan:
 - infographic
 - tiktok
 - leonardo
 - veo
 - analyze_video
 
-Aturan:
-- Jika user meminta konten carousel infografis → infographic
-- Jika user meminta carousel TikTok / slide storytelling → tiktok
-- Jika user meminta prompt gambar Leonardo → leonardo
-- Jika user meminta prompt video Veo → veo
-- Jika user meminta analisa video → analyze_video
+Balas hanya salah satu.
 
-Balas HANYA dengan salah satu nama mode di atas.
-Jangan beri penjelasan tambahan.
-
-Permintaan user:
+User:
 ${message}
 `;
 
@@ -134,7 +141,11 @@ ${message}
   return result.trim().toLowerCase();
 }
 
+/* ===========================
+   PROMPT BUILDER
+=========================== */
 function buildPromptByMode(mode, message) {
+
   if (mode === "infographic") {
     return `Buat konsep infografis carousel.
 
@@ -205,8 +216,12 @@ NEGATIVE PROMPT`;
 =========================== */
 
 app.get("/", (req, res) => {
-  res.send("AI Studio Pro aktif");
+  res.send("AI Studio Pro aktif 🚀");
 });
+
+/* ===========================
+   GENERATE TEXT
+=========================== */
 
 app.post("/api/generate", async (req, res) => {
   try {
@@ -229,7 +244,7 @@ app.post("/api/generate", async (req, res) => {
       return res.json({
         success: true,
         selectedMode: finalMode,
-        text: "Mode Analyze Video membutuhkan upload file video. Silakan pilih mode Analyze Video lalu upload video."
+        text: "Mode ini butuh upload video."
       });
     }
 
@@ -241,14 +256,19 @@ app.post("/api/generate", async (req, res) => {
       selectedMode: finalMode,
       text
     });
+
   } catch (err) {
-    console.error("SERVER ERROR /api/generate:", err);
+    console.error(err);
     res.status(500).json({
       success: false,
       error: err.message
     });
   }
 });
+
+/* ===========================
+   ANALYZE VIDEO (FINAL UPGRADE)
+=========================== */
 
 app.post("/api/analyze-video", upload.single("video"), async (req, res) => {
   try {
@@ -260,20 +280,44 @@ app.post("/api/analyze-video", upload.single("video"), async (req, res) => {
     }
 
     const prompt = req.body.prompt || "Analisa video ini scene by scene.";
+    const modeType = req.body.modeType || "original";
 
-    const finalPrompt = `
-Analisa video ini berdasarkan isi visual aslinya.
+    let finalPrompt = "";
 
-Instruksi user:
+    if (modeType === "storytelling") {
+
+      finalPrompt = `
+User ingin membuat ulang cerita dari video (bukan meniru).
+
+Instruksi:
 ${prompt}
 
-Buat output:
-1. Ringkasan isi video
-2. Storyboard per scene
-3. Prompt Veo cinematic per scene
-4. Angle kamera, lighting, dan mood per scene
-5. Caption TikTok
+Output:
+1. Ide cerita baru
+2. Storyboard storytelling
+3. Hook kuat
+4. Voice over baru
+5. Prompt Veo cinematic
+6. Caption TikTok
 `;
+
+    } else {
+
+      finalPrompt = `
+Analisa video sesuai alur asli.
+
+Instruksi:
+${prompt}
+
+Output:
+1. Ringkasan video
+2. Storyboard asli
+3. Prompt Veo per scene
+4. Camera, lighting, mood
+5. Caption
+`;
+
+    }
 
     const text = await callGeminiWithVideo(
       req.file.buffer,
@@ -284,10 +328,12 @@ Buat output:
     res.json({
       success: true,
       selectedMode: "analyze_video",
+      modeType,
       text
     });
+
   } catch (err) {
-    console.error("SERVER ERROR /api/analyze-video:", err);
+    console.error(err);
     res.status(500).json({
       success: false,
       error: err.message
@@ -296,11 +342,11 @@ Buat output:
 });
 
 /* ===========================
-   SERVER START
+   START SERVER
 =========================== */
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log("AI Studio Pro aktif di port " + PORT);
+  console.log("Server jalan di port " + PORT);
 });
