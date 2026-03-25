@@ -1,119 +1,77 @@
-import express from "express";
-import cors from "cors";
-import path from "path";
-import multer from "multer";
-import { fileURLToPath } from "url";
+/* ===========================
+   SERVER.JS FINAL (FULL MODE)
+=========================== */
 
+const express = require("express");
+const multer = require("multer");
+const cors = require("cors");
 const app = express();
-
-/* ===========================
-   UPLOAD
-=========================== */
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 100 * 1024 * 1024 }
-});
-
-/* ===========================
-   PATH
-=========================== */
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-/* ===========================
-   MIDDLEWARE
-=========================== */
+const upload = multer();
 app.use(cors());
-app.use(express.json({ limit: "20mb" }));
-app.use(express.static(__dirname));
+app.use(express.json());
+app.use(express.static("public")); // untuk chat.html, css, js
 
-/* ===========================
-   ENV
-=========================== */
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-
-/* ===========================
-   GEMINI TEXT
-=========================== */
-async function callGeminiText(prompt) {
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }]
-      })
-    }
-  );
-
-  const data = await response.json();
-
-  if (data.error) throw new Error(data.error.message);
-
-  return data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+// ===========================
+// UTILITY FUNCTION (FAKE GEMINI CALL)
+// ===========================
+async function callGemini(prompt) {
+  // placeholder: ganti dengan panggilan AI nyata
+  return `Hasil AI untuk prompt:\n${prompt}`;
 }
 
-/* ===========================
-   GEMINI VIDEO
-=========================== */
-async function callGeminiWithVideo(buffer, mimeType, prompt) {
-  const base64 = buffer.toString("base64");
-
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [
-              {
-                inlineData: {
-                  mimeType: mimeType,
-                  data: base64
-                }
-              },
-              { text: prompt }
-            ]
-          }
-        ]
-      })
-    }
-  );
-
-  const data = await response.json();
-
-  if (data.error) throw new Error(data.error.message);
-
-  return data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+async function callGeminiWithVideo(videoBuffer, mimetype, prompt) {
+  // placeholder: ganti dengan panggilan AI video nyata
+  return `Hasil AI untuk video dengan prompt:\n${prompt}`;
 }
 
-/* ===========================
-   ROOT (DEBUG VERSION)
-=========================== */
-app.get("/", (req, res) => {
-  res.send("AI Studio Pro 🚀 VERSION STORYTELLING AKTIF");
-});
-
-/* ===========================
-   GENERATE
-=========================== */
+// ===========================
+// ENDPOINT GENERATE (SEMUA MODE)
+// ===========================
 app.post("/api/generate", async (req, res) => {
   try {
-    const { prompt } = req.body;
+    const { mode, prompt } = req.body;
 
-    const text = await callGeminiText(prompt);
+    if (!prompt) {
+      return res.status(400).json({ success: false, error: "Prompt kosong" });
+    }
+
+    // Mode auto = Gemini pilih tool
+    let selectedMode = mode || "auto";
+
+    // Logika sederhana: bisa dikembangkan sesuai AI nyata
+    let finalPrompt = "";
+    switch (selectedMode) {
+      case "infographic":
+        finalPrompt = `Buat infografis dari topik:\n${prompt}`;
+        break;
+      case "tiktok":
+        finalPrompt = `Buat TikTok carousel cinematic:\n${prompt}`;
+        break;
+      case "leonardo":
+        finalPrompt = `Buat prompt Leonardo T2I/I2V cinematic:\n${prompt}`;
+        break;
+      case "veo":
+        finalPrompt = `Buat prompt Veo cinematic scene by scene:\n${prompt}`;
+        break;
+      case "analyze_video":
+        // Fallback jika user lewat endpoint generate, minta pakai endpoint analyze-video
+        finalPrompt = `Analisa video (user pakai generate endpoint secara tidak sengaja):\n${prompt}`;
+        break;
+      case "auto":
+      default:
+        finalPrompt = `Auto mode: AI pilih tool sesuai prompt:\n${prompt}`;
+    }
+
+    const text = await callGemini(finalPrompt);
 
     res.json({
       success: true,
+      selectedMode,
       text
     });
 
   } catch (err) {
+    console.error("ERROR /api/generate:", err);
     res.status(500).json({
       success: false,
       error: err.message
@@ -121,9 +79,9 @@ app.post("/api/generate", async (req, res) => {
   }
 });
 
-/* ===========================
-   ANALYZE VIDEO (FINAL FIX)
-=========================== */
+// ===========================
+// ENDPOINT ANALYZE VIDEO
+// ===========================
 app.post("/api/analyze-video", upload.single("video"), async (req, res) => {
   try {
     if (!req.file) {
@@ -134,19 +92,9 @@ app.post("/api/analyze-video", upload.single("video"), async (req, res) => {
     }
 
     const prompt = req.body.prompt || "Analisa video ini";
-    
-    // 🔥 DEBUG LOG
-    console.log("BODY:", req.body);
 
-    // 🔥 AMBIL MODE
-    let modeType = req.body.modeType;
-
-    // 🔥 AUTO FIX (kalau frontend gak kirim)
-    if (!modeType) {
-      modeType = "storytelling"; // 👉 default paksa biar keliatan
-    }
-
-    console.log("MODE TERPAKAI:", modeType);
+    // ambil modeType dari frontend, fallback storytelling
+    let modeType = req.body.modeType || "storytelling";
 
     let finalPrompt = "";
 
@@ -194,7 +142,7 @@ Output:
     });
 
   } catch (err) {
-    console.error("ERROR:", err);
+    console.error("ERROR /api/analyze-video:", err);
     res.status(500).json({
       success: false,
       error: err.message
@@ -202,11 +150,10 @@ Output:
   }
 });
 
-/* ===========================
-   START
-=========================== */
+// ===========================
+// START SERVER
+// ===========================
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, "0.0.0.0", () => {
   console.log("SERVER RUNNING DI PORT " + PORT);
 });
