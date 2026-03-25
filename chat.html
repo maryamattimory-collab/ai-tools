@@ -2,53 +2,48 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Studio Pro</title>
-
 <style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#0f172a;
-  color:#e5e7eb;
+body {
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
+  padding: 20px;
 }
 
-.container{
-  max-width:800px;
-  margin:auto;
-  padding:20px;
+.container {
+  max-width: 600px;
+  margin: auto;
 }
 
-textarea, select, button, input{
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  border-radius:10px;
-  border:none;
+select, textarea, input, button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
 }
 
-button{
-  background:#38bdf8;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
+button {
+  background: #22c55e;
+  color: white;
+  cursor: pointer;
 }
 
-.chat{
-  margin-top:20px;
-  background:#020617;
-  padding:15px;
-  border-radius:12px;
-  white-space:pre-wrap;
+#videoUpload {
+  display: none;
+}
+
+#analyzeStyle {
+  display: none;
 }
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
-<h2>AI Studio Pro 🚀</h2>
+<h2>AI Studio Pro</h2>
 
 <select id="mode">
   <option value="auto">Auto</option>
@@ -59,72 +54,83 @@ button{
   <option value="analyze_video">Analyze Video</option>
 </select>
 
-<textarea id="prompt" placeholder="Tulis prompt..."></textarea>
+<textarea id="prompt" placeholder="Tulis prompt kamu..."></textarea>
 
-<input type="file" id="videoFile" style="display:none">
+<div id="videoUpload">
+  <input type="file" id="videoFile" accept="video/*">
 
-<!-- 🔥 TAMBAHAN BARU (TIDAK MERUSAK UI) -->
-<select id="analyzeStyle" style="display:none">
-  <option value="original">Ikuti Alur Asli</option>
-  <option value="storytelling">Storytelling Ulang</option>
-  <option value="hybrid">Hybrid</option>
-</select>
+  <select id="analyzeStyle">
+    <option value="original">Ikuti Alur Asli</option>
+    <option value="storytelling">Storytelling Ulang</option>
+    <option value="hybrid">Gabungan</option>
+  </select>
+</div>
 
 <button onclick="sendPrompt()">Generate</button>
 
-<div class="chat" id="chatBox"></div>
+<pre id="result"></pre>
 
 </div>
 
 <script>
 const modeSelect = document.getElementById("mode");
-const videoFile = document.getElementById("videoFile");
+const videoUpload = document.getElementById("videoUpload");
 const analyzeStyle = document.getElementById("analyzeStyle");
 
-// tampilkan input sesuai mode
 modeSelect.addEventListener("change", () => {
-  const isAnalyze = modeSelect.value === "analyze_video";
-
-  videoFile.style.display = isAnalyze ? "block" : "none";
-  analyzeStyle.style.display = isAnalyze ? "block" : "none";
+  if (modeSelect.value === "analyze_video") {
+    videoUpload.style.display = "block";
+    analyzeStyle.style.display = "block";
+  } else {
+    videoUpload.style.display = "none";
+    analyzeStyle.style.display = "none";
+  }
 });
 
-async function sendPrompt(){
+async function sendPrompt() {
   const mode = modeSelect.value;
   const prompt = document.getElementById("prompt").value;
+  const resultBox = document.getElementById("result");
 
-  const chat = document.getElementById("chatBox");
-  chat.innerHTML = "Loading...";
+  resultBox.textContent = "Loading...";
 
-  if(mode === "analyze_video"){
-    const file = videoFile.files[0];
-    if(!file) return alert("Upload video dulu");
+  try {
+    if (mode === "analyze_video") {
+      const file = document.getElementById("videoFile").files[0];
+      const style = analyzeStyle.value;
 
-    const style = analyzeStyle.value;
+      const formData = new FormData();
+      formData.append("video", file);
+      formData.append("prompt", prompt);
+      formData.append("style", style);
 
-    const formData = new FormData();
-    formData.append("video", file);
-    formData.append("prompt", prompt);
-    formData.append("style", style); // 🔥 kirim pilihan
+      const res = await fetch("/api/analyze-video", {
+        method: "POST",
+        body: formData
+      });
 
-    const res = await fetch("/api/analyze-video", {
-      method:"POST",
-      body:formData
-    });
+      const data = await res.json();
+      resultBox.textContent = data.text;
 
-    const data = await res.json();
-    chat.innerHTML = data.text;
-    return;
+    } else {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          mode,
+          prompt
+        })
+      });
+
+      const data = await res.json();
+      resultBox.textContent = data.text;
+    }
+
+  } catch (err) {
+    resultBox.textContent = "Error: " + err.message;
   }
-
-  const res = await fetch("/api/generate", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ mode, prompt })
-  });
-
-  const data = await res.json();
-  chat.innerHTML = data.text;
 }
 </script>
 
