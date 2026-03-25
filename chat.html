@@ -14,12 +14,12 @@ body{
 }
 
 .container{
-  max-width:1100px;
+  max-width:800px;
   margin:auto;
   padding:20px;
 }
 
-textarea, select, button{
+textarea, select, button, input{
   width:100%;
   padding:10px;
   margin-top:10px;
@@ -39,37 +39,7 @@ button{
   background:#020617;
   padding:15px;
   border-radius:12px;
-}
-
-/* TAB UI */
-.tabs{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-bottom:10px;
-}
-
-.tab-btn{
-  background:#1e293b;
-  padding:8px 12px;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-.tab-btn.active{
-  background:#38bdf8;
-}
-
-.tab-content{
-  display:none;
-  background:#111827;
-  padding:15px;
-  border-radius:10px;
   white-space:pre-wrap;
-}
-
-.tab-content.active{
-  display:block;
 }
 </style>
 </head>
@@ -93,6 +63,13 @@ button{
 
 <input type="file" id="videoFile" style="display:none">
 
+<!-- 🔥 TAMBAHAN BARU (TIDAK MERUSAK UI) -->
+<select id="analyzeStyle" style="display:none">
+  <option value="original">Ikuti Alur Asli</option>
+  <option value="storytelling">Storytelling Ulang</option>
+  <option value="hybrid">Hybrid</option>
+</select>
+
 <button onclick="sendPrompt()">Generate</button>
 
 <div class="chat" id="chatBox"></div>
@@ -102,9 +79,14 @@ button{
 <script>
 const modeSelect = document.getElementById("mode");
 const videoFile = document.getElementById("videoFile");
+const analyzeStyle = document.getElementById("analyzeStyle");
 
+// tampilkan input sesuai mode
 modeSelect.addEventListener("change", () => {
-  videoFile.style.display = modeSelect.value === "analyze_video" ? "block" : "none";
+  const isAnalyze = modeSelect.value === "analyze_video";
+
+  videoFile.style.display = isAnalyze ? "block" : "none";
+  analyzeStyle.style.display = isAnalyze ? "block" : "none";
 });
 
 async function sendPrompt(){
@@ -118,9 +100,12 @@ async function sendPrompt(){
     const file = videoFile.files[0];
     if(!file) return alert("Upload video dulu");
 
+    const style = analyzeStyle.value;
+
     const formData = new FormData();
     formData.append("video", file);
     formData.append("prompt", prompt);
+    formData.append("style", style); // 🔥 kirim pilihan
 
     const res = await fetch("/api/analyze-video", {
       method:"POST",
@@ -128,7 +113,7 @@ async function sendPrompt(){
     });
 
     const data = await res.json();
-    renderTabs(data.text);
+    chat.innerHTML = data.text;
     return;
   }
 
@@ -139,43 +124,7 @@ async function sendPrompt(){
   });
 
   const data = await res.json();
-  renderTabs(data.text);
-}
-
-/* 🔥 INI BAGIAN PENTING */
-function renderTabs(text){
-  const chat = document.getElementById("chatBox");
-
-  const sections = text.split(/###\s+/).filter(s => s.trim());
-
-  let tabs = `<div class="tabs">`;
-  let content = "";
-
-  sections.forEach((sec, i) => {
-    const lines = sec.split("\n");
-    const title = lines[0];
-    const body = lines.slice(1).join("\n");
-
-    tabs += `<div class="tab-btn ${i===0?"active":""}" onclick="openTab(${i})">${title}</div>`;
-
-    content += `
-      <div class="tab-content ${i===0?"active":""}" id="tab-${i}">
-        ${body}
-      </div>
-    `;
-  });
-
-  tabs += "</div>";
-
-  chat.innerHTML = tabs + content;
-}
-
-function openTab(i){
-  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-  document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
-
-  document.querySelectorAll(".tab-btn")[i].classList.add("active");
-  document.getElementById("tab-"+i).classList.add("active");
+  chat.innerHTML = data.text;
 }
 </script>
 
