@@ -1,88 +1,299 @@
-const express=require("express");
-const multer=require("multer");
-const app=express();
-const upload=multer();
+import express from "express";
+import cors from "cors";
+import fetch from "node-fetch";
+import path from "path";
+import { fileURLToPath } from "url";
 
-// Middleware JSON
+const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(cors());
 app.use(express.json());
+app.use(express.static(__dirname));
 
-// ===========================
-// GENERATE GENERAL
-// ===========================
-app.post("/api/generate",async(req,res)=>{
-  try{
-    const {mode,prompt}=req.body;
-    // 🔥 DEBUG
-    console.log("GENERATE:",mode,prompt);
-    // Contoh dummy response
-    res.json({
-      success:true,
-      selectedMode:mode,
-      text:`Ini hasil AI untuk mode ${mode} dengan prompt:\n${prompt}`
-    });
-  }catch(err){
-    res.status(500).json({success:false,error:err.message});
-  }
-});
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const MODEL = "gemini-2.5-flash";
 
-// ===========================
-// ANALYZE VIDEO (FINAL FIX)
-// ===========================
-app.post("/api/analyze-video",upload.single("video"),async(req,res)=>{
-  try{
-    if(!req.file){return res.status(400).json({success:false,error:"Upload video dulu"});}
-    const prompt=req.body.prompt||"Analisa video ini";
-    console.log("BODY:",req.body);
+async function callGemini(parts) {
 
-    let modeType=req.body.mode;
-    if(!modeType){modeType="storytelling";}
-
-    console.log("MODE TERPAKAI:",modeType);
-
-    let finalPrompt="";
-    if(modeType==="storytelling"){
-      finalPrompt=`
-User ingin membuat ulang cerita dari video (bukan meniru).
-
-Instruksi:
-${prompt}
-
-Output:
-1. Ide cerita baru
-2. Storyboard storytelling
-3. Hook kuat
-4. Script voice over baru
-5. Prompt Veo cinematic
-6. Caption TikTok
-`;
-    }else{
-      finalPrompt=`
-Analisa video sesuai alur asli.
-
-Instruksi:
-${prompt}
-
-Output:
-1. Ringkasan video
-2. Storyboard asli
-3. Prompt Veo per scene
-4. Camera, lighting, mood
-5. Caption
-`;
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: "user",
+            parts
+          }
+        ]
+      })
     }
+  );
 
-    // 🔥 Dummy callGemini
-    const text=`[SIMULASI GEMINI] Analisis video selesai.\nPrompt yang digunakan:\n${finalPrompt}`;
+  const data = await response.json();
 
-    res.json({success:true,modeType,text});
-  }catch(err){
-    console.error("ERROR:",err);
-    res.status(500).json({success:false,error:err.message});
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text || JSON.stringify(data);
+}
+
+
+
+
+
+
+/* ===========================
+   INFOGRAPHIC GENERATOR
+=========================== */
+
+app.post("/api/generate-infographic", async (req, res) => {
+
+  try {
+
+    const { topic } = req.body;
+
+    const result = await callGemini([
+      {
+        text: `
+Buat konsep infografis Instagram carousel.
+
+Topik:
+${topic}
+
+Output harus berisi:
+
+JUDUL
+SLIDE 1
+SLIDE 2
+SLIDE 3
+SLIDE 4
+SLIDE 5
+CTA
+
+Gunakan bahasa Indonesia.
+        `
+      }
+    ]);
+
+    res.json({
+      success: true,
+      text: result
+    });
+
+  } catch (err) {
+
+    res.status(500).json({
+      error: err.message
+    });
+
   }
+
 });
 
-// ===========================
-// START SERVER
-// ===========================
-const PORT=process.env.PORT||3000;
-app.listen(PORT,"0.0.0.0",()=>{console.log("SERVER RUNNING DI PORT "+PORT);});
+
+
+
+
+
+
+/* ===========================
+   TIKTOK CAROUSEL GENERATOR
+=========================== */
+
+app.post("/api/generate-tiktok-carousel", async (req, res) => {
+
+  try {
+
+    const { topic } = req.body;
+
+    const result = await callGemini([
+      {
+        text: `
+Buat TikTok carousel storytelling.
+
+Topik:
+${topic}
+
+Format:
+
+Hook
+Slide 1
+Slide 2
+Slide 3
+Slide 4
+Slide 5
+Closing
+
+Gunakan bahasa santai.
+        `
+      }
+    ]);
+
+    res.json({
+      success: true,
+      text: result
+    });
+
+  } catch (err) {
+
+    res.status(500).json({
+      error: err.message
+    });
+
+  }
+
+});
+
+
+
+
+
+
+
+/* ===========================
+   LEONARDO PROMPT GENERATOR
+=========================== */
+
+app.post("/api/generate-leonardo-prompt", async (req, res) => {
+
+  try {
+
+    const { topic } = req.body;
+
+    const result = await callGemini([
+      {
+        text: `
+Buat prompt gambar Leonardo AI.
+
+Topik:
+${topic}
+
+Gunakan gaya:
+
+soft pastel
+3D cartoon
+semi chibi
+cinematic lighting
+Pixar style
+
+Format:
+
+PROMPT
+NEGATIVE PROMPT
+STYLE
+        `
+      }
+    ]);
+
+    res.json({
+      success: true,
+      text: result
+    });
+
+  } catch (err) {
+
+    res.status(500).json({
+      error: err.message
+    });
+
+  }
+
+});
+
+
+
+
+
+
+
+/* ===========================
+   VEO VIDEO PROMPT GENERATOR
+=========================== */
+
+app.post("/api/generate-veo-prompt", async (req, res) => {
+
+  try {
+
+    const { topic } = req.body;
+
+    const result = await callGemini([
+      {
+        text: `
+Buat prompt video cinematic untuk generator video seperti Veo.
+
+Topik:
+${topic}
+
+Output format:
+
+JUDUL VIDEO
+
+SCENE 1
+SCENE 2
+SCENE 3
+SCENE 4
+
+STYLE
+CAMERA
+LIGHTING
+MOOD
+NEGATIVE PROMPT
+        `
+      }
+    ]);
+
+    res.json({
+      success: true,
+      text: result
+    });
+
+  } catch (err) {
+
+    res.status(500).json({
+      error: err.message
+    });
+
+  }
+
+});
+
+
+
+
+
+
+
+/* ===========================
+   ANALYZE VIDEO
+=========================== */
+
+app.post("/api/analyze-video", async (req, res) => {
+
+  res.json({
+    success: false,
+    message: "Analyze video membutuhkan upload video."
+  });
+
+});
+
+
+
+
+
+
+
+/* ===========================
+   SERVER START
+=========================== */
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+
+  console.log("AI Studio Pro API aktif di port", PORT);
+
+});
