@@ -1,566 +1,183 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Studio Pro</title>
-  <style>
-    *{
-      box-sizing:border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Studio Pro</title>
 
-    body{
-      margin:0;
-      font-family:Arial,sans-serif;
-      background:#0f172a;
-      color:#e5e7eb;
-    }
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0f172a;
+  color:#e5e7eb;
+}
 
-    .container{
-      max-width:1100px;
-      margin:auto;
-      padding:24px 16px 40px;
-    }
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
 
-    .topbar{
-      margin-bottom:20px;
-    }
+textarea, select, button{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
+  border:none;
+}
 
-    .badge{
-      display:inline-block;
-      padding:6px 12px;
-      border-radius:999px;
-      background:#1e293b;
-      color:#93c5fd;
-      font-size:12px;
-      font-weight:bold;
-      margin-bottom:12px;
-      border:1px solid rgba(255,255,255,0.06);
-    }
+button{
+  background:#38bdf8;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    h1{
-      margin:0 0 10px;
-      font-size:32px;
-      color:white;
-    }
+.chat{
+  margin-top:20px;
+  background:#020617;
+  padding:15px;
+  border-radius:12px;
+}
 
-    .subtitle{
-      margin:0;
-      color:#94a3b8;
-      line-height:1.7;
-      font-size:15px;
-      max-width:760px;
-    }
+/* TAB UI */
+.tabs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:10px;
+}
 
-    .layout{
-      display:grid;
-      grid-template-columns:380px 1fr;
-      gap:18px;
-      align-items:start;
-    }
+.tab-btn{
+  background:#1e293b;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+}
 
-    .panel{
-      background:#111827;
-      border:1px solid rgba(255,255,255,0.06);
-      border-radius:18px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.2);
-    }
+.tab-btn.active{
+  background:#38bdf8;
+}
 
-    .left-panel{
-      padding:18px;
-      position:sticky;
-      top:18px;
-    }
+.tab-content{
+  display:none;
+  background:#111827;
+  padding:15px;
+  border-radius:10px;
+  white-space:pre-wrap;
+}
 
-    .right-panel{
-      padding:18px;
-    }
-
-    .section-title{
-      margin:0 0 14px;
-      font-size:18px;
-      color:white;
-    }
-
-    .row{
-      margin-bottom:14px;
-    }
-
-    label{
-      display:block;
-      margin-bottom:7px;
-      font-size:14px;
-      font-weight:bold;
-      color:#cbd5e1;
-    }
-
-    select,
-    textarea,
-    input{
-      width:100%;
-      padding:12px 14px;
-      border:none;
-      border-radius:12px;
-      font-size:14px;
-      background:#f8fafc;
-      color:#111827;
-    }
-
-    textarea{
-      min-height:180px;
-      resize:vertical;
-      line-height:1.5;
-    }
-
-    .prompt-tools{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-
-    button{
-      border:none;
-      border-radius:12px;
-      padding:10px 14px;
-      font-size:14px;
-      font-weight:bold;
-      cursor:pointer;
-      color:white;
-      background:#38bdf8;
-      transition:0.2s ease;
-    }
-
-    button:hover{
-      opacity:0.96;
-    }
-
-    .secondary{
-      background:#334155;
-    }
-
-    .danger{
-      background:#ef4444;
-    }
-
-    .small-btn{
-      background:#334155;
-      font-size:12px;
-      padding:8px 11px;
-    }
-
-    .button-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-top:10px;
-    }
-
-    .helper{
-      background:#0b1220;
-      border:1px solid rgba(255,255,255,0.06);
-      border-radius:14px;
-      padding:14px;
-      margin-top:16px;
-    }
-
-    .helper strong{
-      display:block;
-      margin-bottom:8px;
-      color:#e2e8f0;
-      font-size:14px;
-    }
-
-    .helper p{
-      margin:0;
-      color:#94a3b8;
-      font-size:13px;
-      line-height:1.7;
-    }
-
-    .status{
-      margin-top:12px;
-      min-height:18px;
-      font-size:13px;
-      color:#93c5fd;
-    }
-
-    .chat-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-bottom:14px;
-    }
-
-    .chat-header h2{
-      margin:0;
-      font-size:18px;
-      color:white;
-    }
-
-    .chat{
-      background:#020617;
-      border:1px solid rgba(255,255,255,0.06);
-      border-radius:16px;
-      min-height:520px;
-      max-height:78vh;
-      overflow:auto;
-      padding:16px;
-    }
-
-    .chat-empty{
-      text-align:center;
-      color:#94a3b8;
-      font-size:14px;
-      line-height:1.8;
-      padding:70px 20px;
-    }
-
-    .bubble{
-      max-width:88%;
-      padding:14px;
-      border-radius:14px;
-      margin-top:12px;
-      white-space:pre-wrap;
-      line-height:1.65;
-      word-wrap:break-word;
-    }
-
-    .user{
-      margin-left:auto;
-      background:#2563eb;
-      color:white;
-      text-align:right;
-    }
-
-    .ai{
-      margin-right:auto;
-      background:#1e293b;
-      color:#f8fafc;
-    }
-
-    .tool-actions{
-      margin-top:12px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-
-    .tool-actions button{
-      background:#475569;
-      padding:8px 12px;
-      font-size:12px;
-    }
-
-    @media (max-width:900px){
-      .layout{
-        grid-template-columns:1fr;
-      }
-
-      .left-panel{
-        position:static;
-      }
-    }
-
-    @media (max-width:640px){
-      h1{
-        font-size:28px;
-      }
-
-      .button-row{
-        flex-direction:column;
-      }
-
-      .button-row button{
-        width:100%;
-      }
-
-      .bubble{
-        max-width:100%;
-      }
-    }
-  </style>
+.tab-content.active{
+  display:block;
+}
+</style>
 </head>
+
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <div class="topbar">
-      <div class="badge">AI CONTENT TOOL</div>
-      <h1>AI Studio Pro</h1>
-      <p class="subtitle">
-        Buat infografis, TikTok carousel, prompt Leonardo, prompt Veo, dan analisa video dalam satu workspace yang ringan dan stabil.
-      </p>
-    </div>
+<h2>AI Studio Pro 🚀</h2>
 
-    <div class="layout">
+<select id="mode">
+  <option value="auto">Auto</option>
+  <option value="infographic">Infografis</option>
+  <option value="tiktok">TikTok</option>
+  <option value="leonardo">Leonardo</option>
+  <option value="veo">Veo</option>
+  <option value="analyze_video">Analyze Video</option>
+</select>
 
-      <div class="panel left-panel">
-        <h2 class="section-title">Workspace</h2>
+<textarea id="prompt" placeholder="Tulis prompt..."></textarea>
 
-        <div class="row">
-          <label for="mode">Pilih Mode</label>
-          <select id="mode">
-            <option value="auto">Auto (Gemini pilih tool)</option>
-            <option value="infographic">Infografis</option>
-            <option value="tiktok">TikTok Carousel</option>
-            <option value="leonardo">Prompt Leonardo</option>
-            <option value="veo">Prompt Veo</option>
-            <option value="analyze_video">Analyze Video</option>
-          </select>
-        </div>
+<input type="file" id="videoFile" style="display:none">
 
-        <div class="row">
-          <label for="prompt">Topik / Perintah</label>
-          <textarea id="prompt" placeholder="Tulis topik atau perintah di sini..."></textarea>
-        </div>
+<button onclick="sendPrompt()">Generate</button>
 
-        <div class="row" id="videoPromptTools" style="display:none;">
-          <label>Prompt Otomatis Analyze Video</label>
-          <div class="prompt-tools">
-            <button type="button" class="small-btn" onclick="setPrompt('Analisa video ini menjadi scene by scene prompt cinematic untuk Veo')">Scene by scene Veo</button>
-            <button type="button" class="small-btn" onclick="setPrompt('Analisa video ini lalu buat deskripsi angle kamera, lighting, dan mood per scene')">Kamera + lighting</button>
-            <button type="button" class="small-btn" onclick="setPrompt('Analisa video ini dan ubah menjadi storyboard singkat + prompt Leonardo per scene')">Storyboard + Leonardo</button>
-          </div>
-        </div>
+<div class="chat" id="chatBox"></div>
 
-        <div class="row" id="videoUpload" style="display:none;">
-          <label for="videoFile">Upload Video Referensi</label>
-          <input type="file" id="videoFile" accept="video/*">
-        </div>
+</div>
 
-        <div class="button-row">
-          <button type="button" onclick="sendPrompt()">Generate</button>
-          <button type="button" class="secondary" onclick="clearPrompt()">Clear Prompt</button>
-          <button type="button" class="danger" onclick="clearChat()">Clear Chat</button>
-        </div>
+<script>
+const modeSelect = document.getElementById("mode");
+const videoFile = document.getElementById("videoFile");
 
-        <div class="status" id="statusText"></div>
+modeSelect.addEventListener("change", () => {
+  videoFile.style.display = modeSelect.value === "analyze_video" ? "block" : "none";
+});
 
-        <div class="helper">
-          <strong>Tips</strong>
-          <p>
-            Gunakan mode Analyze Video jika kamu ingin AI membaca isi video asli yang diupload. Untuk mode lain, cukup masukkan topik atau ide.
-          </p>
-        </div>
+async function sendPrompt(){
+  const mode = modeSelect.value;
+  const prompt = document.getElementById("prompt").value;
+
+  const chat = document.getElementById("chatBox");
+  chat.innerHTML = "Loading...";
+
+  if(mode === "analyze_video"){
+    const file = videoFile.files[0];
+    if(!file) return alert("Upload video dulu");
+
+    const formData = new FormData();
+    formData.append("video", file);
+    formData.append("prompt", prompt);
+
+    const res = await fetch("/api/analyze-video", {
+      method:"POST",
+      body:formData
+    });
+
+    const data = await res.json();
+    renderTabs(data.text);
+    return;
+  }
+
+  const res = await fetch("/api/generate", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ mode, prompt })
+  });
+
+  const data = await res.json();
+  renderTabs(data.text);
+}
+
+/* 🔥 INI BAGIAN PENTING */
+function renderTabs(text){
+  const chat = document.getElementById("chatBox");
+
+  const sections = text.split(/###\s+/).filter(s => s.trim());
+
+  let tabs = `<div class="tabs">`;
+  let content = "";
+
+  sections.forEach((sec, i) => {
+    const lines = sec.split("\n");
+    const title = lines[0];
+    const body = lines.slice(1).join("\n");
+
+    tabs += `<div class="tab-btn ${i===0?"active":""}" onclick="openTab(${i})">${title}</div>`;
+
+    content += `
+      <div class="tab-content ${i===0?"active":""}" id="tab-${i}">
+        ${body}
       </div>
+    `;
+  });
 
-      <div class="panel right-panel">
-        <div class="chat-header">
-          <h2>Hasil AI</h2>
-        </div>
+  tabs += "</div>";
 
-        <div class="chat" id="chatBox">
-          <div class="chat-empty">
-            Hasil AI akan muncul di sini.<br><br>
-            Pilih mode, isi prompt, lalu klik <strong>Generate</strong>.
-          </div>
-        </div>
-      </div>
+  chat.innerHTML = tabs + content;
+}
 
-    </div>
-  </div>
+function openTab(i){
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
 
-  <script>
-    let lastText = "";
-    let lastJSON = null;
+  document.querySelectorAll(".tab-btn")[i].classList.add("active");
+  document.getElementById("tab-"+i).classList.add("active");
+}
+</script>
 
-    const modeSelect = document.getElementById("mode");
-    const videoUpload = document.getElementById("videoUpload");
-    const videoPromptTools = document.getElementById("videoPromptTools");
-    const statusText = document.getElementById("statusText");
-
-    function updateUploadUI(){
-      const mode = modeSelect.value;
-
-      videoUpload.style.display = "none";
-      videoPromptTools.style.display = "none";
-
-      if(mode === "analyze_video"){
-        videoUpload.style.display = "block";
-        videoPromptTools.style.display = "block";
-      }
-    }
-
-    modeSelect.addEventListener("change", updateUploadUI);
-    updateUploadUI();
-
-    function setPrompt(text){
-      document.getElementById("prompt").value = text;
-    }
-
-    function clearPrompt(){
-      document.getElementById("prompt").value = "";
-      statusText.innerText = "";
-    }
-
-    function clearChat(){
-      const chat = document.getElementById("chatBox");
-      chat.innerHTML = `
-        <div class="chat-empty">
-          Hasil AI akan muncul di sini.<br><br>
-          Pilih mode, isi prompt, lalu klik <strong>Generate</strong>.
-        </div>
-      `;
-      statusText.innerText = "Chat dibersihkan.";
-      lastText = "";
-      lastJSON = null;
-    }
-
-    function addBubble(role, text){
-      const chat = document.getElementById("chatBox");
-
-      const empty = chat.querySelector(".chat-empty");
-      if(empty){
-        empty.remove();
-      }
-
-      const bubble = document.createElement("div");
-      bubble.className = "bubble " + (role === "user" ? "user" : "ai");
-      bubble.innerText = text;
-
-      chat.appendChild(bubble);
-      chat.scrollTop = chat.scrollHeight;
-
-      return bubble;
-    }
-
-    function escapeHtml(str){
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
-
-    function renderAiOutput(aiBubble, output){
-      aiBubble.innerHTML =
-        escapeHtml(output).replace(/\n/g, "<br>") +
-        `<div class="tool-actions">
-          <button onclick="copyLastText()">Salin</button>
-          <button onclick="downloadTxt()">Download TXT</button>
-          <button onclick="downloadJson()">Download JSON</button>
-        </div>`;
-    }
-
-    async function sendPrompt(){
-      const mode = document.getElementById("mode").value;
-      const prompt = document.getElementById("prompt").value.trim();
-
-      if(!prompt){
-        alert("Prompt kosong");
-        return;
-      }
-
-      addBubble("user", prompt);
-      const aiBubble = addBubble("ai", "Memproses...");
-      statusText.innerText = "Mengirim request ke server...";
-
-      try {
-        if (mode === "analyze_video") {
-          const videoFile = document.getElementById("videoFile").files[0];
-
-          if (!videoFile) {
-            aiBubble.innerText = "Upload video dulu.";
-            statusText.innerText = "Belum ada video yang diupload.";
-            return;
-          }
-
-          const formData = new FormData();
-          formData.append("video", videoFile);
-          formData.append("prompt", prompt);
-          formData.append("mode", mode);
-
-          statusText.innerText = "Mengupload video dan meminta Gemini menganalisa isi video...";
-
-          const res = await fetch("/api/analyze-video", {
-            method: "POST",
-            body: formData
-          });
-
-          const data = await res.json();
-          lastJSON = data;
-
-          const output =
-            data.text ||
-            data.error ||
-            JSON.stringify(data, null, 2);
-
-          lastText = output;
-          renderAiOutput(aiBubble, output);
-          statusText.innerText = "Selesai.";
-          return;
-        }
-
-        const res = await fetch("/api/generate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            mode,
-            prompt
-          })
-        });
-
-        const data = await res.json();
-        lastJSON = data;
-
-        const selectedMode = data.selectedMode ? `\n\nMode terpilih: ${data.selectedMode}` : "";
-        const output =
-          (data.text || data.error || JSON.stringify(data, null, 2)) + selectedMode;
-
-        lastText = output;
-        renderAiOutput(aiBubble, output);
-        statusText.innerText = "Selesai.";
-
-      } catch (err) {
-        aiBubble.innerText = "Error: " + err.message;
-        statusText.innerText = "Terjadi error saat memanggil server.";
-      }
-    }
-
-    function copyLastText(){
-      if(!lastText){
-        alert("Belum ada hasil.");
-        return;
-      }
-
-      navigator.clipboard.writeText(lastText)
-        .then(() => {
-          alert("Teks berhasil disalin");
-        })
-        .catch(() => {
-          alert("Gagal menyalin teks");
-        });
-    }
-
-    function downloadTxt(){
-      if(!lastText){
-        alert("Belum ada hasil.");
-        return;
-      }
-
-      const blob = new Blob([lastText], { type:"text/plain" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "hasil-ai.txt";
-      a.click();
-      URL.revokeObjectURL(a.href);
-    }
-
-    function downloadJson(){
-      if(!lastJSON){
-        alert("Belum ada hasil.");
-        return;
-      }
-
-      const blob = new Blob([JSON.stringify(lastJSON, null, 2)], { type:"application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "hasil-ai.json";
-      a.click();
-      URL.revokeObjectURL(a.href);
-    }
-  </script>
 </body>
 </html>
