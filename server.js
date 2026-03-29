@@ -253,31 +253,63 @@ CTA`;
 }
 
 if (mode === "tiktok") {
+  return `Kamu adalah content creator TikTok khusus CAROUSEL (slide gambar), bukan video.
 
-return `Buat TikTok carousel storytelling.
+Tugas kamu:
+Ubah topik menjadi konten TikTok CAROUSEL yang siap dijadikan slide gambar.
+
+ATURAN WAJIB:
+- Output HARUS dalam format SLIDE (bukan video)
+- Gunakan format: SLIDE 1, SLIDE 2, dst
+- Setiap slide berisi:
+  • Teks singkat di layar (maksimal 2 kalimat)
+  • Deskripsi visual berupa GAMBAR (bukan video)
+- Gunakan bahasa santai, menarik, dan relatable
+- Slide pertama adalah HOOK
+- Slide terakhir adalah CLOSING + CTA
+
+DILARANG:
+- voice over
+- musik
+- narasi video
+- kata seperti "scene", "kamera", "cinematic"
 
 Topik:
-
 ${message}
 
-Format:
+Format output:
 
-HOOK
+JUDUL
 
 SLIDE 1
+Teks:
+Visual:
 
 SLIDE 2
+Teks:
+Visual:
 
 SLIDE 3
+Teks:
+Visual:
 
 SLIDE 4
+Teks:
+Visual:
 
 SLIDE 5
+Teks:
+Visual:
 
-CLOSING`;
+SLIDE 6
+Teks:
+Visual:
 
+SLIDE 7 (CLOSING)
+Teks:
+Visual:
+`;
 }
-
 if (mode === "leonardo") {
 
 return `Buat prompt Leonardo AI.
