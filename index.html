@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -15,7 +16,7 @@ color:white;
 display:flex;
 align-items:center;
 justify-content:center;
-height:100vh;
+min-height:100vh;
 }
 
 .container{
@@ -55,6 +56,14 @@ border-radius:8px;
 font-size:14px;
 }
 
+input, select{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border-radius:8px;
+border:none;
+}
+
 button{
 background:#38bdf8;
 border:none;
@@ -64,10 +73,21 @@ border-radius:10px;
 cursor:pointer;
 color:white;
 font-weight:bold;
+margin:5px;
 }
 
 button:hover{
 background:#0ea5e9;
+}
+
+.output{
+background:#020617;
+padding:15px;
+border-radius:10px;
+margin-top:15px;
+text-align:left;
+white-space:pre-line;
+font-size:14px;
 }
 
 .footer{
@@ -77,17 +97,58 @@ font-size:13px;
 }
 
 </style>
+
 </head>
 
 <body>
 
 <div class="container">
 
-<h1>AI Studio Pro</h1>
+<h1>🎬 AI Cerita Otomatis</h1>
 
 <div class="sub">
-Tools AI untuk membuat konten visual, prompt video, dan analisa konten otomatis
+Buat cerita film emosional dalam 1 klik (siap untuk TikTok & Reels)
 </div>
+
+<!-- 🔥 TOOLS BARU (DITAMBAHKAN) -->
+
+<div class="card">
+
+<h3>🔥 Pilih Cepat:</h3>
+
+<button onclick="isiPreset('Anak Durhaka')">Anak Durhaka</button> <button onclick="isiPreset('Ibu Sabar')">Ibu Sabar</button> <button onclick="isiPreset('Anak Menyesal')">Anak Menyesal</button>
+
+<br><br>
+
+<input type="text" id="judul" placeholder="Judul Cerita">
+<input type="text" id="tema" placeholder="Tema (contoh: anak durhaka)">
+
+<select id="scene">
+<option>3 Scene</option>
+<option>5 Scene</option>
+<option>7 Scene</option>
+</select>
+
+<select id="emosi">
+<option>Sedih</option>
+<option>Haru</option>
+<option>Bahagia</option>
+<option>Religius</option>
+</select>
+
+<select id="karakter">
+<option>Ibu & Anak</option>
+<option>Anak</option>
+<option>Hewan</option>
+</select>
+
+<button onclick="generate()">🎬 Buat Cerita Sekarang</button>
+
+<div id="output" class="output"></div>
+
+</div>
+
+<!-- 🔽 BAGIAN LAMA (TIDAK DIHAPUS) -->
 
 <div class="card">
 
@@ -113,6 +174,41 @@ AI Studio Pro • Powered by Gemini
 </div>
 
 </div>
+
+<script>
+
+function isiPreset(tipe){
+document.getElementById('judul').value = tipe;
+document.getElementById('tema').value = tipe;
+}
+
+function generate(){
+const judul = document.getElementById('judul').value;
+const tema = document.getElementById('tema').value;
+const scene = document.getElementById('scene').value;
+const emosi = document.getElementById('emosi').value;
+const karakter = document.getElementById('karakter').value;
+
+const hasil = `
+🎬 ${judul}
+
+SCENE 1
+Visual: ${karakter} dalam situasi ${tema}
+Voice Over: Awal cerita penuh ${emosi}
+
+SCENE 2
+Visual: Konflik mulai muncul
+Voice Over: Emosi semakin ${emosi}
+
+SCENE 3
+Visual: Puncak cerita
+Voice Over: Momen paling menyentuh
+`;
+
+document.getElementById("output").innerText = hasil;
+}
+
+</script>
 
 </body>
 </html>
