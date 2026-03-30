@@ -6,7 +6,6 @@
 <title>AI Studio Pro</title>
 
 <style>
-
 body{
 margin:0;
 font-family:Arial, sans-serif;
@@ -96,19 +95,17 @@ margin-top:15px;
 color:#64748b;
 font-size:12px;
 }
-
 </style>
-
 </head>
 
 <body>
 
 <div class="container">
 
-<h1>🎬 AI Film Generator</h1>
+<h1>🚀 AI Content & Ads Generator</h1>
 
 <div class="sub">
-Buat cerita film otomatis lengkap dengan visual, style, dan voice over
+Buat film & iklan otomatis hanya dari teks
 </div>
 
 <div class="card">
@@ -124,7 +121,8 @@ Buat cerita film otomatis lengkap dengan visual, style, dan voice over
 <br><br>
 
 <input type="text" id="judul" placeholder="Judul Cerita">
-<input type="text" id="tema" placeholder="Tema (bebas: horor, cinta, islami, dll)">
+<input type="text" id="tema" placeholder="Tema (bebas)">
+<input type="text" id="produk" placeholder="Nama Produk (untuk iklan)">
 
 <select id="scene">
 <option value="3">3 Scene</option>
@@ -156,7 +154,19 @@ Buat cerita film otomatis lengkap dengan visual, style, dan voice over
 <option>Studio Ghibli</option>
 </select>
 
-<button onclick="generate()">🎬 Buat Film Sekarang</button>
+<select id="target">
+<option>Ibu Rumah Tangga</option>
+<option>Remaja</option>
+<option>Anak Muda</option>
+<option>Umum</option>
+</select>
+
+<select id="gender">
+<option>Perempuan</option>
+<option>Laki-laki</option>
+</select>
+
+<button onclick="generate()">🎬 Buat Film</button>
 <button onclick="generateAds()">💰 Buat Iklan</button>
 
 <div id="output" class="output"></div>
@@ -164,7 +174,6 @@ Buat cerita film otomatis lengkap dengan visual, style, dan voice over
 </div>
 
 <div class="card">
-
 <h4>Tools Lainnya</h4>
 
 <div class="features">
@@ -207,61 +216,67 @@ const style = document.getElementById('style').value;
 
 let alur = [
 "Perkenalan karakter",
-"Kehidupan awal yang tenang",
-"Muncul konflik kecil",
-"Masalah mulai membesar",
+"Kehidupan awal",
+"Muncul konflik",
+"Masalah membesar",
 "Ketegangan meningkat",
-"Titik terendah karakter",
-"Puncak konflik (klimaks)",
-"Momen kesadaran",
-"Mulai perubahan",
+"Titik terendah",
+"Puncak konflik",
+"Kesadaran",
+"Perubahan",
 "Ending menyentuh"
 ];
 
-let hasil = `🎬 ${judul}\n\nStyle Visual: ${style}\nTema: ${tema}\n\n`;
+let hasil = `🎬 ${judul}\n\nStyle: ${style}\nTema: ${tema}\n\n`;
 
 for(let i=1;i<=totalScene;i++){
-
 let posisi = alur[i-1] || "Kelanjutan cerita";
 
 hasil += `SCENE ${i}\n`;
 hasil += `Deskripsi: ${posisi}\n`;
-hasil += `Visual: ${karakter} dalam cerita ${tema}, gaya ${style}, cinematic lighting\n`;
-hasil += `Prompt T2I: ${karakter}, ${tema}, ${style}, highly detailed, cinematic, dramatic lighting\n`;
-hasil += `Prompt I2V: cinematic video, ${emosi}, smooth camera movement, emotional storytelling\n`;
-hasil += `Voice Over: Narasi ${emosi} pada bagian ${posisi}\n`;
+hasil += `Visual: ${karakter}, ${tema}, ${style}, cinematic\n`;
+hasil += `Prompt: ${karakter}, ${tema}, ${style}, highly detailed\n`;
+hasil += `Voice Over: Narasi ${emosi}\n`;
 hasil += `------------------------\n\n`;
-
 }
 
 document.getElementById("output").innerText = hasil;
-
 }
 
 function generateAds(){
 
-const produk = document.getElementById('judul').value || "Produk";
+const produk = document.getElementById('produk').value || "Produk";
+const target = document.getElementById('target').value;
+const gender = document.getElementById('gender').value;
 
 let hasil = `💰 SCRIPT IKLAN\n\n`;
 
-hasil += `Hook:\n“Capek ${produk} tapi belum maksimal?”\n\n`;
-hasil += `Masalah:\nMasih banyak yang bingung dan ribet dalam ${produk}\n\n`;
-hasil += `Solusi:\nSekarang bisa lebih mudah dengan bantuan AI\n\n`;
+hasil += `Produk: ${produk}\nTarget: ${target}\nModel: ${gender}\n\n`;
+
+hasil += `Hook:\n“${target}, pernah ngerasa ${produk} gak maksimal?”\n\n`;
+
+hasil += `Masalah:\nBanyak ${target.toLowerCase()} masih bingung\n\n`;
+
+hasil += `Solusi:\nSekarang lebih mudah pakai AI\n\n`;
+
 hasil += `CTA:\nMau juga? coba sekarang\n\n`;
 
 hasil += `------------------------\n\n`;
 
-hasil += `🎬 FORMAT VIDEO:\n`;
-hasil += `Scene 1: Hook\nScene 2: Masalah\nScene 3: Solusi\nScene 4: Hasil\nScene 5: CTA\n\n`;
+hasil += `🎬 FORMAT VIDEO:\n\n`;
+hasil += `Scene 1: ${gender} bingung\n`;
+hasil += `Scene 2: Masalah muncul\n`;
+hasil += `Scene 3: Pakai ${produk}\n`;
+hasil += `Scene 4: Hasil bagus\n`;
+hasil += `Scene 5: CTA\n\n`;
 
 hasil += `------------------------\n\n`;
 
 hasil += `📝 CAPTION:\n`;
-hasil += `${produk} sekarang jadi lebih mudah. Gak perlu ribet lagi.\n`;
+hasil += `${produk} bikin hidup ${target.toLowerCase()} lebih mudah\n`;
 hasil += `CTA: klik sekarang`;
 
 document.getElementById("output").innerText = hasil;
-
 }
 
 </script>
