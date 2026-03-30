@@ -157,6 +157,7 @@ Buat cerita film otomatis lengkap dengan visual, style, dan voice over
 </select>
 
 <button onclick="generate()">🎬 Buat Film Sekarang</button>
+<button onclick="generateAds()">💰 Buat Iklan</button>
 
 <div id="output" class="output"></div>
 
@@ -232,6 +233,32 @@ hasil += `Voice Over: Narasi ${emosi} pada bagian ${posisi}\n`;
 hasil += `------------------------\n\n`;
 
 }
+
+document.getElementById("output").innerText = hasil;
+
+}
+
+function generateAds(){
+
+const produk = document.getElementById('judul').value || "Produk";
+
+let hasil = `💰 SCRIPT IKLAN\n\n`;
+
+hasil += `Hook:\n“Capek ${produk} tapi belum maksimal?”\n\n`;
+hasil += `Masalah:\nMasih banyak yang bingung dan ribet dalam ${produk}\n\n`;
+hasil += `Solusi:\nSekarang bisa lebih mudah dengan bantuan AI\n\n`;
+hasil += `CTA:\nMau juga? coba sekarang\n\n`;
+
+hasil += `------------------------\n\n`;
+
+hasil += `🎬 FORMAT VIDEO:\n`;
+hasil += `Scene 1: Hook\nScene 2: Masalah\nScene 3: Solusi\nScene 4: Hasil\nScene 5: CTA\n\n`;
+
+hasil += `------------------------\n\n`;
+
+hasil += `📝 CAPTION:\n`;
+hasil += `${produk} sekarang jadi lebih mudah. Gak perlu ribet lagi.\n`;
+hasil += `CTA: klik sekarang`;
 
 document.getElementById("output").innerText = hasil;
 
