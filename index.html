@@ -26,34 +26,35 @@ padding:40px;
 }
 
 h1{
-font-size:48px;
+font-size:42px;
 margin-bottom:10px;
 }
 
 .sub{
 color:#94a3b8;
-margin-bottom:30px;
+margin-bottom:25px;
 }
 
 .card{
 background:#1e293b;
-padding:30px;
+padding:25px;
 border-radius:16px;
-margin-bottom:25px;
+margin-bottom:20px;
 }
 
 .features{
 display:grid;
 grid-template-columns:1fr 1fr;
 gap:10px;
-margin-bottom:30px;
+margin-bottom:20px;
 }
 
 .feature{
 background:#020617;
-padding:12px;
+padding:10px;
 border-radius:8px;
-font-size:14px;
+font-size:13px;
+color:#94a3b8;
 }
 
 input, select{
@@ -62,13 +63,14 @@ padding:10px;
 margin-bottom:10px;
 border-radius:8px;
 border:none;
+outline:none;
 }
 
 button{
 background:#38bdf8;
 border:none;
-padding:14px 28px;
-font-size:16px;
+padding:14px 20px;
+font-size:15px;
 border-radius:10px;
 cursor:pointer;
 color:white;
@@ -91,9 +93,9 @@ font-size:14px;
 }
 
 .footer{
-margin-top:20px;
+margin-top:15px;
 color:#64748b;
-font-size:13px;
+font-size:12px;
 }
 
 </style>
@@ -104,24 +106,24 @@ font-size:13px;
 
 <div class="container">
 
-<h1>🎬 AI Cerita Otomatis</h1>
+<h1>🎬 AI Film Generator</h1>
 
 <div class="sub">
-Buat cerita film emosional dalam 1 klik (siap untuk TikTok & Reels)
+Buat cerita film otomatis lengkap dengan visual, style, dan voice over
 </div>
 
-<!-- 🔥 TOOLS BARU (DITAMBAHKAN) -->
+<!-- 🔥 GENERATOR UTAMA -->
 
 <div class="card">
 
 <h3>🔥 Pilih Cepat:</h3>
 
-<button onclick="isiPreset('Anak Durhaka')">Anak Durhaka</button> <button onclick="isiPreset('Ibu Sabar')">Ibu Sabar</button> <button onclick="isiPreset('Anak Menyesal')">Anak Menyesal</button>
+<button onclick="preset('Anak Durhaka','Sedih')">Anak Durhaka</button> <button onclick="preset('Ibu Sabar','Haru')">Ibu Sabar</button> <button onclick="preset('Anak Menyesal','Sedih')">Anak Menyesal</button> <button onclick="preset('Cerita Islami','Religius')">Islami</button> <button onclick="preset('Cerita Horor','Sedih')">Horor</button>
 
 <br><br>
 
 <input type="text" id="judul" placeholder="Judul Cerita">
-<input type="text" id="tema" placeholder="Tema (contoh: anak durhaka)">
+<input type="text" id="tema" placeholder="Tema (bebas: horor, cinta, islami, dll)">
 
 <select id="scene">
 <option>3 Scene</option>
@@ -134,33 +136,43 @@ Buat cerita film emosional dalam 1 klik (siap untuk TikTok & Reels)
 <option>Haru</option>
 <option>Bahagia</option>
 <option>Religius</option>
+<option>Tegang</option>
 </select>
 
 <select id="karakter">
 <option>Ibu & Anak</option>
 <option>Anak</option>
+<option>Remaja</option>
 <option>Hewan</option>
 </select>
 
-<button onclick="generate()">🎬 Buat Cerita Sekarang</button>
+<select id="style">
+<option>3D Pixar</option>
+<option>Anime</option>
+<option>Realistis Cinematic</option>
+<option>Kartun Anak</option>
+<option>Studio Ghibli</option>
+</select>
+
+<button onclick="generate()">🎬 Buat Film Sekarang</button>
 
 <div id="output" class="output"></div>
 
 </div>
 
-<!-- 🔽 BAGIAN LAMA (TIDAK DIHAPUS) -->
+<!-- 🔽 TOOLS LAMA (TETAP ADA) -->
 
 <div class="card">
 
-<div class="features">
+<h4>Tools Lainnya</h4>
 
+<div class="features">
 <div class="feature">Infografis Generator</div>
 <div class="feature">TikTok Carousel</div>
 <div class="feature">Leonardo Prompt</div>
 <div class="feature">Veo Video Prompt</div>
 <div class="feature">Analyze Video</div>
 <div class="feature">Gabungkan Foto</div>
-
 </div>
 
 <a href="/chat.html">
@@ -177,35 +189,33 @@ AI Studio Pro • Powered by Gemini
 
 <script>
 
-function isiPreset(tipe){
-document.getElementById('judul').value = tipe;
-document.getElementById('tema').value = tipe;
+function preset(judul, emosi){
+document.getElementById('judul').value = judul;
+document.getElementById('tema').value = judul;
+document.getElementById('emosi').value = emosi;
 }
 
 function generate(){
+
 const judul = document.getElementById('judul').value;
 const tema = document.getElementById('tema').value;
 const scene = document.getElementById('scene').value;
 const emosi = document.getElementById('emosi').value;
 const karakter = document.getElementById('karakter').value;
+const style = document.getElementById('style').value;
 
-const hasil = `
-🎬 ${judul}
+let hasil = `🎬 ${judul}\n\nStyle Visual: ${style}\nTema: ${tema}\n\n`;
 
-SCENE 1
-Visual: ${karakter} dalam situasi ${tema}
-Voice Over: Awal cerita penuh ${emosi}
-
-SCENE 2
-Visual: Konflik mulai muncul
-Voice Over: Emosi semakin ${emosi}
-
-SCENE 3
-Visual: Puncak cerita
-Voice Over: Momen paling menyentuh
-`;
+for(let i=1;i<=3;i++){
+hasil += `SCENE ${i}\n`;
+hasil += `Visual: ${karakter} dalam cerita ${tema}, gaya ${style}\n`;
+hasil += `Prompt T2I: ${karakter}, ${tema}, ${style}, cinematic lighting, high detail\n`;
+hasil += `Prompt I2V: cinematic scene, emotional ${emosi}, dramatic camera movement\n`;
+hasil += `Voice Over: Narasi penuh ${emosi} pada bagian ini\n\n`;
+}
 
 document.getElementById("output").innerText = hasil;
+
 }
 
 </script>
