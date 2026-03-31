@@ -20,50 +20,51 @@ hasil += `Solusi:\nSekarang lebih mudah pakai AI\n\n`;
 
 hasil += `CTA:\nMau juga? coba sekarang\n\n`;
 
+hasil += `========================\n`;
+hasil += `🎬 STORYBOARD IKLAN\n`;
+hasil += `========================\n\n`;
+
+let scenes = [
+{
+judul:"HOOK",
+vo:`Pernah ngerasa ${produk} gak maksimal?`,
+t2i:`${gender}, confused expression, ${style}, cinematic lighting`,
+i2v:`cinematic video, confused, slow zoom`
+},
+{
+judul:"MASALAH",
+vo:`Banyak ${target.toLowerCase()} masih bingung dan ribet`,
+t2i:`struggling with ${produk}, messy situation, ${style}`,
+i2v:`cinematic, chaotic movement`
+},
+{
+judul:"SOLUSI",
+vo:`Sekarang ada cara lebih mudah`,
+t2i:`discovering ${produk}, happy expression, ${style}`,
+i2v:`smooth transition, cinematic`
+},
+{
+judul:"HASIL",
+vo:`Sekarang jadi lebih mudah dan praktis`,
+t2i:`happy result, clean aesthetic, ${style}`,
+i2v:`bright cinematic lighting`
+},
+{
+judul:"CTA",
+vo:`Mau juga? coba sekarang`,
+t2i:`product highlight, call to action`,
+i2v:`focus product cinematic`
+}
+];
+
+scenes.forEach((s, i)=>{
+hasil += `SCENE ${i+1} - ${s.judul}\n`;
+hasil += `Visual: ${gender} (${target})\n`;
+hasil += `T2I: ${s.t2i}\n`;
+hasil += `I2V: ${s.i2v}\n`;
+hasil += `VO: ${s.vo}\n`;
 hasil += `------------------------\n\n`;
-
-hasil += `🎬 FORMAT VIDEO:\n\n`;
-
-
-// SCENE 1
-hasil += `SCENE 1 (Hook)\n`;
-hasil += `Visual: ${gender} terlihat bingung\n`;
-hasil += `T2I: ${gender}, expression confused, ${style}, cinematic lighting\n`;
-hasil += `I2V: cinematic video, confused expression, slow zoom\n`;
-hasil += `VO: “Pernah ngerasa ${produk} gak maksimal?”\n`;
-hasil += `------------------------\n\n`;
-
-// SCENE 2
-hasil += `SCENE 2 (Masalah)\n`;
-hasil += `Visual: aktivitas terlihat sulit dan ribet\n`;
-hasil += `T2I: struggling with ${produk}, messy situation, ${style}\n`;
-hasil += `I2V: cinematic video, chaotic movement\n`;
-hasil += `VO: “Banyak ${target.toLowerCase()} masih bingung dan ribet”\n`;
-hasil += `------------------------\n\n`;
-
-// SCENE 3
-hasil += `SCENE 3 (Solusi)\n`;
-hasil += `Visual: menemukan solusi ${produk}\n`;
-hasil += `T2I: discovering ${produk}, happy expression, ${style}\n`;
-hasil += `I2V: cinematic video, smooth transition\n`;
-hasil += `VO: “Sekarang ada cara lebih mudah”\n`;
-hasil += `------------------------\n\n`;
-
-// SCENE 4
-hasil += `SCENE 4 (Hasil)\n`;
-hasil += `Visual: hasil terlihat lebih baik\n`;
-hasil += `T2I: happy result using ${produk}, clean, aesthetic\n`;
-hasil += `I2V: cinematic video, bright lighting\n`;
-hasil += `VO: “Sekarang jadi lebih mudah dan praktis”\n`;
-hasil += `------------------------\n\n`;
-
-// SCENE 5
-hasil += `SCENE 5 (CTA)\n`;
-hasil += `Visual: ajakan beli muncul\n`;
-hasil += `T2I: call to action text, product highlight\n`;
-hasil += `I2V: cinematic video, focus on product\n`;
-hasil += `VO: “Mau juga? coba sekarang”\n`;
-hasil += `------------------------\n\n`;
+});
 
 hasil += `📝 CAPTION:\n`;
 hasil += `${produk} bikin hidup ${target.toLowerCase()} lebih mudah\n`;
