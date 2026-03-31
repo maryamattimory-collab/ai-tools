@@ -102,10 +102,10 @@ font-size:12px;
 
 <div class="container">
 
-<h1>🚀 AI Content & Ads Generator</h1>
+<h1>🎬 AI Film Generator</h1>
 
 <div class="sub">
-Buat film & iklan otomatis siap produksi
+Buat cerita film otomatis lengkap dengan visual, style, dan voice over
 </div>
 
 <div class="card">
@@ -121,8 +121,8 @@ Buat film & iklan otomatis siap produksi
 <br><br>
 
 <input type="text" id="judul" placeholder="Judul Cerita">
-<input type="text" id="tema" placeholder="Tema">
-<input type="text" id="produk" placeholder="Nama Produk">
+<input type="text" id="tema" placeholder="Tema (bebas: horor, cinta, islami, dll)">
+<input type="text" id="produk" placeholder="Nama Produk (untuk iklan)">
 
 <select id="scene">
 <option value="3">3 Scene</option>
@@ -166,10 +166,28 @@ Buat film & iklan otomatis siap produksi
 <option>Laki-laki</option>
 </select>
 
-<button onclick="generateFilm()">🎬 Buat Film</button>
+<button onclick="generate()">🎬 Buat Film Sekarang</button>
 <button onclick="generateAds()">💰 Buat Iklan</button>
 
 <div id="output" class="output"></div>
+
+</div>
+
+<div class="card">
+
+<h4>Tools Lainnya</h4>
+
+<div class="features">
+<div class="feature">Infografis Generator</div>
+<div class="feature">TikTok Carousel</div>
+<div class="feature">Leonardo Prompt</div>
+<div class="feature">Veo Video Prompt</div>
+<div class="feature">Analyze Video</div>
+</div>
+
+<a href="/chat.html">
+<button>Masuk ke AI Tools</button>
+</a>
 
 </div>
 
@@ -187,25 +205,46 @@ document.getElementById('tema').value = judul;
 document.getElementById('emosi').value = emosi;
 }
 
-function generateFilm(){
+function generate(){
+
 const judul = document.getElementById('judul').value || "Tanpa Judul";
 const tema = document.getElementById('tema').value || "Tema Umum";
-const totalScene = parseInt(document.getElementById('scene').value);
+const totalScene = parseInt(document.getElementById('scene').value) || 3;
 const emosi = document.getElementById('emosi').value;
 const karakter = document.getElementById('karakter').value;
 const style = document.getElementById('style').value;
 
-let hasil = `🎬 ${judul}\n\n`;
+let alur = [
+"Perkenalan karakter",
+"Kehidupan awal yang tenang",
+"Muncul konflik kecil",
+"Masalah mulai membesar",
+"Ketegangan meningkat",
+"Titik terendah karakter",
+"Puncak konflik (klimaks)",
+"Momen kesadaran",
+"Mulai perubahan",
+"Ending menyentuh"
+];
+
+let hasil = `🎬 ${judul}\n\nStyle Visual: ${style}\nTema: ${tema}\n\n`;
 
 for(let i=1;i<=totalScene;i++){
+
+let posisi = alur[i-1] || "Kelanjutan cerita";
+
 hasil += `SCENE ${i}\n`;
-hasil += `Visual: ${karakter}, ${tema}, ${style}\n`;
-hasil += `T2I: ${karakter}, ${tema}, ${style}, cinematic\n`;
-hasil += `I2V: cinematic video, ${emosi}\n`;
-hasil += `VO: Narasi ${emosi}\n\n`;
+hasil += `Deskripsi: ${posisi}\n`;
+hasil += `Visual: ${karakter} dalam cerita ${tema}, gaya ${style}, cinematic lighting\n`;
+hasil += `Prompt T2I: ${karakter}, ${tema}, ${style}, highly detailed, cinematic, dramatic lighting\n`;
+hasil += `Prompt I2V: cinematic video, ${emosi}, smooth camera movement, emotional storytelling\n`;
+hasil += `Voice Over: Narasi ${emosi} pada bagian ${posisi}\n`;
+hasil += `------------------------\n\n`;
+
 }
 
 document.getElementById("output").innerText = hasil;
+
 }
 
 function generateAds(){
@@ -220,13 +259,13 @@ let hasil = `💰 IKLAN SIAP PRODUKSI\n\n`;
 
 for(let i=1;i<=5;i++){
 
-let sceneText = ["Hook kuat","Masalah","Solusi","Hasil","CTA"][i-1];
+let sceneText = ["Hook","Masalah","Solusi","Hasil","CTA"][i-1];
 
 hasil += `SCENE ${i} (${sceneText})\n`;
 hasil += `Visual: ${gender}, ${target}, ${produk}, ${style}\n`;
-hasil += `T2I: ${gender}, ${produk}, ${style}, highly detailed, cinematic\n`;
-hasil += `I2V: cinematic video, ${emosi}, smooth motion\n`;
-hasil += `VO: Narasi ${emosi} tentang ${produk}\n`;
+hasil += `Prompt T2I: ${gender}, ${produk}, ${style}, highly detailed, cinematic\n`;
+hasil += `Prompt I2V: cinematic video, ${emosi}, smooth motion\n`;
+hasil += `Voice Over: Narasi ${emosi} tentang ${produk}\n`;
 hasil += `------------------------\n\n`;
 
 }
