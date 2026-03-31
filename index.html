@@ -105,7 +105,7 @@ font-size:12px;
 <h1>🚀 AI Content & Ads Generator</h1>
 
 <div class="sub">
-Buat film & iklan otomatis hanya dari teks
+Buat film & iklan otomatis siap produksi
 </div>
 
 <div class="card">
@@ -121,8 +121,8 @@ Buat film & iklan otomatis hanya dari teks
 <br><br>
 
 <input type="text" id="judul" placeholder="Judul Cerita">
-<input type="text" id="tema" placeholder="Tema (bebas)">
-<input type="text" id="produk" placeholder="Nama Produk (untuk iklan)">
+<input type="text" id="tema" placeholder="Tema">
+<input type="text" id="produk" placeholder="Nama Produk">
 
 <select id="scene">
 <option value="3">3 Scene</option>
@@ -166,28 +166,10 @@ Buat film & iklan otomatis hanya dari teks
 <option>Laki-laki</option>
 </select>
 
-<button onclick="generate()">🎬 Buat Film</button>
+<button onclick="generateFilm()">🎬 Buat Film</button>
 <button onclick="generateAds()">💰 Buat Iklan</button>
 
 <div id="output" class="output"></div>
-
-</div>
-
-<div class="card">
-<h4>Tools Lainnya</h4>
-
-<div class="features">
-<div class="feature">Infografis Generator</div>
-<div class="feature">TikTok Carousel</div>
-<div class="feature">Leonardo Prompt</div>
-<div class="feature">Veo Video Prompt</div>
-<div class="feature">Analyze Video</div>
-<div class="feature">Gabungkan Foto</div>
-</div>
-
-<a href="/chat.html">
-<button>Masuk ke AI Tools</button>
-</a>
 
 </div>
 
@@ -205,39 +187,22 @@ document.getElementById('tema').value = judul;
 document.getElementById('emosi').value = emosi;
 }
 
-function generate(){
-
+function generateFilm(){
 const judul = document.getElementById('judul').value || "Tanpa Judul";
 const tema = document.getElementById('tema').value || "Tema Umum";
-const totalScene = parseInt(document.getElementById('scene').value) || 3;
+const totalScene = parseInt(document.getElementById('scene').value);
 const emosi = document.getElementById('emosi').value;
 const karakter = document.getElementById('karakter').value;
 const style = document.getElementById('style').value;
 
-let alur = [
-"Perkenalan karakter",
-"Kehidupan awal",
-"Muncul konflik",
-"Masalah membesar",
-"Ketegangan meningkat",
-"Titik terendah",
-"Puncak konflik",
-"Kesadaran",
-"Perubahan",
-"Ending menyentuh"
-];
-
-let hasil = `🎬 ${judul}\n\nStyle: ${style}\nTema: ${tema}\n\n`;
+let hasil = `🎬 ${judul}\n\n`;
 
 for(let i=1;i<=totalScene;i++){
-let posisi = alur[i-1] || "Kelanjutan cerita";
-
 hasil += `SCENE ${i}\n`;
-hasil += `Deskripsi: ${posisi}\n`;
-hasil += `Visual: ${karakter}, ${tema}, ${style}, cinematic\n`;
-hasil += `Prompt: ${karakter}, ${tema}, ${style}, highly detailed\n`;
-hasil += `Voice Over: Narasi ${emosi}\n`;
-hasil += `------------------------\n\n`;
+hasil += `Visual: ${karakter}, ${tema}, ${style}\n`;
+hasil += `T2I: ${karakter}, ${tema}, ${style}, cinematic\n`;
+hasil += `I2V: cinematic video, ${emosi}\n`;
+hasil += `VO: Narasi ${emosi}\n\n`;
 }
 
 document.getElementById("output").innerText = hasil;
@@ -248,35 +213,26 @@ function generateAds(){
 const produk = document.getElementById('produk').value || "Produk";
 const target = document.getElementById('target').value;
 const gender = document.getElementById('gender').value;
+const style = document.getElementById('style').value;
+const emosi = document.getElementById('emosi').value;
 
-let hasil = `💰 SCRIPT IKLAN\n\n`;
+let hasil = `💰 IKLAN SIAP PRODUKSI\n\n`;
 
-hasil += `Produk: ${produk}\nTarget: ${target}\nModel: ${gender}\n\n`;
+for(let i=1;i<=5;i++){
 
-hasil += `Hook:\n“${target}, pernah ngerasa ${produk} gak maksimal?”\n\n`;
+let sceneText = ["Hook kuat","Masalah","Solusi","Hasil","CTA"][i-1];
 
-hasil += `Masalah:\nBanyak ${target.toLowerCase()} masih bingung\n\n`;
-
-hasil += `Solusi:\nSekarang lebih mudah pakai AI\n\n`;
-
-hasil += `CTA:\nMau juga? coba sekarang\n\n`;
-
+hasil += `SCENE ${i} (${sceneText})\n`;
+hasil += `Visual: ${gender}, ${target}, ${produk}, ${style}\n`;
+hasil += `T2I: ${gender}, ${produk}, ${style}, highly detailed, cinematic\n`;
+hasil += `I2V: cinematic video, ${emosi}, smooth motion\n`;
+hasil += `VO: Narasi ${emosi} tentang ${produk}\n`;
 hasil += `------------------------\n\n`;
 
-hasil += `🎬 FORMAT VIDEO:\n\n`;
-hasil += `Scene 1: ${gender} bingung\n`;
-hasil += `Scene 2: Masalah muncul\n`;
-hasil += `Scene 3: Pakai ${produk}\n`;
-hasil += `Scene 4: Hasil bagus\n`;
-hasil += `Scene 5: CTA\n\n`;
-
-hasil += `------------------------\n\n`;
-
-hasil += `📝 CAPTION:\n`;
-hasil += `${produk} bikin hidup ${target.toLowerCase()} lebih mudah\n`;
-hasil += `CTA: klik sekarang`;
+}
 
 document.getElementById("output").innerText = hasil;
+
 }
 
 </script>
