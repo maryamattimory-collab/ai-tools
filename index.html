@@ -147,6 +147,155 @@ Buat cerita film otomatis lengkap dengan visual, style, dan voice over
 <option>Ibu Rumah Tangga</option>
 <option>Remaja</option>
 <option>Anak Muda</option>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Studio Pro</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:linear-gradient(135deg,#0f172a,#020617);
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+min-height:100vh;
+}
+.container{
+text-align:center;
+max-width:700px;
+padding:40px;
+}
+h1{
+font-size:42px;
+margin-bottom:10px;
+}
+.sub{
+color:#94a3b8;
+margin-bottom:25px;
+}
+.card{
+background:#1e293b;
+padding:25px;
+border-radius:16px;
+margin-bottom:20px;
+}
+.features{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-bottom:20px;
+}
+.feature{
+background:#020617;
+padding:10px;
+border-radius:8px;
+font-size:13px;
+color:#94a3b8;
+}
+input, select{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border-radius:8px;
+border:none;
+outline:none;
+}
+button{
+background:#38bdf8;
+border:none;
+padding:14px 20px;
+font-size:15px;
+border-radius:10px;
+cursor:pointer;
+color:white;
+font-weight:bold;
+margin:5px;
+}
+button:hover{
+background:#0ea5e9;
+}
+.output{
+background:#020617;
+padding:15px;
+border-radius:10px;
+margin-top:15px;
+text-align:left;
+white-space:pre-line;
+font-size:14px;
+}
+.footer{
+margin-top:15px;
+color:#64748b;
+font-size:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🚀 AI Content & Ads Generator</h1>
+
+<div class="sub">
+Buat film & iklan otomatis hanya dari teks
+</div>
+
+<div class="card">
+
+<h3>🔥 Pilih Cepat:</h3>
+
+<button onclick="preset('Anak Durhaka','Sedih')">Anak Durhaka</button>
+<button onclick="preset('Ibu Sabar','Haru')">Ibu Sabar</button>
+<button onclick="preset('Anak Menyesal','Sedih')">Anak Menyesal</button>
+<button onclick="preset('Cerita Islami','Religius')">Islami</button>
+<button onclick="preset('Cerita Horor','Tegang')">Horor</button>
+
+<br><br>
+
+<input type="text" id="judul" placeholder="Judul Cerita">
+<input type="text" id="tema" placeholder="Tema (bebas)">
+<input type="text" id="produk" placeholder="Nama Produk (untuk iklan)">
+
+<select id="scene">
+<option value="3">3 Scene</option>
+<option value="5">5 Scene</option>
+<option value="7">7 Scene</option>
+<option value="10">10 Scene</option>
+</select>
+
+<select id="emosi">
+<option>Sedih</option>
+<option>Haru</option>
+<option>Bahagia</option>
+<option>Religius</option>
+<option>Tegang</option>
+</select>
+
+<select id="karakter">
+<option>Ibu & Anak</option>
+<option>Anak</option>
+<option>Remaja</option>
+<option>Hewan</option>
+</select>
+
+<select id="style">
+<option>3D Pixar</option>
+<option>Anime</option>
+<option>Realistis Cinematic</option>
+<option>Kartun Anak</option>
+<option>Studio Ghibli</option>
+</select>
+
+<select id="target">
+<option>Ibu Rumah Tangga</option>
+<option>Remaja</option>
+<option>Anak Muda</option>
 <option>Umum</option>
 </select>
 
@@ -163,7 +312,6 @@ Buat cerita film otomatis lengkap dengan visual, style, dan voice over
 </div>
 
 <div class="card">
-
 <h4>Tools Lainnya</h4>
 
 <div class="features">
@@ -172,6 +320,7 @@ Buat cerita film otomatis lengkap dengan visual, style, dan voice over
 <div class="feature">Leonardo Prompt</div>
 <div class="feature">Veo Video Prompt</div>
 <div class="feature">Analyze Video</div>
+<div class="feature">Gabungkan Foto</div>
 </div>
 
 <a href="/chat.html">
@@ -205,31 +354,31 @@ const style = document.getElementById('style').value;
 
 let alur = [
 "Perkenalan karakter",
-"Kehidupan awal yang tenang",
-"Muncul konflik kecil",
-"Masalah mulai membesar",
-"Titik terendah karakter",
+"Kehidupan awal",
+"Muncul konflik",
+"Masalah membesar",
+"Ketegangan meningkat",
+"Titik terendah",
 "Puncak konflik",
-"Ending"
+"Kesadaran",
+"Perubahan",
+"Ending menyentuh"
 ];
 
 let hasil = `🎬 ${judul}\n\nStyle: ${style}\nTema: ${tema}\n\n`;
 
 for(let i=1;i<=totalScene;i++){
-
-let posisi = alur[i-1] || "Lanjutan cerita";
+let posisi = alur[i-1] || "Kelanjutan cerita";
 
 hasil += `SCENE ${i}\n`;
 hasil += `Deskripsi: ${posisi}\n`;
-hasil += `Visual: ${karakter}, ${tema}, ${style}\n`;
-hasil += `T2I: ${karakter}, ${tema}, ${style}, cinematic\n`;
-hasil += `I2V: cinematic video, ${emosi}\n`;
-hasil += `VO: Narasi ${emosi}\n\n`;
-
+hasil += `Visual: ${karakter}, ${tema}, ${style}, cinematic\n`;
+hasil += `Prompt: ${karakter}, ${tema}, ${style}, highly detailed\n`;
+hasil += `Voice Over: Narasi ${emosi}\n`;
+hasil += `------------------------\n\n`;
 }
 
 document.getElementById("output").innerText = hasil;
-
 }
 
 function generateAds(){
@@ -241,11 +390,9 @@ const style = document.getElementById('style').value;
 
 let hasil = `💰 SCRIPT IKLAN\n\n`;
 
-hasil += `Produk: ${produk}\n`;
-hasil += `Target: ${target}\n`;
-hasil += `Model: ${gender}\n\n`;
+hasil += `Produk: ${produk}\nTarget: ${target}\nModel: ${gender}\n\n`;
 
-hasil += `Hook:\n“Ibu Rumah Tangga, pernah ngerasa ${produk} gak maksimal?”\n\n`;
+hasil += `Hook:\n"${target}, pernah ngerasa ${produk} gak maksimal?"\n\n`;
 
 hasil += `Masalah:\nBanyak ${target.toLowerCase()} masih bingung\n\n`;
 
@@ -257,34 +404,19 @@ hasil += `------------------------\n\n`;
 
 hasil += `🎬 FORMAT VIDEO:\n\n`;
 
-hasil += `Scene 1: ${gender} bingung\n`;
-hasil += `T2I: ${gender}, confused, ${style}\n`;
-hasil += `I2V: cinematic confused\n`;
-hasil += `VO: Pernah ngerasa ${produk} gak maksimal?\n\n`;
+hasil += `Scene 1: ${gender} bingung\nT2I: ${gender}, confused, ${style}\nI2V: cinematic slow zoom\nVO: "${target}, pernah ngerasa ${produk} gak maksimal?"\n\n`;
 
-hasil += `Scene 2: Masalah muncul\n`;
-hasil += `T2I: struggling with ${produk}\n`;
-hasil += `I2V: chaotic scene\n`;
-hasil += `VO: Banyak ${target.toLowerCase()} masih bingung\n\n`;
+hasil += `Scene 2: Masalah muncul\nT2I: struggling with ${produk}, messy\nI2V: chaotic movement\nVO: Banyak ${target.toLowerCase()} masih bingung\n\n`;
 
-hasil += `Scene 3: Pakai produk\n`;
-hasil += `T2I: using ${produk}\n`;
-hasil += `I2V: smooth transition\n`;
-hasil += `VO: Sekarang ada solusi\n\n`;
+hasil += `Scene 3: Pakai ${produk}\nT2I: using ${produk}, happy\nI2V: smooth transition\nVO: Sekarang lebih mudah pakai AI\n\n`;
 
-hasil += `Scene 4: Hasil bagus\n`;
-hasil += `T2I: happy result\n`;
-hasil += `I2V: bright cinematic\n`;
-hasil += `VO: Lebih mudah dan praktis\n\n`;
+hasil += `Scene 4: Hasil bagus\nT2I: clean aesthetic result\nI2V: bright cinematic\nVO: Lebih mudah dan praktis\n\n`;
 
-hasil += `Scene 5: CTA\n`;
-hasil += `T2I: product highlight\n`;
-hasil += `I2V: zoom product\n`;
-hasil += `VO: Mau juga? coba sekarang\n\n`;
+hasil += `Scene 5: CTA\nT2I: product highlight\nI2V: zoom product\nVO: Mau juga? coba sekarang\n\n`;
 
 hasil += `------------------------\n\n`;
 
-hasil += `📝 CAPTION:\n${produk} bikin hidup ${target.toLowerCase()} lebih mudah`;
+hasil += `📝 CAPTION:\n${produk} bikin hidup ${target.toLowerCase()} lebih mudah\nCTA: klik sekarang`;
 
 document.getElementById("output").innerText = hasil;
 
