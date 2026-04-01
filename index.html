@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -21,32 +22,11 @@ text-align:center;
 max-width:700px;
 padding:40px;
 }
-h1{
-font-size:42px;
-margin-bottom:10px;
-}
-.sub{
-color:#94a3b8;
-margin-bottom:25px;
-}
 .card{
 background:#1e293b;
 padding:25px;
 border-radius:16px;
 margin-bottom:20px;
-}
-.features{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin-bottom:20px;
-}
-.feature{
-background:#020617;
-padding:10px;
-border-radius:8px;
-font-size:13px;
-color:#94a3b8;
 }
 input, select{
 width:100%;
@@ -54,21 +34,15 @@ padding:10px;
 margin-bottom:10px;
 border-radius:8px;
 border:none;
-outline:none;
 }
 button{
 background:#38bdf8;
 border:none;
-padding:14px 20px;
-font-size:15px;
+padding:12px;
 border-radius:10px;
-cursor:pointer;
 color:white;
 font-weight:bold;
-margin:5px;
-}
-button:hover{
-background:#0ea5e9;
+cursor:pointer;
 }
 .output{
 background:#020617;
@@ -77,181 +51,31 @@ border-radius:10px;
 margin-top:15px;
 text-align:left;
 white-space:pre-line;
-font-size:14px;
-}
-.footer{
-margin-top:15px;
-color:#64748b;
-font-size:12px;
 }
 </style>
-</head>
 
-<body>
-
-<div class="card">
-
-<h3>🎯 Pilih Mode:</h3>
-
-<select id="mode" onchange="ubahMode()">
-<option value="film">🎬 Mode Film</option>
-<option value="iklan">💰 Mode Iklan</option>
-</select>
-
-<br><br>
-
-<input type="text" id="judul" placeholder="Judul Cerita">
-<input type="text" id="tema" placeholder="Tema">
-<input type="text" id="produk" placeholder="Nama Produk (iklan)">
-
-<select id="scene">
-<option value="3">3 Scene</option>
-<option value="5">5 Scene</option>
-<option value="7">7 Scene</option>
-<option value="10">10 Scene</option>
-</select>
-
-<select id="emosi">
-<option>Sedih</option>
-<option>Haru</option>
-<option>Bahagia</option>
-<option>Religius</option>
-<option>Tegang</option>
-</select>
-
-<select id="karakter">
-<option>Ibu & Anak</option>
-<option>Anak</option>
-<option>Remaja</option>
-<option>Hewan</option>
-</select>
-
-<select id="style">
-<option>3D Pixar</option>
-<option>Anime</option>
-<option>Realistis Cinematic</option>
-<option>Kartun Anak</option>
-<option>Studio Ghibli</option>
-</select>
-
-<select id="target">
-<option>Ibu Rumah Tangga</option>
-<option>Remaja</option>
-<option>Anak Muda</option>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Studio Pro</title>
-
-<style>
-body{
-margin:0;
-font-family:Arial, sans-serif;
-background:linear-gradient(135deg,#0f172a,#020617);
-color:white;
-display:flex;
-align-items:center;
-justify-content:center;
-min-height:100vh;
-}
-.container{
-text-align:center;
-max-width:700px;
-padding:40px;
-}
-h1{
-font-size:42px;
-margin-bottom:10px;
-}
-.sub{
-color:#94a3b8;
-margin-bottom:25px;
-}
-.card{
-background:#1e293b;
-padding:25px;
-border-radius:16px;
-margin-bottom:20px;
-}
-.features{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin-bottom:20px;
-}
-.feature{
-background:#020617;
-padding:10px;
-border-radius:8px;
-font-size:13px;
-color:#94a3b8;
-}
-input, select{
-width:100%;
-padding:10px;
-margin-bottom:10px;
-border-radius:8px;
-border:none;
-outline:none;
-}
-button{
-background:#38bdf8;
-border:none;
-padding:14px 20px;
-font-size:15px;
-border-radius:10px;
-cursor:pointer;
-color:white;
-font-weight:bold;
-margin:5px;
-}
-button:hover{
-background:#0ea5e9;
-}
-.output{
-background:#020617;
-padding:15px;
-border-radius:10px;
-margin-top:15px;
-text-align:left;
-white-space:pre-line;
-font-size:14px;
-}
-.footer{
-margin-top:15px;
-color:#64748b;
-font-size:12px;
-}
-</style>
 </head>
 
 <body>
 
 <div class="container">
 
-<h1>🚀 AI Content & Ads Generator</h1>
-
-<div class="sub">
-Buat film & iklan otomatis hanya dari teks
-</div>
+<h1>🎬 AI Content & Ads Generator</h1>
 
 <div class="card">
 
-<h3>🔥 Pilih Cepat:</h3>
+<h3>🎯 Pilih Mode</h3>
+<select id="mode" onchange="ubahMode()">
+<option value="film" selected>🎬 Film</option>
+<option value="iklan">💰 Iklan</option>
+</select>
 
-<button onclick="preset('Anak Durhaka','Sedih')">Anak Durhaka</button>
-<button onclick="preset('Ibu Sabar','Haru')">Ibu Sabar</button>
-<button onclick="preset('Anak Menyesal','Sedih')">Anak Menyesal</button>
-<button onclick="preset('Cerita Islami','Religius')">Islami</button>
-<button onclick="preset('Cerita Horor','Tegang')">Horor</button>
+<!-- 🎬 FILM -->
 
-<br><br>
+<div id="filmFields">
 
 <input type="text" id="judul" placeholder="Judul Cerita">
-<input type="text" id="tema" placeholder="Tema (bebas)">
-<input type="text" id="produk" placeholder="Nama Produk (untuk iklan)">
+<input type="text" id="tema" placeholder="Tema">
 
 <select id="scene">
 <option value="3">3 Scene</option>
@@ -282,6 +106,16 @@ Buat film & iklan otomatis hanya dari teks
 <option>Kartun Anak</option>
 <option>Studio Ghibli</option>
 </select>
+
+<button onclick="generate()">🎬 Buat Film</button>
+
+</div>
+
+<!-- 💰 IKLAN -->
+
+<div id="iklanFields" style="display:none;">
+
+<input type="text" id="produk" placeholder="Nama Produk">
 
 <select id="target">
 <option>Ibu Rumah Tangga</option>
@@ -295,122 +129,83 @@ Buat film & iklan otomatis hanya dari teks
 <option>Laki-laki</option>
 </select>
 
-<button onclick="generate()">🎬 Buat Film</button>
+<select id="styleAds">
+<option>3D Pixar</option>
+<option>Anime</option>
+<option>Realistis Cinematic</option>
+</select>
+
 <button onclick="generateAds()">💰 Buat Iklan</button>
+
+</div>
 
 <div id="output" class="output"></div>
 
-</div>
-
-<div class="card">
-<h4>Tools Lainnya</h4>
-
-<div class="features">
-<div class="feature">Infografis Generator</div>
-<div class="feature">TikTok Carousel</div>
-<div class="feature">Leonardo Prompt</div>
-<div class="feature">Veo Video Prompt</div>
-<div class="feature">Analyze Video</div>
-<div class="feature">Gabungkan Foto</div>
-</div>
-
-<a href="/chat.html">
-<button>Masuk ke AI Tools</button>
-</a>
-
-</div>
-
-<div class="footer">
-AI Studio Pro • Powered by Gemini
 </div>
 
 </div>
 
 <script>
 
-function preset(judul, emosi){
-document.getElementById('judul').value = judul;
-document.getElementById('tema').value = judul;
-document.getElementById('emosi').value = emosi;
+function ubahMode(){
+let mode = document.getElementById("mode").value;
+
+if(mode === "film"){
+document.getElementById("filmFields").style.display = "block";
+document.getElementById("iklanFields").style.display = "none";
+}else{
+document.getElementById("filmFields").style.display = "none";
+document.getElementById("iklanFields").style.display = "block";
+}
 }
 
+window.onload = ubahMode;
+
+// 🎬 FILM
 function generate(){
 
-const judul = document.getElementById('judul').value || "Tanpa Judul";
-const tema = document.getElementById('tema').value || "Tema Umum";
-const totalScene = parseInt(document.getElementById('scene').value) || 3;
-const emosi = document.getElementById('emosi').value;
-const karakter = document.getElementById('karakter').value;
-const style = document.getElementById('style').value;
-
-let alur = [
-"Perkenalan karakter",
-"Kehidupan awal",
-"Muncul konflik",
-"Masalah membesar",
-"Ketegangan meningkat",
-"Titik terendah",
-"Puncak konflik",
-"Kesadaran",
-"Perubahan",
-"Ending menyentuh"
-];
+let judul = document.getElementById('judul').value || "Tanpa Judul";
+let tema = document.getElementById('tema').value || "Tema Umum";
+let totalScene = parseInt(document.getElementById('scene').value);
+let emosi = document.getElementById('emosi').value;
+let karakter = document.getElementById('karakter').value;
+let style = document.getElementById('style').value;
 
 let hasil = `🎬 ${judul}\n\nStyle: ${style}\nTema: ${tema}\n\n`;
 
 for(let i=1;i<=totalScene;i++){
-let posisi = alur[i-1] || "Kelanjutan cerita";
-
 hasil += `SCENE ${i}\n`;
-hasil += `Deskripsi: ${posisi}\n`;
-hasil += `Visual: ${karakter}, ${tema}, ${style}, cinematic\n`;
-hasil += `Prompt: ${karakter}, ${tema}, ${style}, highly detailed\n`;
-hasil += `Voice Over: Narasi ${emosi}\n`;
-hasil += `------------------------\n\n`;
+hasil += `Visual: ${karakter}, ${tema}, ${style}\n`;
+hasil += `Voice Over: Narasi ${emosi}\n\n`;
 }
 
 document.getElementById("output").innerText = hasil;
 }
 
+// 💰 IKLAN
 function generateAds(){
 
-const produk = document.getElementById('produk').value || "Produk";
-const target = document.getElementById('target').value;
-const gender = document.getElementById('gender').value;
-const style = document.getElementById('style').value;
+let produk = document.getElementById('produk').value || "Produk";
+let target = document.getElementById('target').value;
+let gender = document.getElementById('gender').value;
+let style = document.getElementById('styleAds').value;
 
-let hasil = `💰 SCRIPT IKLAN\n\n`;
+let hasil = `💰 IKLAN ${produk}\n\nTarget: ${target}\n\n`;
 
-hasil += `Produk: ${produk}\nTarget: ${target}\nModel: ${gender}\n\n`;
-
-hasil += `Hook:\n"${target}, pernah ngerasa ${produk} gak maksimal?"\n\n`;
-
-hasil += `Masalah:\nBanyak ${target.toLowerCase()} masih bingung\n\n`;
-
-hasil += `Solusi:\nSekarang lebih mudah pakai AI\n\n`;
-
-hasil += `CTA:\nMau juga? coba sekarang\n\n`;
-
-hasil += `------------------------\n\n`;
+hasil += `Hook:\n"${target}, pernah ngerasa ${produk} kurang efektif?"\n\n`;
+hasil += `Masalah:\nMasih banyak yang bingung\n\n`;
+hasil += `Solusi:\nSekarang lebih mudah pakai ${produk}\n\n`;
+hasil += `CTA:\nCoba sekarang!\n\n`;
 
 hasil += `🎬 FORMAT VIDEO:\n\n`;
 
-hasil += `Scene 1: ${gender} bingung\nT2I: ${gender}, confused, ${style}\nI2V: cinematic slow zoom\nVO: "${target}, pernah ngerasa ${produk} gak maksimal?"\n\n`;
-
-hasil += `Scene 2: Masalah muncul\nT2I: struggling with ${produk}, messy\nI2V: chaotic movement\nVO: Banyak ${target.toLowerCase()} masih bingung\n\n`;
-
-hasil += `Scene 3: Pakai ${produk}\nT2I: using ${produk}, happy\nI2V: smooth transition\nVO: Sekarang lebih mudah pakai AI\n\n`;
-
-hasil += `Scene 4: Hasil bagus\nT2I: clean aesthetic result\nI2V: bright cinematic\nVO: Lebih mudah dan praktis\n\n`;
-
-hasil += `Scene 5: CTA\nT2I: product highlight\nI2V: zoom product\nVO: Mau juga? coba sekarang\n\n`;
-
-hasil += `------------------------\n\n`;
-
-hasil += `📝 CAPTION:\n${produk} bikin hidup ${target.toLowerCase()} lebih mudah\nCTA: klik sekarang`;
+hasil += `Scene 1: ${gender} bingung\n`;
+hasil += `Scene 2: Masalah muncul\n`;
+hasil += `Scene 3: Pakai ${produk}\n`;
+hasil += `Scene 4: Hasil bagus\n`;
+hasil += `Scene 5: CTA\n`;
 
 document.getElementById("output").innerText = hasil;
-
 }
 
 </script>
