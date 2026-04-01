@@ -89,23 +89,14 @@ font-size:12px;
 
 <body>
 
-<div class="container">
-
-<h1>🎬 AI Film Generator</h1>
-
-<div class="sub">
-Buat cerita film otomatis lengkap dengan visual, style, dan voice over
-</div>
-
 <div class="card">
 
-<h3>🔥 Pilih Cepat:</h3>
+<h3>🎯 Pilih Mode:</h3>
 
-<button onclick="preset('Anak Durhaka','Sedih')">Anak Durhaka</button>
-<button onclick="preset('Ibu Sabar','Haru')">Ibu Sabar</button>
-<button onclick="preset('Anak Menyesal','Sedih')">Anak Menyesal</button>
-<button onclick="preset('Cerita Islami','Religius')">Islami</button>
-<button onclick="preset('Cerita Horor','Tegang')">Horor</button>
+<select id="mode" onchange="ubahMode()">
+<option value="film">🎬 Mode Film</option>
+<option value="iklan">💰 Mode Iklan</option>
+</select>
 
 <br><br>
 
