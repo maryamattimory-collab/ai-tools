@@ -291,29 +291,186 @@ const style = document.getElementById('styleAds').value;
 let hasil = `💰 SCRIPT IKLAN\n\n`;
 
 hasil += `Produk: ${produk}\nTarget: ${target}\nModel: ${gender}\n\n`;
-
-hasil += `Hook:\n"${target}, pernah ngerasa ${produk} gak maksimal?"\n\n`;
-
-hasil += `Masalah:\nBanyak ${target.toLowerCase()} masih bingung\n\n`;
-
-hasil += `Solusi:\nSekarang lebih mudah pakai AI\n\n`;
-
-hasil += `CTA:\nMau juga? coba sekarang\n\n`;
-
-hasil += `------------------------\n\n`;
-
-hasil += `🎬 FORMAT VIDEO:\n\n`;
-
-hasil += `Scene 1: ${gender} bingung\n`;
-hasil += `Scene 2: Masalah muncul\n`;
-hasil += `Scene 3: Pakai ${produk}\n`;
-hasil += `Scene 4: Hasil bagus\n`;
-hasil += `Scene 5: CTA\n`;
-
-document.getElementById("output").innerText = hasil;
+<!DOCTYPE html><html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Studio Pro</title><style>
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#0f172a,#020617);
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
 }
 
-</script>
+.container{
+max-width:700px;
+padding:30px;
+}
 
-</body>
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:15px;
+margin-bottom:20px;
+}
+
+input, select{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border-radius:8px;
+border:none;
+}
+
+button{
+background:#38bdf8;
+border:none;
+padding:12px;
+border-radius:10px;
+color:white;
+font-weight:bold;
+cursor:pointer;
+width:100%;
+}
+
+.output{
+background:#020617;
+padding:15px;
+border-radius:10px;
+margin-top:15px;
+white-space:pre-line;
+font-size:14px;
+}
+</style></head><body><div class="container"><div class="card"><h2>🔥 AI Content Generator</h2><!-- MODE --><select id="mode" onchange="ubahMode()">
+<option value="film">🎬 Mode Film</option>
+<option value="iklan">💰 Mode Iklan</option>
+<option value="edukasi">🧠 Mode Edukasi</option>
+</select><!-- UMUM --><input type="text" id="judul" placeholder="Judul / Nama Konten"><select id="style">
+<option>3D Pixar</option>
+<option>Anime</option>
+<option>Realistis Cinematic</option>
+<option>Kartun Anak</option>
+<option>Studio Ghibli</option>
+<option>💀 Cute Skeleton</option> 
+</select><select id="emosi">
+<option>Sedih</option>
+<option>Haru</option>
+<option>Bahagia</option>
+<option>Religius</option>
+<option>Tegang</option>
+</select><!-- FILM --><div id="filmFields">
+<select id="scene">
+<option value="3">3 Scene</option>
+<option value="5">5 Scene</option>
+<option value="7">7 Scene</option>
+<option value="10">10 Scene</option>
+</select><select id="karakter">
+<option>Ibu & Anak</option>
+<option>Remaja</option>
+<option>Hewan</option>
+<option>Fantasi</option>
+</select>
+</div><!-- IKLAN --><div id="iklanFields" style="display:none;">
+<input type="text" id="produk" placeholder="Nama Produk">
+<input type="text" id="target" placeholder="Target Audience">
+</div><!-- EDUKASI --><div id="edukasiFields" style="display:none;">
+<input type="text" id="topik" placeholder="Topik Edukasi (buah, organ, dll)">
+</div><button onclick="generate()">🚀 Generate</button>
+
+<div id="output" class="output"></div></div></div><script>
+
+function ubahMode(){
+let mode = document.getElementById("mode").value;
+
+document.getElementById("filmFields").style.display = "none";
+document.getElementById("iklanFields").style.display = "none";
+document.getElementById("edukasiFields").style.display = "none";
+
+if(mode === "film"){
+document.getElementById("filmFields").style.display = "block";
+}
+if(mode === "iklan"){
+document.getElementById("iklanFields").style.display = "block";
+}
+if(mode === "edukasi"){
+document.getElementById("edukasiFields").style.display = "block";
+}
+}
+
+function generate(){
+
+let mode = document.getElementById("mode").value;
+let judul = document.getElementById("judul").value;
+let style = document.getElementById("style").value;
+let emosi = document.getElementById("emosi").value;
+
+let hasil = `🎬 ${judul}\n\nStyle: ${style}\n\n`;
+
+// ================= FILM =================
+if(mode === "film"){
+
+let totalScene = parseInt(document.getElementById("scene").value);
+let karakter = document.getElementById("karakter").value;
+
+let alur = [
+"Perkenalan",
+"Awal cerita",
+"Konflik muncul",
+"Masalah membesar",
+"Ketegangan meningkat",
+"Titik terendah",
+"Klimaks",
+"Kesadaran",
+"Perubahan",
+"Ending"
+];
+
+for(let i=1;i<=totalScene;i++){
+hasil += `SCENE ${i}\n`;
+hasil += `Deskripsi: ${alur[i-1] || "Lanjutan cerita"}\n`;
+hasil += `Visual: ${karakter}, gaya ${style}, cinematic\n`;
+hasil += `Voice Over: Narasi ${emosi}\n\n`;
+}
+
+}
+
+// ================= IKLAN =================
+if(mode === "iklan"){
+
+let produk = document.getElementById("produk").value;
+let target = document.getElementById("target").value;
+
+hasil += `💰 IKLAN ${produk}\n\n`;
+hasil += `Target: ${target}\n\n`;
+
+hasil += `HOOK:\nProduk ${produk} bikin hidup lebih mudah\n\n`;
+hasil += `MASALAH:\nMasalah umum yang dialami ${target}\n\n`;
+hasil += `SOLUSI:\nGunakan ${produk} sekarang\n\n`;
+hasil += `CTA:\nBeli sekarang sebelum kehabisan\n`;
+
+}
+
+// ================= EDUKASI =================
+if(mode === "edukasi"){
+
+let topik = document.getElementById("topik").value;
+
+for(let i=1;i<=3;i++){
+hasil += `SCENE ${i}\n`;
+hasil += `Visual: ${topik} berbicara, gaya ${style}\n`;
+hasil += `Voice Over: Edukasi tentang ${topik}\n\n`;
+}
+
+}
+
+document.getElementById("output").innerText = hasil;
+
+}
+
+</script></body>
 </html>
