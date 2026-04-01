@@ -94,7 +94,6 @@ font-size:12px;
 <div class="container">
 
 <h1>🎬 AI Studio Pro</h1>
-
 <div class="sub">Generator Film, Iklan, Edukasi AI</div>
 
 <div class="card">
@@ -104,32 +103,36 @@ Credit: 10
 </div>
 
 <select id="mode">
-<option value="film">🎬 AI Film</option>
+<option value="film" selected>🎬 AI Film</option>
 <option value="iklan">💰 AI Iklan</option>
 <option value="edukasi">🧠 AI Edukasi</option>
 </select>
 
 <input type="text" id="judul" placeholder="Judul">
 <input type="text" id="tema" placeholder="Tema">
-<input type="text" id="produk" placeholder="Produk (khusus iklan)">
+<input type="text" id="produk" placeholder="Produk (khusus iklan)" style="display:none;">
 
 <select id="scene">
-<option value="3">3 Scene</option>
+<option value="3" selected>3 Scene</option>
 <option value="5">5 Scene</option>
 <option value="7">7 Scene</option>
 <option value="10">10 Scene</option>
 </select>
 
 <select id="emosi">
-<option>Sedih</option>
+<option selected>Sedih</option>
 <option>Haru</option>
 <option>Bahagia</option>
 <option>Religius</option>
 <option>Tegang</option>
+<option>Ketakutan</option>
+<option>Ceria</option>
+<option>Seru</option>
+<option>Pertualangan</option>
 </select>
 
 <select id="karakter">
-<option>Ibu & Anak</option>
+<option selected>Ibu & Anak</option>
 <option>Anak</option>
 <option>Remaja</option>
 <option>Hewan</option>
@@ -138,9 +141,9 @@ Credit: 10
 </select>
 
 <select id="style">
+<option selected>Realistic Cinematic</option>
 <option>3D Pixar</option>
 <option>Anime</option>
-<option>Realistic Cinematic</option>
 <option>Kartun Anak</option>
 <option>Studio Ghibli</option>
 <option>Skeleton Cute</option>
@@ -153,7 +156,6 @@ Credit: 10
 </div>
 
 <div class="card">
-
 <h4>Tools AI</h4>
 
 <div class="features">
@@ -168,7 +170,6 @@ Credit: 10
 <a href="/chat.html">
 <button>Masuk ke AI Tools</button>
 </a>
-
 </div>
 
 <div class="footer">AI Studio Pro</div>
@@ -189,6 +190,11 @@ credit = parseInt(credit);
 function updateCreditDisplay(){
 document.getElementById("creditInfo").innerText = "Credit: " + credit;
 }
+
+document.getElementById("mode").addEventListener("change", function(){
+let produk = document.getElementById("produk");
+produk.style.display = (this.value === "iklan") ? "block" : "none";
+});
 
 function generate(){
 
@@ -226,9 +232,9 @@ baseVisual = `${produk} sebagai fokus utama`;
 
 hasil += `SCENE ${i}\n`;
 hasil += `Visual: ${baseVisual}, style ${style}, cinematic, mood ${emosi}, lighting dramatic\n`;
-hasil += `Prompt T2I: ${baseVisual}, ${style}, ultra detailed, cinematic lighting, depth of field\n`;
-hasil += `Prompt I2V: cinematic motion, emotional ${emosi}, smooth camera\n`;
-hasil += `Voice Over: Narasi scene ${i}\n\n`;
+hasil += `Prompt T2I: ${baseVisual}, ${style}, ultra detailed, cinematic lighting, depth of field, 35mm film\n`;
+hasil += `Prompt I2V: cinematic motion, emotional ${emosi}, smooth camera movement\n`;
+hasil += `Voice Over: Narasi scene ${i} dengan nuansa ${emosi}\n\n`;
 }
 
 document.getElementById("output").innerText = hasil;
