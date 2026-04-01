@@ -22,11 +22,32 @@ text-align:center;
 max-width:700px;
 padding:40px;
 }
+h1{
+font-size:42px;
+margin-bottom:10px;
+}
+.sub{
+color:#94a3b8;
+margin-bottom:25px;
+}
 .card{
 background:#1e293b;
 padding:25px;
 border-radius:16px;
 margin-bottom:20px;
+}
+.features{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-bottom:20px;
+}
+.feature{
+background:#020617;
+padding:10px;
+border-radius:8px;
+font-size:13px;
+color:#94a3b8;
 }
 input, select{
 width:100%;
@@ -34,15 +55,21 @@ padding:10px;
 margin-bottom:10px;
 border-radius:8px;
 border:none;
+outline:none;
 }
 button{
 background:#38bdf8;
 border:none;
-padding:12px;
+padding:14px 20px;
+font-size:15px;
 border-radius:10px;
+cursor:pointer;
 color:white;
 font-weight:bold;
-cursor:pointer;
+margin:5px;
+}
+button:hover{
+background:#0ea5e9;
 }
 .output{
 background:#020617;
@@ -51,6 +78,12 @@ border-radius:10px;
 margin-top:15px;
 text-align:left;
 white-space:pre-line;
+font-size:14px;
+}
+.footer{
+margin-top:15px;
+color:#64748b;
+font-size:12px;
 }
 </style>
 
@@ -60,15 +93,32 @@ white-space:pre-line;
 
 <div class="container">
 
-<h1>🎬 AI Content & Ads Generator</h1>
+<h1>🚀 AI Content & Ads Generator</h1>
+
+<div class="sub">
+Buat film & iklan otomatis hanya dari teks
+</div>
 
 <div class="card">
 
+<!-- 🔥 MODE -->
+
 <h3>🎯 Pilih Mode</h3>
 <select id="mode" onchange="ubahMode()">
-<option value="film" selected>🎬 Film</option>
-<option value="iklan">💰 Iklan</option>
+<option value="film" selected>🎬 Mode Film</option>
+<option value="iklan">💰 Mode Iklan</option>
 </select>
+
+<br>
+
+<!-- 🔥 PRESET (BALIKIN) -->
+
+<h3>🔥 Pilih Cepat:</h3>
+<button onclick="preset('Anak Durhaka','Sedih')">Anak Durhaka</button>
+<button onclick="preset('Ibu Sabar','Haru')">Ibu Sabar</button>
+<button onclick="preset('Anak Menyesal','Sedih')">Anak Menyesal</button>
+<button onclick="preset('Cerita Islami','Religius')">Islami</button>
+<button onclick="preset('Cerita Horor','Tegang')">Horor</button>
 
 <!-- 🎬 FILM -->
 
@@ -143,10 +193,35 @@ white-space:pre-line;
 
 </div>
 
+<!-- 🔽 TOOLS LAMA (TIDAK DIGANGGU) -->
+
+<div class="card">
+<h4>Tools Lainnya</h4>
+
+<div class="features">
+<div class="feature">Infografis Generator</div>
+<div class="feature">TikTok Carousel</div>
+<div class="feature">Leonardo Prompt</div>
+<div class="feature">Veo Video Prompt</div>
+<div class="feature">Analyze Video</div>
+<div class="feature">Gabungkan Foto</div>
+</div>
+
+<a href="/chat.html">
+<button>Masuk ke AI Tools</button>
+</a>
+
+</div>
+
+<div class="footer">
+AI Studio Pro • Powered by Gemini
+</div>
+
 </div>
 
 <script>
 
+// 🔥 MODE SWITCH
 function ubahMode(){
 let mode = document.getElementById("mode").value;
 
@@ -158,25 +233,48 @@ document.getElementById("filmFields").style.display = "none";
 document.getElementById("iklanFields").style.display = "block";
 }
 }
-
 window.onload = ubahMode;
+
+// 🔥 PRESET
+function preset(judul, emosi){
+document.getElementById('judul').value = judul;
+document.getElementById('tema').value = judul;
+document.getElementById('emosi').value = emosi;
+}
 
 // 🎬 FILM
 function generate(){
 
-let judul = document.getElementById('judul').value || "Tanpa Judul";
-let tema = document.getElementById('tema').value || "Tema Umum";
-let totalScene = parseInt(document.getElementById('scene').value);
-let emosi = document.getElementById('emosi').value;
-let karakter = document.getElementById('karakter').value;
-let style = document.getElementById('style').value;
+const judul = document.getElementById('judul').value || "Tanpa Judul";
+const tema = document.getElementById('tema').value || "Tema Umum";
+const totalScene = parseInt(document.getElementById('scene').value);
+const emosi = document.getElementById('emosi').value;
+const karakter = document.getElementById('karakter').value;
+const style = document.getElementById('style').value;
+
+let alur = [
+"Perkenalan karakter",
+"Kehidupan awal",
+"Muncul konflik",
+"Masalah membesar",
+"Ketegangan meningkat",
+"Titik terendah",
+"Puncak konflik",
+"Kesadaran",
+"Perubahan",
+"Ending menyentuh"
+];
 
 let hasil = `🎬 ${judul}\n\nStyle: ${style}\nTema: ${tema}\n\n`;
 
 for(let i=1;i<=totalScene;i++){
+let posisi = alur[i-1] || "Kelanjutan cerita";
+
 hasil += `SCENE ${i}\n`;
+hasil += `Deskripsi: ${posisi}\n`;
 hasil += `Visual: ${karakter}, ${tema}, ${style}\n`;
-hasil += `Voice Over: Narasi ${emosi}\n\n`;
+hasil += `Voice Over: Narasi ${emosi}\n`;
+hasil += `------------------------\n\n`;
 }
 
 document.getElementById("output").innerText = hasil;
@@ -185,17 +283,24 @@ document.getElementById("output").innerText = hasil;
 // 💰 IKLAN
 function generateAds(){
 
-let produk = document.getElementById('produk').value || "Produk";
-let target = document.getElementById('target').value;
-let gender = document.getElementById('gender').value;
-let style = document.getElementById('styleAds').value;
+const produk = document.getElementById('produk').value || "Produk";
+const target = document.getElementById('target').value;
+const gender = document.getElementById('gender').value;
+const style = document.getElementById('styleAds').value;
 
-let hasil = `💰 IKLAN ${produk}\n\nTarget: ${target}\n\n`;
+let hasil = `💰 SCRIPT IKLAN\n\n`;
 
-hasil += `Hook:\n"${target}, pernah ngerasa ${produk} kurang efektif?"\n\n`;
-hasil += `Masalah:\nMasih banyak yang bingung\n\n`;
-hasil += `Solusi:\nSekarang lebih mudah pakai ${produk}\n\n`;
-hasil += `CTA:\nCoba sekarang!\n\n`;
+hasil += `Produk: ${produk}\nTarget: ${target}\nModel: ${gender}\n\n`;
+
+hasil += `Hook:\n"${target}, pernah ngerasa ${produk} gak maksimal?"\n\n`;
+
+hasil += `Masalah:\nBanyak ${target.toLowerCase()} masih bingung\n\n`;
+
+hasil += `Solusi:\nSekarang lebih mudah pakai AI\n\n`;
+
+hasil += `CTA:\nMau juga? coba sekarang\n\n`;
+
+hasil += `------------------------\n\n`;
 
 hasil += `🎬 FORMAT VIDEO:\n\n`;
 
