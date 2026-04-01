@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html><html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Studio Pro</title>
-
-<style>
+<title>AI Studio Pro</title><style>
 body{
 margin:0;
 font-family:Arial, sans-serif;
@@ -86,62 +83,38 @@ margin-top:15px;
 color:#64748b;
 font-size:12px;
 }
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<h1>🎬 AI Studio Pro</h1>
-
-<div class="sub">
-Generate film, iklan, edukasi + AI tools lengkap tanpa kehilangan fitur lama
-</div>
-
-<div class="card">
-
-<h3>🔥 Quick Preset:</h3>
+</style></head><body><div class="container"><h1>🎬 AI Studio Pro</h1><div class="sub">
+Generate film, iklan, edukasi + AI tools lengkap
+</div><div class="card"><h3>🔥 Quick Preset:</h3>
 <button onclick="preset('Anak Durhaka','Sedih')">Anak Durhaka</button>
 <button onclick="preset('Ibu Sabar','Haru')">Ibu Sabar</button>
 <button onclick="preset('Anak Menyesal','Sedih')">Anak Menyesal</button>
 <button onclick="preset('Cerita Islami','Religius')">Islami</button>
-<button onclick="preset('Cerita Horor','Tegang')">Horor</button>
-
-<br><br>
+<button onclick="preset('Cerita Horor','Tegang')">Horor</button><br><br>
 
 <input type="text" id="judul" placeholder="Judul Cerita">
-<input type="text" id="tema" placeholder="Tema">
-
-<!-- MODE BARU -->
-<select id="mode">
+<input type="text" id="tema" placeholder="Tema"><select id="mode">
 <option value="film" selected>🎬 AI Film</option>
 <option value="iklan">💰 AI Iklan</option>
 <option value="edukasi">🧠 AI Edukasi</option>
-</select>
-
-<select id="scene">
+</select><select id="scene">
 <option value="3" selected>3 Scene</option>
 <option value="5">5 Scene</option>
 <option value="7">7 Scene</option>
-</select>
-
-<select id="emosi">
+</select><select id="emosi">
 <option>Sedih</option>
 <option>Haru</option>
 <option>Bahagia</option>
 <option>Religius</option>
 <option>Tegang</option>
-</select>
-
-<select id="karakter">
+</select><select id="karakter">
 <option>Ibu & Anak</option>
 <option>Anak</option>
 <option>Remaja</option>
 <option>Hewan</option>
-</select>
-
-<select id="style">
+<option>Food Object</option>
+<option>Fruit Object</option>
+</select><select id="style">
 <option selected>3D Pixar</option>
 <option>Anime</option>
 <option>Realistis Cinematic</option>
@@ -149,47 +122,26 @@ Generate film, iklan, edukasi + AI tools lengkap tanpa kehilangan fitur lama
 <option>Studio Ghibli</option>
 <option>Skeleton</option>
 <option>Food Character</option>
-</select>
-
-<!-- AI TOOLS TETAP ADA -->
-<select id="aitools">
+</select><select id="aitools">
 <option value="none" selected>AI Tools: None</option>
 <option value="t2i">Text to Image</option>
 <option value="i2v">Image to Video</option>
 <option value="voice">Voice Over</option>
 <option value="lip">AI Lip Sync</option>
 <option value="prompt">Prompt Generator</option>
-</select>
+</select><button onclick="generate()">🎬 Generate</button>
 
-<button onclick="generate()">🎬 Generate</button>
-
-<div id="output" class="output"></div>
-
-</div>
-
-<div class="card">
-<h4>Tools Lainnya </h4>
+<div id="output" class="output"></div></div><div class="card">
+<h4>Tools Lainnya</h4>
 <div class="features">
 <div class="feature">Infografis Generator</div>
 <div class="feature">TikTok Carousel</div>
 <div class="feature">Leonardo Prompt</div>
 <div class="feature">Veo Video Prompt</div>
 <div class="feature">Analyze Video</div>
-
+<div class="feature">Gabungkan Foto</div>
 </div>
-
-<a href="/chat.html">
-<button>Masuk ke AI Tools</button>
-</a>
-</div>
-
-<div class="footer">
-AI Studio Pro • All Features Integrated
-</div>
-
-</div>
-
-<script>
+</div></div><script>
 
 function preset(judul, emosi){
 document.getElementById('judul').value = judul;
@@ -208,78 +160,69 @@ const style = document.getElementById('style').value;
 const mode = document.getElementById('mode').value;
 const aitools = document.getElementById('aitools').value;
 
-// ================= VISUAL =================
-let visualBase = "";
+let visualBase = `${karakter}, ${style}, cinematic lighting, depth of field, 35mm film look`;
 
-if(style === "Realistis Cinematic"){
-visualBase = `${karakter}, realistic, cinematic lighting, 35mm film look`;
-}
-else if(style === "Skeleton"){
-visualBase = `${karakter}, skeleton character, dark horror cinematic lighting`;
-}
-else if(style === "Food Character"){
-visualBase = `${karakter} as anthropomorphic food character, cute expressive, colorful`;
-}
-else{
-visualBase = `${karakter}, ${style}, cinematic scene`;
+// EDUKASI OBJECT TALK
+if(mode === "edukasi"){
+visualBase = `${karakter} as anthropomorphic object (food/fruit), talking like human, expressive face, educational scene, bright lighting, colorful background`;
 }
 
-// ================= MODE HOOK =================
 let hook = "";
 
 if(mode === "edukasi"){
-hook = "Belajar AI sekarang lebih mudah dan cepat...";
-}
-else if(mode === "film"){
+hook = "Belajar jadi lebih seru dengan karakter objek yang bisa berbicara...";
+}else if(mode === "film"){
 hook = "Ini bukan sekadar cerita... ini perjalanan hidup.";
-}
-else{
+}else{
 hook = `Pernah ngerasa ${tema} kurang maksimal?`;
 }
 
-// ================= OUTPUT =================
 let hasil = `🎬 ${judul}\n\n`;
-hasil += `Mode: ${mode}\n`;
-hasil += `Tema: ${tema}\n`;
-hasil += `Style: ${style}\n\n`;
-
+hasil += `Mode: ${mode}\nTema: ${tema}\nStyle: ${style}\n\n`;
 hasil += `HOOK:\n${hook}\n\n`;
 
-// ================= SCENE =================
 for(let i=1;i<=sceneCount;i++){
 
 hasil += `SCENE ${i}\n`;
 hasil += `Mood: ${emosi}\n`;
 hasil += `Visual: ${visualBase}, cinematic lighting, depth of field\n`;
 hasil += `T2I: ${visualBase}, ultra detailed, cinematic, 4k\n`;
-hasil += `I2V: cinematic motion, smooth camera movement\n`;
-hasil += `VO: narasi emosional (${emosi})\n\n`;
+hasil += `I2V: cinematic motion, camera movement, smooth transition\n`;
+hasil += `VO: narration (${emosi})\n\n`;
 }
 
-// ================= AI TOOLS OUTPUT =================
-hasil += `====================\n🧠 AI TOOLS OUTPUT\n====================\n\n`;
+// ================= AI FILM AUTO PIPELINE =================
+hasil += `====================\nAI TOOLS OUTPUT\n====================\n\n`;
+
+if(mode === "film"){
+hasil += "AUTO FULL PIPELINE MODE:\n";
+hasil += "- T2I: generate semua scene visual\n";
+hasil += "- I2V: animasi video tiap scene\n";
+hasil += "- Voice: narasi lengkap\n";
+hasil += "- Lip Sync: jika ada dialog\n\n";
+}else{
 
 if(aitools === "t2i"){
-hasil += `T2I Prompt:\n${visualBase}, ultra detailed, cinematic, 4k\n\n`;
+hasil += `T2I Prompt:\n${visualBase}, ultra detailed\n\n`;
 }
-else if(aitools === "i2v"){
-hasil += `I2V Prompt:\ncinematic motion, dolly zoom, smooth camera movement\n\n`;
+if(aitools === "i2v"){
+hasil += `I2V Prompt:\ncinematic motion, dolly zoom, smooth movement\n\n`;
 }
-else if(aitools === "voice"){
-hasil += `Voice Over:\nemotional narration, cinematic storytelling voice\n\n`;
+if(aitools === "voice"){
+hasil += `Voice Over:\nemotional narration\n\n`;
 }
-else if(aitools === "lip"){
-hasil += `Lip Sync:\nsync mouth movement with audio, natural speaking animation\n\n`;
+if(aitools === "lip"){
+hasil += `Lip Sync:\nsync mouth movement with audio\n\n`;
 }
-else if(aitools === "prompt"){
-hasil += `Advanced Prompt:\nsubject, cinematic lighting, depth of field, 35mm film look, ultra realistic\n\n`;
+if(aitools === "prompt"){
+hasil += `Advanced Prompt:\nsubject, cinematic lighting, depth of field, 35mm film look\n\n`;
+}
+
 }
 
 document.getElementById("output").innerText = hasil;
 
 }
 
-</script>
-
-</body>
+</script></body>
 </html>
