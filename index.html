@@ -71,6 +71,10 @@ margin:5px;
 
 button:hover{background:#0ea5e9;}
 
+.copy-btn{
+background:#22c55e;
+}
+
 .output{
 background:#020617;
 padding:15px;
@@ -87,7 +91,6 @@ color:#64748b;
 font-size:12px;
 }
 
-/* hide tambahan */
 .extra{
 display:none;
 }
@@ -107,7 +110,6 @@ display:none;
 Credit: 10
 </div>
 
-<!-- TEMPLATE -->
 <select id="template">
 <option value="">🎯 Pilih Ide (Opsional)</option>
 <option value="ibu">Ibu & Anak Menyesal</option>
@@ -116,7 +118,6 @@ Credit: 10
 <option value="edukasi">Edukasi Buah / Object Talk</option>
 </select>
 
-<!-- MODE -->
 <select id="mode">
 <option value="film">🎬 AI Film</option>
 <option value="iklan">💰 AI Iklan</option>
@@ -129,7 +130,6 @@ Credit: 10
 
 <input type="text" id="produk" placeholder="Produk (khusus iklan)" style="display:none;">
 
-<!-- EDUKASI PRO -->
 <div id="edukasiProBox" class="extra">
 <select id="outputType">
 <option value="storybook">Storybook</option>
@@ -181,6 +181,15 @@ Credit: 10
 </select>
 
 <button onclick="generate()">🎬 Generate</button>
+<button class="copy-btn" onclick="copyText()">📋 Copy</button>
+
+<div style="font-size:13px;color:#94a3b8;margin-top:10px;">
+📌 Cara pakai:<br>
+1. Pilih template<br>
+2. Klik generate<br>
+3. Copy hasil<br>
+4. Masukkan ke AI / editor
+</div>
 
 <div id="output" class="output"></div>
 
@@ -208,7 +217,6 @@ Credit: 10
 
 <script>
 
-// CREDIT
 let credit = localStorage.getItem("ai_credit");
 if(credit === null){
 credit = 10;
@@ -221,7 +229,6 @@ function updateCredit(){
 document.getElementById("creditInfo").innerText = "Credit: " + credit;
 }
 
-// TEMPLATE
 template.onchange = function(){
 if(this.value==="ibu"){
 judul.value="Anak Menyesal";
@@ -245,21 +252,18 @@ tema.value="Buah mengajarkan anak";
 }
 };
 
-// MODE CHANGE
 mode.onchange = function(){
 produk.style.display = this.value==="iklan"?"block":"none";
 edukasiProBox.style.display = this.value==="edukasi_pro"?"block":"none";
 };
 
-// GENERATE
 function generate(){
 
-if(credit<=0) return alert("Credit habis!");
+if(credit<=0) return alert("Credit habis, balik lagi besok ya 😊");
 
-let hasil="";
+let hasil="🔥 READY TO USE SCRIPT\n\n";
 const modeVal = mode.value;
 
-// EDUKASI PRO
 if(modeVal==="edukasi_pro"){
 
 hasil += `📚 EDUKASI PRO\n\n`;
@@ -284,10 +288,7 @@ if(outputType.value==="script"){
 hasil += `Script video edukasi\nTema: ${tema.value}\n`;
 }
 
-}
-
-// MODE NORMAL
-else{
+}else{
 
 hasil += `🎬 ${judul.value}\nMode: ${modeVal}\nTema: ${tema.value}\n`;
 
@@ -314,11 +315,15 @@ hasil += `VO: narasi ${emosi.value}\n\n`;
 
 output.innerText = hasil;
 
-// CREDIT -
 credit--;
 localStorage.setItem("ai_credit", credit);
 updateCredit();
 
+}
+
+function copyText(){
+navigator.clipboard.writeText(output.innerText);
+alert("Berhasil di copy!");
 }
 
 updateCredit();
