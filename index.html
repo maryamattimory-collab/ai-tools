@@ -86,6 +86,11 @@ margin-top:15px;
 color:#64748b;
 font-size:12px;
 }
+
+/* hide tambahan */
+.extra{
+display:none;
+}
 </style>
 </head>
 
@@ -111,15 +116,32 @@ Credit: 10
 <option value="edukasi">Edukasi Buah / Object Talk</option>
 </select>
 
+<!-- MODE -->
 <select id="mode">
-<option value="film" selected>🎬 AI Film</option>
+<option value="film">🎬 AI Film</option>
 <option value="iklan">💰 AI Iklan</option>
 <option value="edukasi">🧠 AI Edukasi</option>
+<option value="edukasi_pro">📚 Edukasi Pro</option>
 </select>
 
 <input type="text" id="judul" placeholder="Judul">
 <input type="text" id="tema" placeholder="Tema">
+
 <input type="text" id="produk" placeholder="Produk (khusus iklan)" style="display:none;">
+
+<!-- EDUKASI PRO -->
+<div id="edukasiProBox" class="extra">
+<select id="outputType">
+<option value="storybook">Storybook</option>
+<option value="lkpd">LKPD</option>
+<option value="komik">Komik</option>
+<option value="workbook">Workbook</option>
+<option value="script">Script Video</option>
+</select>
+
+<input type="text" id="usia" placeholder="Usia anak (contoh: 7-10 tahun)">
+<input type="text" id="tujuan" placeholder="Tujuan pembelajaran">
+</div>
 
 <select id="scene">
 <option value="3">3 Scene</option>
@@ -173,7 +195,6 @@ Credit: 10
 <div class="feature">Leonardo Prompt</div>
 <div class="feature">Veo Video Prompt</div>
 <div class="feature">Analyze Video</div>
-<div class="feature">Gabungkan Foto</div>
 </div>
 
 <a href="/chat.html">
@@ -200,89 +221,100 @@ function updateCredit(){
 document.getElementById("creditInfo").innerText = "Credit: " + credit;
 }
 
-// TEMPLATE AUTO FILL
-document.getElementById("template").addEventListener("change", function(){
-
-const val = this.value;
-
-if(val === "ibu"){
-judul.value = "Anak Menyesal";
-tema.value = "Anak durhaka kepada ibu lalu menyesal";
-emosi.value = "Sedih";
-karakter.value = "Ibu & Anak";
-mode.value = "film";
+// TEMPLATE
+template.onchange = function(){
+if(this.value==="ibu"){
+judul.value="Anak Menyesal";
+tema.value="Anak durhaka kepada ibu lalu menyesal";
+emosi.value="Sedih";
 }
-
-if(val === "horor"){
-judul.value = "Malam Terakhir";
-tema.value = "Rumah angker penuh misteri";
-emosi.value = "Ketakutan";
-karakter.value = "Remaja";
-mode.value = "film";
+if(this.value==="horor"){
+judul.value="Malam Terakhir";
+tema.value="Rumah angker penuh misteri";
+emosi.value="Ketakutan";
 }
-
-if(val === "iklan"){
-judul.value = "Mie Ajaib";
-tema.value = "Mie instan dimasak makhluk misterius";
-emosi.value = "Seru";
-karakter.value = "Remaja";
-mode.value = "iklan";
+if(this.value==="iklan"){
+mode.value="iklan";
+judul.value="Mie Ajaib";
+tema.value="Mie instan misterius";
 }
-
-if(val === "edukasi"){
-judul.value = "Buah Bisa Bicara";
-tema.value = "Buah mengajarkan anak makan sehat";
-emosi.value = "Ceria";
-karakter.value = "Buah";
-mode.value = "edukasi";
+if(this.value==="edukasi"){
+mode.value="edukasi";
+judul.value="Buah Bisa Bicara";
+tema.value="Buah mengajarkan anak";
 }
+};
 
-});
-
-// MODE IKLAN
-document.getElementById("mode").addEventListener("change", function(){
-document.getElementById("produk").style.display =
-this.value === "iklan" ? "block" : "none";
-});
+// MODE CHANGE
+mode.onchange = function(){
+produk.style.display = this.value==="iklan"?"block":"none";
+edukasiProBox.style.display = this.value==="edukasi_pro"?"block":"none";
+};
 
 // GENERATE
 function generate(){
 
-if(credit <= 0){
-alert("Credit habis!");
-return;
+if(credit<=0) return alert("Credit habis!");
+
+let hasil="";
+const modeVal = mode.value;
+
+// EDUKASI PRO
+if(modeVal==="edukasi_pro"){
+
+hasil += `📚 EDUKASI PRO\n\n`;
+
+if(outputType.value==="storybook"){
+hasil += `Buat cerita anak Islami\nTema: ${tema.value}\nUsia: ${usia.value}\n`;
 }
 
-const mode = modeEl.value;
-const judul = judulEl.value;
-const tema = temaEl.value;
-const produk = produkEl.value;
-const scene = parseInt(sceneEl.value);
-const emosi = emosiEl.value;
-const karakter = karakterEl.value;
-const style = styleEl.value;
+if(outputType.value==="lkpd"){
+hasil += `Buat LKPD\nTema: ${tema.value}\nTujuan: ${tujuan.value}\n`;
+}
 
-let hasil = `🎬 ${judul}\nMode: ${mode}\nTema: ${tema}\n`;
+if(outputType.value==="komik"){
+hasil += `Script komik 4 panel\nTema: ${tema.value}\n`;
+}
 
-if(mode==="iklan") hasil += `Produk: ${produk}\n\n`;
+if(outputType.value==="workbook"){
+hasil += `Workbook latihan\nTema: ${tema.value}\n`;
+}
 
-for(let i=1;i<=scene;i++){
+if(outputType.value==="script"){
+hasil += `Script video edukasi\nTema: ${tema.value}\n`;
+}
 
-let base = `${karakter}, ${tema}`;
+}
 
-if(mode==="edukasi") base = `${karakter} object talk (humanized)`;
-if(mode==="iklan") base = `${produk} fokus utama`;
+// MODE NORMAL
+else{
+
+hasil += `🎬 ${judul.value}\nMode: ${modeVal}\nTema: ${tema.value}\n`;
+
+if(modeVal==="iklan"){
+hasil += `Produk: ${produk.value}\n\n`;
+}
+
+for(let i=1;i<=scene.value;i++){
+
+let base = `${karakter.value}, ${tema.value}`;
+
+if(modeVal==="edukasi") base = `${karakter.value} object talk`;
+if(modeVal==="iklan") base = `${produk.value} fokus utama`;
 
 hasil += `SCENE ${i}\n`;
-hasil += `Visual: ${base}, ${style}, mood ${emosi}\n`;
-hasil += `T2I: ${base}, cinematic\n`;
-hasil += `I2V: cinematic motion\n`;
-hasil += `VO: Narasi ${emosi}\n\n`;
+hasil += `Visual: ${base}, ${style.value}, mood ${emosi.value}\n`;
+hasil += `T2I: cinematic\n`;
+hasil += `I2V: motion\n`;
+hasil += `VO: narasi ${emosi.value}\n\n`;
+
+}
 
 }
 
 output.innerText = hasil;
 
+// CREDIT -
 credit--;
 localStorage.setItem("ai_credit", credit);
 updateCredit();
