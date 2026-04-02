@@ -102,6 +102,15 @@ font-size:12px;
 Credit: 10
 </div>
 
+<!-- TEMPLATE -->
+<select id="template">
+<option value="">🎯 Pilih Ide (Opsional)</option>
+<option value="ibu">Ibu & Anak Menyesal</option>
+<option value="horor">Horor Seram</option>
+<option value="iklan">Iklan Produk Lucu</option>
+<option value="edukasi">Edukasi Buah / Object Talk</option>
+</select>
+
 <select id="mode">
 <option value="film" selected>🎬 AI Film</option>
 <option value="iklan">💰 AI Iklan</option>
@@ -132,7 +141,7 @@ Credit: 10
 </select>
 
 <select id="karakter">
-<option>Ibu & Anak</option>
+<option selected>Ibu & Anak</option>
 <option>Anak</option>
 <option>Remaja</option>
 <option>Hewan</option>
@@ -141,7 +150,7 @@ Credit: 10
 </select>
 
 <select id="style">
-<option>Realistic Cinematic</option>
+<option selected>Realistic Cinematic</option>
 <option>3D Pixar</option>
 <option>Anime</option>
 <option>Kartun Anak</option>
@@ -178,23 +187,62 @@ Credit: 10
 
 <script>
 
+// CREDIT
 let credit = localStorage.getItem("ai_credit");
-
 if(credit === null){
 credit = 10;
 localStorage.setItem("ai_credit", credit);
-} else {
+}else{
 credit = parseInt(credit);
 }
 
-function updateCreditDisplay(){
+function updateCredit(){
 document.getElementById("creditInfo").innerText = "Credit: " + credit;
 }
 
+// TEMPLATE AUTO FILL
+document.getElementById("template").addEventListener("change", function(){
+
+const val = this.value;
+
+if(val === "ibu"){
+judul.value = "Anak Menyesal";
+tema.value = "Anak durhaka kepada ibu lalu menyesal";
+emosi.value = "Sedih";
+karakter.value = "Ibu & Anak";
+mode.value = "film";
+}
+
+if(val === "horor"){
+judul.value = "Malam Terakhir";
+tema.value = "Rumah angker penuh misteri";
+emosi.value = "Ketakutan";
+karakter.value = "Remaja";
+mode.value = "film";
+}
+
+if(val === "iklan"){
+judul.value = "Mie Ajaib";
+tema.value = "Mie instan dimasak makhluk misterius";
+emosi.value = "Seru";
+karakter.value = "Remaja";
+mode.value = "iklan";
+}
+
+if(val === "edukasi"){
+judul.value = "Buah Bisa Bicara";
+tema.value = "Buah mengajarkan anak makan sehat";
+emosi.value = "Ceria";
+karakter.value = "Buah";
+mode.value = "edukasi";
+}
+
+});
+
 // MODE IKLAN
 document.getElementById("mode").addEventListener("change", function(){
-let produk = document.getElementById("produk");
-produk.style.display = (this.value === "iklan") ? "block" : "none";
+document.getElementById("produk").style.display =
+this.value === "iklan" ? "block" : "none";
 });
 
 // GENERATE
@@ -205,51 +253,43 @@ alert("Credit habis!");
 return;
 }
 
-const mode = document.getElementById('mode').value;
-const judul = document.getElementById('judul').value;
-const tema = document.getElementById('tema').value;
-const produk = document.getElementById('produk').value;
-const scene = parseInt(document.getElementById('scene').value);
-const emosi = document.getElementById('emosi').value;
-const karakter = document.getElementById('karakter').value;
-const style = document.getElementById('style').value;
+const mode = modeEl.value;
+const judul = judulEl.value;
+const tema = temaEl.value;
+const produk = produkEl.value;
+const scene = parseInt(sceneEl.value);
+const emosi = emosiEl.value;
+const karakter = karakterEl.value;
+const style = styleEl.value;
 
 let hasil = `🎬 ${judul}\nMode: ${mode}\nTema: ${tema}\n`;
 
-if(mode === "iklan"){
-hasil += `Produk: ${produk}\n\n`;
-}
+if(mode==="iklan") hasil += `Produk: ${produk}\n\n`;
 
 for(let i=1;i<=scene;i++){
 
-let baseVisual = `${karakter}, ${tema}`;
+let base = `${karakter}, ${tema}`;
 
-if(mode === "edukasi"){
-baseVisual = `${karakter} object talk (humanized)`;
-}
-
-if(mode === "iklan"){
-baseVisual = `${produk} sebagai fokus utama`;
-}
+if(mode==="edukasi") base = `${karakter} object talk (humanized)`;
+if(mode==="iklan") base = `${produk} fokus utama`;
 
 hasil += `SCENE ${i}\n`;
-hasil += `Visual: ${baseVisual}, style ${style}, cinematic, mood ${emosi}\n`;
-hasil += `Prompt T2I: ${baseVisual}, ${style}, ultra detailed\n`;
-hasil += `Prompt I2V: cinematic motion, emotional ${emosi}\n`;
-hasil += `Voice Over: Narasi ${emosi}\n\n`;
+hasil += `Visual: ${base}, ${style}, mood ${emosi}\n`;
+hasil += `T2I: ${base}, cinematic\n`;
+hasil += `I2V: cinematic motion\n`;
+hasil += `VO: Narasi ${emosi}\n\n`;
+
 }
 
-// tampilkan hasil
-document.getElementById("output").innerText = hasil;
+output.innerText = hasil;
 
-// kurangi credit
 credit--;
 localStorage.setItem("ai_credit", credit);
-updateCreditDisplay();
+updateCredit();
 
 }
 
-updateCreditDisplay();
+updateCredit();
 
 </script>
 
