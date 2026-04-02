@@ -98,9 +98,16 @@ font-size:12px;
 
 <div class="card">
 
-<div id="creditInfo" style="margin-bottom:10px;color:#38bdf8;font-weight:bold;">
-Credit: 10
+<div id="userInfo" style="margin-bottom:5px;font-size:13px;color:#94a3b8;">
+Belum login
 </div>
+
+<div id="creditInfo" style="margin-bottom:10px;color:#38bdf8;font-weight:bold;">
+Credit: 0
+</div>
+
+<button onclick="login()">Login Google</button>
+<button onclick="logout()">Logout</button>
 
 <select id="mode">
 <option value="film" selected>🎬 AI Film</option>
@@ -176,32 +183,93 @@ Credit: 10
 
 </div>
 
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 <script>
 
-let credit = localStorage.getItem("ai_credit");
+// CONFIG KAMU (SUDAH BENAR)
+const firebaseConfig = {
+  apiKey: "AIzaSyAE3bS-37GES03FORAuWu9C8JXs9OJq-xo",
+  authDomain: "ai-studio-pro-2a0b8.firebaseapp.com",
+  projectId: "ai-studio-pro-2a0b8",
+};
 
-if(credit === null){
-credit = 10;
-localStorage.setItem("ai_credit", credit);
-} else {
-credit = parseInt(credit);
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let currentUser = null;
+let credit = 0;
+
+// LOGIN
+function login(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider);
 }
 
-function updateCreditDisplay(){
-document.getElementById("creditInfo").innerText = "Credit: " + credit;
+// LOGOUT
+function logout(){
+  auth.signOut();
 }
 
-document.getElementById("mode").addEventListener("change", function(){
-let produk = document.getElementById("produk");
-produk.style.display = (this.value === "iklan") ? "block" : "none";
+// USER STATE
+auth.onAuthStateChanged(async user => {
+  if(user){
+    currentUser = user;
+    document.getElementById("userInfo").innerText = user.email;
+
+    const ref = db.collection("users").doc(user.uid);
+    const doc = await ref.get();
+
+    if(!doc.exists){
+      await ref.set({credit:10});
+      credit = 10;
+    } else {
+      credit = doc.data().credit;
+    }
+
+    updateCreditDisplay();
+
+  } else {
+    currentUser = null;
+    document.getElementById("userInfo").innerText = "Belum login";
+    document.getElementById("creditInfo").innerText = "Login dulu";
+  }
 });
 
-function generate(){
+// UPDATE UI
+function updateCreditDisplay(){
+  document.getElementById("creditInfo").innerText = "Credit: " + credit;
+}
+
+// MODE IKLAN
+document.getElementById("mode").addEventListener("change", function(){
+  let produk = document.getElementById("produk");
+  produk.style.display = (this.value === "iklan") ? "block" : "none";
+});
+
+// GENERATE
+async function generate(){
+
+if(!currentUser){
+alert("Login dulu ya!");
+return;
+}
 
 if(credit <= 0){
 alert("Credit habis!");
 return;
 }
+
+const ref = db.collection("users").doc(currentUser.uid);
+
+// POTONG CREDIT
+await ref.update({credit: credit - 1});
+credit--;
+updateCreditDisplay();
 
 const mode = document.getElementById('mode').value;
 const judul = document.getElementById('judul').value;
@@ -239,13 +307,7 @@ hasil += `Voice Over: Narasi scene ${i} dengan nuansa ${emosi}\n\n`;
 
 document.getElementById("output").innerText = hasil;
 
-// reduce credit
-credit = credit - 1;
-localStorage.setItem("ai_credit", credit);
-updateCreditDisplay();
 }
-
-updateCreditDisplay();
 
 </script>
 
