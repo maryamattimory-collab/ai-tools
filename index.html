@@ -158,7 +158,9 @@ Credit: 10
 <div class="feature">Analyze Video</div>
 </div>
 <a href="/chat.html"><button>Masuk ke AI Tools</button></a>
-</div><div class="footer">AI Studio Pro</div></div><script>
+</div><div class="footer">AI Studio Pro</div></div>
+
+<script>
 
 let credit = localStorage.getItem("ai_credit");
 if(credit === null){
@@ -200,40 +202,61 @@ produk.style.display = this.value==="iklan"?"block":"none";
 edukasiProBox.style.display = this.value==="edukasi_pro"?"block":"none";
 };
 
+function getBackground(i,modeVal){
+
+const film=[
+"ruang kelas sepi","kamar sederhana malam hari","ruang keluarga",
+"jalan malam dengan lampu jalan","lorong gelap","halaman rumah"
+];
+
+const iklan=[
+"kamar mandi modern","dapur modern","ruang tamu minimalis",
+"studio profesional","meja produk cinematic"
+];
+
+if(modeVal==="film") return film[i%film.length];
+if(modeVal==="iklan") return iklan[i%iklan.length];
+if(modeVal==="edukasi") return "lingkungan edukasi sederhana";
+return "background cinematic sesuai scene";
+}
+
 function generate(){
 
-if(credit<=0) return alert("Credit habis, balik lagi besok ya 😊");
+if(credit<=0) return alert("Credit habis");
 
 let hasil="🔥 READY TO USE SCRIPT\n\n";
 const modeVal = mode.value;
 
 if(modeVal==="edukasi_pro"){
 
-hasil += `📚 EDUKASI PRO\n\n`;
+hasil += `📚 EDUKASI PRO\n`;
+hasil += `Output: ${outputType.value}\nTema: ${tema.value}\nUsia: ${usia.value}\nTujuan: ${tujuan.value}\n\n`;
+
+hasil += `STRUCTURE:\n`;
 
 if(outputType.value==="storybook"){
-hasil += `Buat cerita anak Islami\nTema: ${tema.value}\nUsia: ${usia.value}\n`;
+hasil += "Story: Pembukaan - Konflik - Klimaks - Resolusi\n";
 }
 
 if(outputType.value==="lkpd"){
-hasil += `Buat LKPD\nTema: ${tema.value}\nTujuan: ${tujuan.value}\n`;
+hasil += "Bagian: Tujuan - Materi - Soal - Evaluasi\n";
 }
 
 if(outputType.value==="komik"){
-hasil += `Script komik 4 panel\nTema: ${tema.value}\n`;
+hasil += "Panel: Hook - Konflik - Twist - Ending\n";
 }
 
 if(outputType.value==="workbook"){
-hasil += `Workbook latihan\nTema: ${tema.value}\n`;
+hasil += "Latihan bertahap + soal interaktif\n";
 }
 
 if(outputType.value==="script"){
-hasil += `Script video edukasi\nTema: ${tema.value}\n`;
+hasil += "Hook - Scene - Closing message\n";
 }
 
 }else{
 
-hasil += `🎬 ${judul.value}\nMode: ${modeVal}\nTema: ${tema.value}\n`;
+hasil += `🎬 ${judul.value}\nMode: ${modeVal}\nTema: ${tema.value}\n\n`;
 
 if(modeVal==="iklan"){
 hasil += `Produk: ${produk.value}\n\n`;
@@ -244,13 +267,22 @@ for(let i=1;i<=scene.value;i++){
 let base = `${karakter.value}, ${tema.value}`;
 
 if(modeVal==="edukasi") base = `${karakter.value} object talk`;
-if(modeVal==="iklan") base = `${produk.value} fokus utama`;
+if(modeVal==="iklan") base = `${produk.value} sebagai fokus utama`;
 
-hasil += `SCENE ${i}\n`;
-hasil += `Visual: ${base}, ${style.value}, mood ${emosi.value}\n`;
-hasil += `T2I: cinematic\n`;
-hasil += `I2V: motion\n`;
-hasil += `VO: narasi ${emosi.value}\n\n`;
+let bg = getBackground(i,modeVal);
+
+let t2i = `${base}, berada di ${bg}, ${style.value}, cinematic lighting, ultra detailed, depth of field, 35mm film look`;
+
+let i2v = `camera movement slow cinematic, ${i%2===0?"push in":"pan"}, smooth transition, focus on subject`;
+
+hasil += `====================\n`;
+hasil += `SCENE ${i}\n\n`;
+hasil += `Visual:\n${base}\n\n`;
+hasil += `Background:\n${bg}\n\n`;
+hasil += `Mood:\n${emosi.value}\n\n`;
+hasil += `Prompt T2I:\n${t2i}\n\n`;
+hasil += `Prompt I2V:\n${i2v}\n\n`;
+hasil += `VO:\nnarasi ${emosi.value}\n\n`;
 
 }
 
@@ -259,17 +291,17 @@ hasil += `VO: narasi ${emosi.value}\n\n`;
 output.innerText = hasil;
 
 credit--;
-localStorage.setItem("ai_credit", credit);
+localStorage.setItem("ai_credit",credit);
 updateCredit();
 
 }
 
 function copyText(){
 navigator.clipboard.writeText(output.innerText);
-alert("Berhasil di copy!");
+alert("Copied");
 }
 
 updateCredit();
 
-</script></body>
+  </script></body>
 </html>
