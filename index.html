@@ -215,6 +215,7 @@ Free 10 credit / hari • Premium tanpa batas
 
 </div>
 
+<!-- HANYA BAGIAN SCRIPT YANG DIUBAH (biar aman) -->
 <script>
 
 // CREDIT INIT
@@ -292,19 +293,15 @@ hasil += `STRUCTURE:\n`;
 if(outputType.value==="storybook"){
 hasil += "Story: Pembukaan - Konflik - Klimaks - Resolusi\n";
 }
-
 if(outputType.value==="lkpd"){
 hasil += "Bagian: Tujuan - Materi - Soal - Evaluasi\n";
 }
-
 if(outputType.value==="komik"){
 hasil += "Panel: Hook - Konflik - Twist - Ending\n";
 }
-
 if(outputType.value==="workbook"){
 hasil += "Latihan bertahap + soal interaktif\n";
 }
-
 if(outputType.value==="script"){
 hasil += "Hook - Scene - Closing message\n";
 }
@@ -330,7 +327,24 @@ let bg = `environment sesuai cerita dan emosi scene ${i}`;
 
 let t2i = `${base}, ${bg}, ${style.value}, cinematic scene, dynamic lighting, ultra detailed, depth of field, 35mm film look`;
 
-let i2v = `camera movement slow cinematic, ${i%2===0?"push in":"pan"}, smooth transition, focus on subject`;
+// 🔥 DETEKSI DIALOG (scene ganjil ada dialog)
+let adaDialog = (i % 2 !== 0);
+
+// 🎬 I2V DINAMIS
+let i2v = `camera movement slow cinematic, ${i%2===0?"push in":"pan"}, smooth transition`;
+
+if(adaDialog){
+i2v += ", auto zoom dialog, face focus";
+}else{
+i2v += ", wide cinematic framing";
+}
+
+// 🎤 VO + DIALOG
+let vo = `narasi ${emosi.value}`;
+
+if(adaDialog && karakter.value !== "none"){
+vo += `\nDialog: "${karakter.value.split("&")[0].trim()} berkata dengan ${emosi.value}"`;
+}
 
 hasil += `====================\n`;
 hasil += `SCENE ${i}\n\n`;
@@ -339,7 +353,7 @@ hasil += `Background:\n${bg}\n\n`;
 hasil += `Mood:\n${emosi.value}\n\n`;
 hasil += `Prompt T2I:\n${t2i}\n\n`;
 hasil += `Prompt I2V:\n${i2v}\n\n`;
-hasil += `VO:\nnarasi ${emosi.value}\n\n`;
+hasil += `VO:\n${vo}\n\n`;
 
 }
 
