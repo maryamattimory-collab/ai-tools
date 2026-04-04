@@ -286,7 +286,7 @@ let emosiFinal = emosi.value==="custom" ? (customEmosi.value||"emosional") : emo
 let styleFinal = style.value==="custom" ? (customStyle.value||"cinematic") : style.value;
 
 // LIMIT BIAR RINGAN
-let maxScene = Math.min(scene.value,5);
+let maxScene = Math.min(parseInt(scene.value), 10);
 
 for(let i=1;i<=maxScene;i++){
 
