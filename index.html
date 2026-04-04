@@ -115,6 +115,7 @@ Free 10 credit / hari • Premium tanpa batas
 <option value="horor">Horor Seram</option>
 <option value="iklan">Iklan Produk Lucu</option>
 <option value="edukasi">Edukasi Buah / Object Talk</option>
+<option value="clay">🔥 Clay Viral Story</option>
 </select>
 
 <select id="mode">
@@ -127,7 +128,7 @@ Free 10 credit / hari • Premium tanpa batas
 <input type="text" id="judul" placeholder="Judul">
 <input type="text" id="tema" placeholder="Tema">
 
-<input type="text" id="produk" placeholder="Nama Produk (opsional)" style="display:none;">
+<input type="text" id="produk" placeholder="Nama Produk" style="display:none;">
 <input type="file" id="produkImg" accept="image/*" style="display:none;">
 
 <div id="edukasiProBox" class="extra">
@@ -145,9 +146,9 @@ Free 10 credit / hari • Premium tanpa batas
 
 <select id="scene">
 <option value="3">3 Scene</option>
-<option value="5" selected>5 Scene</option>
+<option value="5">5 Scene</option>
 <option value="7">7 Scene</option>
-<option value="10">10 Scene</option>
+<option value="10" selected>10 Scene</option>
 </select>
 
 <select id="emosi">
@@ -160,9 +161,9 @@ Free 10 credit / hari • Premium tanpa batas
 <option>Ceria</option>
 <option>Seru</option>
 <option>Pertualangan</option>
-<option value="custom">Custom Emosi</option>
+<option value="custom">Custom</option>
 </select>
-<input type="text" id="customEmosi" placeholder="Tulis emosi sendiri..." style="display:none;">
+<input type="text" id="customEmosi" placeholder="Emosi custom..." style="display:none;">
 
 <select id="karakter">
 <option>Ibu & Anak</option>
@@ -172,10 +173,10 @@ Free 10 credit / hari • Premium tanpa batas
 <option>Hewan</option>
 <option>Buah</option>
 <option>Sayur</option>
-<option value="custom">Custom (isi sendiri)</option>
+<option value="custom">Custom</option>
 <option value="none">Tanpa Karakter</option>
 </select>
-<input type="text" id="customKarakter" placeholder="Tulis karakter sendiri..." style="display:none;">
+<input type="text" id="customKarakter" placeholder="Karakter custom..." style="display:none;">
 
 <select id="style">
 <option>Realistic Cinematic</option>
@@ -184,9 +185,9 @@ Free 10 credit / hari • Premium tanpa batas
 <option>Kartun Anak</option>
 <option>Studio Ghibli</option>
 <option>Skeleton Cute</option>
-<option value="custom">Custom Style</option>
+<option value="custom">Custom</option>
 </select>
-<input type="text" id="customStyle" placeholder="Tulis style sendiri..." style="display:none;">
+<input type="text" id="customStyle" placeholder="Style custom..." style="display:none;">
 
 <button onclick="generate()">🎬 Generate</button>
 <button class="copy-btn" onclick="copyText()">📋 Copy</button>
@@ -245,6 +246,43 @@ produkImg.style.display = this.value==="iklan"?"block":"none";
 edukasiProBox.style.display = this.value==="edukasi_pro"?"block":"none";
 };
 
+// TEMPLATE
+template.onchange = function(){
+
+if(this.value==="ibu"){
+judul.value="Anak Menyesal";
+tema.value="Anak durhaka kepada ibu lalu menyesal";
+emosi.value="Sedih";
+}
+
+if(this.value==="horor"){
+judul.value="Malam Terakhir";
+tema.value="Rumah angker penuh misteri";
+emosi.value="Ketakutan";
+}
+
+if(this.value==="iklan"){
+mode.value="iklan";
+judul.value="Produk Ajaib";
+tema.value="Produk membantu kehidupan sehari-hari";
+}
+
+if(this.value==="edukasi"){
+mode.value="edukasi";
+judul.value="Belajar Seru";
+tema.value="Edukasi anak";
+}
+
+if(this.value==="clay"){
+mode.value="film";
+judul.value="Ibu yang Terlupakan";
+tema.value="Anak sibuk hingga melupakan ibunya lalu menyesal";
+emosi.value="Sedih";
+style.value="Realistic Cinematic";
+}
+
+};
+
 // CUSTOM
 karakter.onchange = ()=>customKarakter.style.display = karakter.value==="custom"?"block":"none";
 emosi.onchange = ()=>customEmosi.style.display = emosi.value==="custom"?"block":"none";
@@ -260,33 +298,22 @@ return;
 let hasil="🔥 READY TO USE SCRIPT\n\n";
 let modeVal = mode.value;
 
-// EDUKASI PRO
-if(modeVal==="edukasi_pro"){
-hasil += `📚 EDUKASI PRO\nTema: ${tema.value}\n\n`;
-}else{
-
-hasil += `🎬 ${judul.value}\nMode: ${modeVal}\nTema: ${tema.value}\n\n`;
-
-if(modeVal==="iklan"){
-let produkNama = produk.value || "produk";
-let file = document.getElementById("produkImg").files[0];
-
-hasil += `Produk: ${produkNama}\n`;
-
-if(file){
-hasil += `📸 Menggunakan referensi gambar produk\n`;
-}
-
-hasil += `🔥 Struktur: Hook - Problem - Solusi - CTA\n\n`;
-}
-
-// FINAL VALUE
 let karakterFinal = karakter.value==="custom" ? (customKarakter.value||"karakter") : karakter.value;
 let emosiFinal = emosi.value==="custom" ? (customEmosi.value||"emosional") : emosi.value;
 let styleFinal = style.value==="custom" ? (customStyle.value||"cinematic") : style.value;
 
-// LIMIT BIAR RINGAN
-let maxScene = Math.min(parseInt(scene.value), 10);
+// CLAY BOOST
+if(template.value==="clay"){
+styleFinal += ", clay animation, soft texture, emotional lighting, cinematic clay render";
+}
+
+hasil += `🎬 ${judul.value}\nMode: ${modeVal}\nTema: ${tema.value}\n\n`;
+
+let maxScene = Math.min(parseInt(scene.value),10);
+
+if(maxScene===10){
+hasil += "🔥 Mode full cinematic aktif\n\n";
+}
 
 for(let i=1;i<=maxScene;i++){
 
@@ -295,25 +322,20 @@ let base = karakterFinal==="none"
 : `${karakterFinal}, ${tema.value}, ${styleFinal}`;
 
 let adaDialog = (i%2!==0);
-
 let i2v = "cinematic motion";
 if(adaDialog) i2v += ", auto zoom dialog";
 
 let vo = "narasi " + emosiFinal;
 
-if(modeVal==="iklan"){
-if(i==1) vo="HOOK kuat";
-if(i==2) vo="Masalah audience";
-if(i==3) vo="Solusi produk";
-if(i==maxScene) vo="CTA beli sekarang";
+if(template.value==="clay"){
+if(i==1) vo="Hook emosional kuat";
+if(i==maxScene) vo="Ending sedih menyentuh";
 }
 
 hasil += `SCENE ${i}\n`;
 hasil += `Visual: ${base}\n`;
 hasil += `I2V: ${i2v}\n`;
 hasil += `VO: ${vo}\n\n`;
-
-}
 
 }
 
