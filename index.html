@@ -127,7 +127,8 @@ Free 10 credit / hari • Premium tanpa batas
 <input type="text" id="judul" placeholder="Judul">
 <input type="text" id="tema" placeholder="Tema">
 
-<input type="text" id="produk" placeholder="Produk (khusus iklan)" style="display:none;">
+<input type="text" id="produk" placeholder="Nama Produk (opsional)" style="display:none;">
+<input type="file" id="produkImg" accept="image/*" style="display:none;">
 
 <div id="edukasiProBox" class="extra">
 <select id="outputType">
@@ -159,7 +160,9 @@ Free 10 credit / hari • Premium tanpa batas
 <option>Ceria</option>
 <option>Seru</option>
 <option>Pertualangan</option>
+<option value="custom">Custom Emosi</option>
 </select>
+<input type="text" id="customEmosi" placeholder="Tulis emosi sendiri..." style="display:none;">
 
 <select id="karakter">
 <option>Ibu & Anak</option>
@@ -172,7 +175,6 @@ Free 10 credit / hari • Premium tanpa batas
 <option value="custom">Custom (isi sendiri)</option>
 <option value="none">Tanpa Karakter</option>
 </select>
-
 <input type="text" id="customKarakter" placeholder="Tulis karakter sendiri..." style="display:none;">
 
 <select id="style">
@@ -182,7 +184,9 @@ Free 10 credit / hari • Premium tanpa batas
 <option>Kartun Anak</option>
 <option>Studio Ghibli</option>
 <option>Skeleton Cute</option>
+<option value="custom">Custom Style</option>
 </select>
+<input type="text" id="customStyle" placeholder="Tulis style sendiri..." style="display:none;">
 
 <button onclick="generate()">🎬 Generate</button>
 <button class="copy-btn" onclick="copyText()">📋 Copy</button>
@@ -237,13 +241,14 @@ document.getElementById("creditInfo").innerText = "Credit: " + credit;
 // MODE
 mode.onchange = function(){
 produk.style.display = this.value==="iklan"?"block":"none";
+produkImg.style.display = this.value==="iklan"?"block":"none";
 edukasiProBox.style.display = this.value==="edukasi_pro"?"block":"none";
 };
 
-// CUSTOM KARAKTER
-karakter.onchange = function(){
-customKarakter.style.display = this.value==="custom"?"block":"none";
-};
+// CUSTOM
+karakter.onchange = ()=>customKarakter.style.display = karakter.value==="custom"?"block":"none";
+emosi.onchange = ()=>customEmosi.style.display = emosi.value==="custom"?"block":"none";
+style.onchange = ()=>customStyle.style.display = style.value==="custom"?"block":"none";
 
 function generate(){
 
@@ -264,26 +269,37 @@ hasil += `🎬 ${judul.value}\nMode: ${modeVal}\nTema: ${tema.value}\n\n`;
 
 if(modeVal==="iklan"){
 let produkNama = produk.value || "produk";
-hasil += `Produk: ${produkNama}\n🔥 Struktur: Hook - Problem - Solusi - CTA\n\n`;
+let file = document.getElementById("produkImg").files[0];
+
+hasil += `Produk: ${produkNama}\n`;
+
+if(file){
+hasil += `📸 Menggunakan referensi gambar produk\n`;
 }
 
-let karakterFinal = karakter.value;
-if(karakter.value==="custom"){
-karakterFinal = customKarakter.value || "karakter";
+hasil += `🔥 Struktur: Hook - Problem - Solusi - CTA\n\n`;
 }
 
+// FINAL VALUE
+let karakterFinal = karakter.value==="custom" ? (customKarakter.value||"karakter") : karakter.value;
+let emosiFinal = emosi.value==="custom" ? (customEmosi.value||"emosional") : emosi.value;
+let styleFinal = style.value==="custom" ? (customStyle.value||"cinematic") : style.value;
+
+// LIMIT BIAR RINGAN
 let maxScene = Math.min(scene.value,5);
 
 for(let i=1;i<=maxScene;i++){
 
-let base = karakterFinal==="none" ? tema.value : karakterFinal+", "+tema.value;
+let base = karakterFinal==="none"
+? `${tema.value}, ${styleFinal}`
+: `${karakterFinal}, ${tema.value}, ${styleFinal}`;
 
 let adaDialog = (i%2!==0);
 
 let i2v = "cinematic motion";
 if(adaDialog) i2v += ", auto zoom dialog";
 
-let vo = "narasi "+emosi.value;
+let vo = "narasi " + emosiFinal;
 
 if(modeVal==="iklan"){
 if(i==1) vo="HOOK kuat";
