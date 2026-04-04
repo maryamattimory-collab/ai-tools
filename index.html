@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="id">
+<!DOCTYPE html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -128,6 +129,7 @@ Free 10 credit / hari • Premium tanpa batas
 <input type="text" id="tema" placeholder="Tema">
 
 <input type="text" id="produk" placeholder="Produk (khusus iklan)" style="display:none;">
+<input type="file" id="produkImg" accept="image/*" style="display:none;">
 
 <div id="edukasiProBox" class="extra">
 <select id="outputType">
@@ -138,7 +140,7 @@ Free 10 credit / hari • Premium tanpa batas
 <option value="script">Script Video</option>
 </select>
 
-<input type="text" id="usia" placeholder="Usia anak (contoh: 7-10 tahun)">
+<input type="text" id="usia" placeholder="Usia anak">
 <input type="text" id="tujuan" placeholder="Tujuan pembelajaran">
 </div>
 
@@ -162,7 +164,7 @@ Free 10 credit / hari • Premium tanpa batas
 </select>
 
 <select id="karakter">
-<option selected>Ibu & Anak</option>
+<option>Ibu & Anak</option>
 <option>Anak</option>
 <option>Remaja</option>
 <option>Hewan</option>
@@ -172,7 +174,7 @@ Free 10 credit / hari • Premium tanpa batas
 </select>
 
 <select id="style">
-<option selected>Realistic Cinematic</option>
+<option>Realistic Cinematic</option>
 <option>3D Pixar</option>
 <option>Anime</option>
 <option>Kartun Anak</option>
@@ -182,14 +184,6 @@ Free 10 credit / hari • Premium tanpa batas
 
 <button onclick="generate()">🎬 Generate</button>
 <button class="copy-btn" onclick="copyText()">📋 Copy</button>
-
-<div style="font-size:13px;color:#94a3b8;margin-top:10px;">
-📌 Cara pakai:<br>
-1. Pilih template<br>
-2. Klik generate<br>
-3. Copy hasil<br>
-4. Masukkan ke AI / editor
-</div>
 
 <div id="output" class="output"></div>
 
@@ -215,12 +209,10 @@ Free 10 credit / hari • Premium tanpa batas
 
 </div>
 
-<!-- HANYA BAGIAN SCRIPT YANG DIUBAH (biar aman) -->
 <script>
 
-// CREDIT INIT
+// CREDIT
 let credit = localStorage.getItem("ai_credit");
-
 if(credit === null){
 credit = 10;
 localStorage.setItem("ai_credit", credit);
@@ -228,11 +220,9 @@ localStorage.setItem("ai_credit", credit);
 credit = parseInt(credit);
 }
 
-// AUTO RESET HARIAN
+// RESET HARIAN
 let today = new Date().toDateString();
-let lastReset = localStorage.getItem("last_reset");
-
-if(lastReset !== today){
+if(localStorage.getItem("last_reset") !== today){
 credit = 10;
 localStorage.setItem("ai_credit", credit);
 localStorage.setItem("last_reset", today);
@@ -242,118 +232,59 @@ function updateCredit(){
 document.getElementById("creditInfo").innerText = "Credit: " + credit;
 }
 
-// TEMPLATE
-template.onchange = function(){
-if(this.value==="ibu"){
-judul.value="Anak Menyesal";
-tema.value="Anak durhaka kepada ibu lalu menyesal";
-emosi.value="Sedih";
-}
-if(this.value==="horor"){
-judul.value="Malam Terakhir";
-tema.value="Rumah angker penuh misteri";
-emosi.value="Ketakutan";
-}
-if(this.value==="iklan"){
-mode.value="iklan";
-judul.value="Mie Ajaib";
-tema.value="Mie instan misterius";
-}
-if(this.value==="edukasi"){
-mode.value="edukasi";
-judul.value="Buah Bisa Bicara";
-tema.value="Buah mengajarkan anak";
-}
-};
-
 // MODE
 mode.onchange = function(){
 produk.style.display = this.value==="iklan"?"block":"none";
+produkImg.style.display = this.value==="iklan"?"block":"none";
 edukasiProBox.style.display = this.value==="edukasi_pro"?"block":"none";
 };
 
 function generate(){
 
 if(credit<=0){
-alert("🔥 Credit kamu habis!\n\nMau lanjut bikin konten?\n\n👉 Upgrade ke versi premium (akses tanpa batas)\nLink ada di bio 😉");
+alert("Credit habis!");
 return;
 }
 
 let hasil="🔥 READY TO USE SCRIPT\n\n";
-const modeVal = mode.value;
+let modeVal = mode.value;
 
 // EDUKASI PRO
 if(modeVal==="edukasi_pro"){
 
-hasil += `📚 EDUKASI PRO\n`;
-hasil += `Output: ${outputType.value}\nTema: ${tema.value}\nUsia: ${usia.value}\nTujuan: ${tujuan.value}\n\n`;
-
-hasil += `STRUCTURE:\n`;
-
-if(outputType.value==="storybook"){
-hasil += "Story: Pembukaan - Konflik - Klimaks - Resolusi\n";
-}
-if(outputType.value==="lkpd"){
-hasil += "Bagian: Tujuan - Materi - Soal - Evaluasi\n";
-}
-if(outputType.value==="komik"){
-hasil += "Panel: Hook - Konflik - Twist - Ending\n";
-}
-if(outputType.value==="workbook"){
-hasil += "Latihan bertahap + soal interaktif\n";
-}
-if(outputType.value==="script"){
-hasil += "Hook - Scene - Closing message\n";
-}
+hasil += `📚 EDUKASI PRO\nTema: ${tema.value}\n\n`;
 
 }else{
 
 hasil += `🎬 ${judul.value}\nMode: ${modeVal}\nTema: ${tema.value}\n\n`;
 
 if(modeVal==="iklan"){
-hasil += `Produk: ${produk.value}\n\n`;
+let produkNama = produk.value || "produk";
+hasil += `Produk: ${produkNama}\n🔥 Struktur: Hook - Problem - Solusi - CTA\n\n`;
 }
 
 for(let i=1;i<=scene.value;i++){
 
-let base = karakter.value === "none"
-? `${tema.value}`
-: `${karakter.value}, ${tema.value}`;
+let base = karakter.value==="none" ? tema.value : karakter.value+", "+tema.value;
 
-if(modeVal==="edukasi") base = `${karakter.value} object talk`;
-if(modeVal==="iklan") base = `${produk.value} sebagai fokus utama`;
+let adaDialog = (i%2!==0);
 
-let bg = `environment sesuai cerita dan emosi scene ${i}`;
+let i2v = "cinematic motion";
+if(adaDialog) i2v += ", auto zoom dialog";
 
-let t2i = `${base}, ${bg}, ${style.value}, cinematic scene, dynamic lighting, ultra detailed, depth of field, 35mm film look`;
+let vo = "narasi "+emosi.value;
 
-// 🔥 DETEKSI DIALOG (scene ganjil ada dialog)
-let adaDialog = (i % 2 !== 0);
-
-// 🎬 I2V DINAMIS
-let i2v = `camera movement slow cinematic, ${i%2===0?"push in":"pan"}, smooth transition`;
-
-if(adaDialog){
-i2v += ", auto zoom dialog, face focus";
-}else{
-i2v += ", wide cinematic framing";
+if(modeVal==="iklan"){
+if(i==1) vo="HOOK kuat";
+if(i==2) vo="Masalah audience";
+if(i==3) vo="Solusi produk";
+if(i==scene.value) vo="CTA beli sekarang";
 }
 
-// 🎤 VO + DIALOG
-let vo = `narasi ${emosi.value}`;
-
-if(adaDialog && karakter.value !== "none"){
-vo += `\nDialog: "${karakter.value.split("&")[0].trim()} berkata dengan ${emosi.value}"`;
-}
-
-hasil += `====================\n`;
-hasil += `SCENE ${i}\n\n`;
-hasil += `Visual: ${base}, ${style.value}, cinematic storytelling, mood ${emosi.value}\n`;
-hasil += `Background:\n${bg}\n\n`;
-hasil += `Mood:\n${emosi.value}\n\n`;
-hasil += `Prompt T2I:\n${t2i}\n\n`;
-hasil += `Prompt I2V:\n${i2v}\n\n`;
-hasil += `VO:\n${vo}\n\n`;
+hasil += `SCENE ${i}\n`;
+hasil += `Visual: ${base}\n`;
+hasil += `I2V: ${i2v}\n`;
+hasil += `VO: ${vo}\n\n`;
 
 }
 
@@ -361,7 +292,6 @@ hasil += `VO:\n${vo}\n\n`;
 
 output.innerText = hasil;
 
-// REDUCE CREDIT
 credit--;
 localStorage.setItem("ai_credit",credit);
 updateCredit();
