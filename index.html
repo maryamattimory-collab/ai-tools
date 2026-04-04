@@ -70,7 +70,6 @@ margin:5px;
 }
 
 button:hover{background:#0ea5e9;}
-
 .copy-btn{background:#22c55e;}
 
 .output{
@@ -129,7 +128,6 @@ Free 10 credit / hari • Premium tanpa batas
 <input type="text" id="tema" placeholder="Tema">
 
 <input type="text" id="produk" placeholder="Produk (khusus iklan)" style="display:none;">
-<input type="file" id="produkImg" accept="image/*" style="display:none;">
 
 <div id="edukasiProBox" class="extra">
 <select id="outputType">
@@ -146,9 +144,9 @@ Free 10 credit / hari • Premium tanpa batas
 
 <select id="scene">
 <option value="3">3 Scene</option>
-<option value="5">5 Scene</option>
+<option value="5" selected>5 Scene</option>
 <option value="7">7 Scene</option>
-<option value="10" selected>10 Scene</option>
+<option value="10">10 Scene</option>
 </select>
 
 <select id="emosi">
@@ -165,13 +163,17 @@ Free 10 credit / hari • Premium tanpa batas
 
 <select id="karakter">
 <option>Ibu & Anak</option>
+<option>Ibu</option>
 <option>Anak</option>
 <option>Remaja</option>
 <option>Hewan</option>
 <option>Buah</option>
 <option>Sayur</option>
+<option value="custom">Custom (isi sendiri)</option>
 <option value="none">Tanpa Karakter</option>
 </select>
+
+<input type="text" id="customKarakter" placeholder="Tulis karakter sendiri..." style="display:none;">
 
 <select id="style">
 <option>Realistic Cinematic</option>
@@ -235,8 +237,12 @@ document.getElementById("creditInfo").innerText = "Credit: " + credit;
 // MODE
 mode.onchange = function(){
 produk.style.display = this.value==="iklan"?"block":"none";
-produkImg.style.display = this.value==="iklan"?"block":"none";
 edukasiProBox.style.display = this.value==="edukasi_pro"?"block":"none";
+};
+
+// CUSTOM KARAKTER
+karakter.onchange = function(){
+customKarakter.style.display = this.value==="custom"?"block":"none";
 };
 
 function generate(){
@@ -251,9 +257,7 @@ let modeVal = mode.value;
 
 // EDUKASI PRO
 if(modeVal==="edukasi_pro"){
-
 hasil += `📚 EDUKASI PRO\nTema: ${tema.value}\n\n`;
-
 }else{
 
 hasil += `🎬 ${judul.value}\nMode: ${modeVal}\nTema: ${tema.value}\n\n`;
@@ -263,9 +267,16 @@ let produkNama = produk.value || "produk";
 hasil += `Produk: ${produkNama}\n🔥 Struktur: Hook - Problem - Solusi - CTA\n\n`;
 }
 
-for(let i=1;i<=scene.value;i++){
+let karakterFinal = karakter.value;
+if(karakter.value==="custom"){
+karakterFinal = customKarakter.value || "karakter";
+}
 
-let base = karakter.value==="none" ? tema.value : karakter.value+", "+tema.value;
+let maxScene = Math.min(scene.value,5);
+
+for(let i=1;i<=maxScene;i++){
+
+let base = karakterFinal==="none" ? tema.value : karakterFinal+", "+tema.value;
 
 let adaDialog = (i%2!==0);
 
@@ -278,7 +289,7 @@ if(modeVal==="iklan"){
 if(i==1) vo="HOOK kuat";
 if(i==2) vo="Masalah audience";
 if(i==3) vo="Solusi produk";
-if(i==scene.value) vo="CTA beli sekarang";
+if(i==maxScene) vo="CTA beli sekarang";
 }
 
 hasil += `SCENE ${i}\n`;
