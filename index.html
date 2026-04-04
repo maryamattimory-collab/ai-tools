@@ -16,30 +16,25 @@ align-items:center;
 justify-content:center;
 min-height:100vh;
 }
-
 .container{
 text-align:center;
 max-width:750px;
 padding:40px;
 }
-
 h1{font-size:42px;margin-bottom:10px;}
 .sub{color:#94a3b8;margin-bottom:25px;}
-
 .card{
 background:#1e293b;
 padding:25px;
 border-radius:16px;
 margin-bottom:20px;
 }
-
 .features{
 display:grid;
 grid-template-columns:1fr 1fr;
 gap:10px;
 margin-bottom:20px;
 }
-
 .feature{
 background:#020617;
 padding:10px;
@@ -47,7 +42,6 @@ border-radius:8px;
 font-size:13px;
 color:#94a3b8;
 }
-
 input, select{
 width:100%;
 padding:10px;
@@ -56,7 +50,6 @@ border-radius:8px;
 border:none;
 outline:none;
 }
-
 button{
 background:#38bdf8;
 border:none;
@@ -68,10 +61,8 @@ color:white;
 font-weight:bold;
 margin:5px;
 }
-
 button:hover{background:#0ea5e9;}
 .copy-btn{background:#22c55e;}
-
 .output{
 background:#020617;
 padding:15px;
@@ -81,13 +72,11 @@ text-align:left;
 white-space:pre-line;
 font-size:14px;
 }
-
 .footer{
 margin-top:15px;
 color:#64748b;
 font-size:12px;
 }
-
 .extra{display:none;}
 </style>
 </head>
@@ -110,84 +99,58 @@ Free 10 credit / hari • Premium tanpa batas
 </div>
 
 <select id="template">
-<option value="">🎯 Pilih Ide (Opsional)</option>
+<option value="">🎯 Pilih Ide</option>
 <option value="ibu">Ibu & Anak Menyesal</option>
 <option value="horor">Horor Seram</option>
-<option value="iklan">Iklan Produk Lucu</option>
-<option value="edukasi">Edukasi Buah / Object Talk</option>
+<option value="iklan">Iklan Produk</option>
+<option value="edukasi">Edukasi</option>
 <option value="clay">🔥 Clay Viral Story</option>
 </select>
 
 <select id="mode">
-<option value="film">🎬 AI Film</option>
-<option value="iklan">💰 AI Iklan</option>
-<option value="edukasi">🧠 AI Edukasi</option>
+<option value="film">🎬 Film</option>
+<option value="iklan">💰 Iklan</option>
+<option value="edukasi">🧠 Edukasi</option>
 <option value="edukasi_pro">📚 Edukasi Pro</option>
 </select>
 
-<input type="text" id="judul" placeholder="Judul">
-<input type="text" id="tema" placeholder="Tema">
+<input id="judul" placeholder="Judul">
+<input id="tema" placeholder="Tema">
 
-<input type="text" id="produk" placeholder="Nama Produk" style="display:none;">
-<input type="file" id="produkImg" accept="image/*" style="display:none;">
-
-<div id="edukasiProBox" class="extra">
-<select id="outputType">
-<option value="storybook">Storybook</option>
-<option value="lkpd">LKPD</option>
-<option value="komik">Komik</option>
-<option value="workbook">Workbook</option>
-<option value="script">Script Video</option>
-</select>
-
-<input type="text" id="usia" placeholder="Usia anak">
-<input type="text" id="tujuan" placeholder="Tujuan pembelajaran">
-</div>
+<input id="produk" placeholder="Nama Produk" style="display:none;">
+<input type="file" id="produkImg" style="display:none;">
 
 <select id="scene">
-<option value="3">3 Scene</option>
-<option value="5">5 Scene</option>
-<option value="7">7 Scene</option>
-<option value="10" selected>10 Scene</option>
+<option>3</option>
+<option>5</option>
+<option>7</option>
+<option selected>10</option>
 </select>
 
 <select id="emosi">
 <option>Sedih</option>
-<option>Haru</option>
 <option>Bahagia</option>
-<option>Religius</option>
 <option>Tegang</option>
-<option selected>Ketakutan</option>
-<option>Ceria</option>
-<option>Seru</option>
-<option>Pertualangan</option>
 <option value="custom">Custom</option>
 </select>
-<input type="text" id="customEmosi" placeholder="Emosi custom..." style="display:none;">
+<input id="customEmosi" placeholder="Custom emosi" style="display:none;">
 
 <select id="karakter">
 <option>Ibu & Anak</option>
 <option>Ibu</option>
 <option>Anak</option>
-<option>Remaja</option>
-<option>Hewan</option>
-<option>Buah</option>
-<option>Sayur</option>
 <option value="custom">Custom</option>
 <option value="none">Tanpa Karakter</option>
 </select>
-<input type="text" id="customKarakter" placeholder="Karakter custom..." style="display:none;">
+<input id="customKarakter" placeholder="Custom karakter" style="display:none;">
 
 <select id="style">
 <option>Realistic Cinematic</option>
 <option>3D Pixar</option>
 <option>Anime</option>
-<option>Kartun Anak</option>
-<option>Studio Ghibli</option>
-<option>Skeleton Cute</option>
 <option value="custom">Custom</option>
 </select>
-<input type="text" id="customStyle" placeholder="Style custom..." style="display:none;">
+<input id="customStyle" placeholder="Custom style" style="display:none;">
 
 <button onclick="generate()">🎬 Generate</button>
 <button class="copy-btn" onclick="copyText()">📋 Copy</button>
@@ -196,98 +159,51 @@ Free 10 credit / hari • Premium tanpa batas
 
 </div>
 
-<div class="card">
-<h4>Tools AI</h4>
-
-<div class="features">
-<div class="feature">Infografis Generator</div>
-<div class="feature">TikTok Carousel</div>
-<div class="feature">Leonardo Prompt</div>
-<div class="feature">Veo Video Prompt</div>
-<div class="feature">Analyze Video</div>
-</div>
-
-<a href="/chat.html">
-<button>Masuk ke AI Tools</button>
-</a>
-</div>
-
 <div class="footer">AI Studio Pro</div>
 
 </div>
 
 <script>
 
-// CREDIT
-let credit = localStorage.getItem("ai_credit");
-if(credit === null){
-credit = 10;
-localStorage.setItem("ai_credit", credit);
-}else{
-credit = parseInt(credit);
-}
-
-// RESET HARIAN
-let today = new Date().toDateString();
-if(localStorage.getItem("last_reset") !== today){
-credit = 10;
-localStorage.setItem("ai_credit", credit);
-localStorage.setItem("last_reset", today);
-}
+let credit = localStorage.getItem("ai_credit") || 10;
 
 function updateCredit(){
-document.getElementById("creditInfo").innerText = "Credit: " + credit;
+document.getElementById("creditInfo").innerText="Credit: "+credit;
 }
 
-// MODE
-mode.onchange = function(){
-produk.style.display = this.value==="iklan"?"block":"none";
-produkImg.style.display = this.value==="iklan"?"block":"none";
-edukasiProBox.style.display = this.value==="edukasi_pro"?"block":"none";
-};
-
 // TEMPLATE
-template.onchange = function(){
+template.onchange=function(){
 
 if(this.value==="ibu"){
 judul.value="Anak Menyesal";
-tema.value="Anak durhaka kepada ibu lalu menyesal";
+tema.value="Durhaka lalu menyesal";
 emosi.value="Sedih";
 }
 
 if(this.value==="horor"){
-judul.value="Malam Terakhir";
-tema.value="Rumah angker penuh misteri";
-emosi.value="Ketakutan";
+judul.value="Rumah Terakhir";
+tema.value="Teror misterius";
+emosi.value="Tegang";
 }
 
 if(this.value==="iklan"){
 mode.value="iklan";
-judul.value="Produk Ajaib";
-tema.value="Produk membantu kehidupan sehari-hari";
-}
-
-if(this.value==="edukasi"){
-mode.value="edukasi";
-judul.value="Belajar Seru";
-tema.value="Edukasi anak";
 }
 
 if(this.value==="clay"){
-mode.value="film";
 judul.value="Ibu yang Terlupakan";
-tema.value="Anak sibuk hingga melupakan ibunya lalu menyesal";
+tema.value="Anak melupakan ibu";
 emosi.value="Sedih";
-style.value="Realistic Cinematic";
 }
 
 };
 
 // CUSTOM
-karakter.onchange = ()=>customKarakter.style.display = karakter.value==="custom"?"block":"none";
-emosi.onchange = ()=>customEmosi.style.display = emosi.value==="custom"?"block":"none";
-style.onchange = ()=>customStyle.style.display = style.value==="custom"?"block":"none";
+karakter.onchange=()=>customKarakter.style.display=karakter.value==="custom"?"block":"none";
+emosi.onchange=()=>customEmosi.style.display=emosi.value==="custom"?"block":"none";
+style.onchange=()=>customStyle.style.display=style.value==="custom"?"block":"none";
 
+// GENERATE
 function generate(){
 
 if(credit<=0){
@@ -295,51 +211,45 @@ alert("Credit habis!");
 return;
 }
 
-let hasil="🔥 READY TO USE SCRIPT\n\n";
-let modeVal = mode.value;
+let hasil="🔥 SCRIPT SIAP PRODUKSI\n\n";
 
-let karakterFinal = karakter.value==="custom" ? (customKarakter.value||"karakter") : karakter.value;
-let emosiFinal = emosi.value==="custom" ? (customEmosi.value||"emosional") : emosi.value;
-let styleFinal = style.value==="custom" ? (customStyle.value||"cinematic") : style.value;
+let karakterFinal=karakter.value==="custom"?customKarakter.value:karakter.value;
+let emosiFinal=emosi.value==="custom"?customEmosi.value:emosi.value;
+let styleFinal=style.value==="custom"?customStyle.value:style.value;
 
-// CLAY BOOST
+// CLAY
 if(template.value==="clay"){
-styleFinal += ", clay animation, soft texture, emotional lighting, cinematic clay render";
+styleFinal+=" clay animation cinematic";
 }
 
-hasil += `🎬 ${judul.value}\nMode: ${modeVal}\nTema: ${tema.value}\n\n`;
+let struktur=[
+"HOOK","KOMEN","KONFLIK","EMOSI NAIK","FLASHBACK",
+"PIKIRAN DALAM","TITIK TERENDAH","PENYESALAN","PESAN","ENDING"
+];
 
-let maxScene = Math.min(parseInt(scene.value),10);
-
-if(maxScene===10){
-hasil += "🔥 Mode full cinematic aktif\n\n";
-}
+let maxScene=parseInt(scene.value);
 
 for(let i=1;i<=maxScene;i++){
 
-let base = karakterFinal==="none"
-? `${tema.value}, ${styleFinal}`
-: `${karakterFinal}, ${tema.value}, ${styleFinal}`;
+let title=struktur[i-1]||"SCENE";
 
-let adaDialog = (i%2!==0);
-let i2v = "cinematic motion";
-if(adaDialog) i2v += ", auto zoom dialog";
+let visual=`${karakterFinal}, ${tema.value}, ${styleFinal}`;
 
-let vo = "narasi " + emosiFinal;
+let vo="narasi "+emosiFinal;
+let i2v=i%2?"auto zoom dialog":"slow pan";
 
-if(template.value==="clay"){
-if(i==1) vo="Hook emosional kuat";
-if(i==maxScene) vo="Ending sedih menyentuh";
-}
+if(i===1) vo="Hook kuat";
+if(i===maxScene) vo="Ending emosional";
 
-hasil += `SCENE ${i}\n`;
-hasil += `Visual: ${base}\n`;
-hasil += `I2V: ${i2v}\n`;
-hasil += `VO: ${vo}\n\n`;
+hasil+=`🎬 SCENE ${i} — ${title}\n`;
+hasil+=`Visual:\n${visual}\n\n`;
+hasil+=`I2V:\n${i2v}\n\n`;
+hasil+=`VO:\n${vo}\n\n`;
+hasil+="====================\n\n";
 
 }
 
-output.innerText = hasil;
+output.innerText=hasil;
 
 credit--;
 localStorage.setItem("ai_credit",credit);
