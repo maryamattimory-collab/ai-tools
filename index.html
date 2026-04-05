@@ -227,7 +227,7 @@ produk.style.display=this.value==="iklan"?"block":"none";
 produkImg.style.display=this.value==="iklan"?"block":"none";
 };
 
-// CUSTOM
+// CUSTOM INPUT
 karakter.onchange=()=>customKarakter.style.display=karakter.value==="custom"?"block":"none";
 emosi.onchange=()=>customEmosi.style.display=emosi.value==="custom"?"block":"none";
 style.onchange=()=>customStyle.style.display=style.value==="custom"?"block":"none";
@@ -235,7 +235,7 @@ style.onchange=()=>customStyle.style.display=style.value==="custom"?"block":"non
 function generate(){
 
 if(credit<=0){
-alert("Credit habis!");
+alert("🔥 Credit habis!\n\nUpgrade untuk akses tanpa batas ya 😉");
 return;
 }
 
@@ -245,9 +245,18 @@ let karakterFinal=karakter.value==="custom"?customKarakter.value:karakter.value;
 let emosiFinal=emosi.value==="custom"?customEmosi.value:emosi.value;
 let styleFinal=style.value==="custom"?customStyle.value:style.value;
 
+// CLAY MODE
 if(template.value==="clay"){
 styleFinal+=", clay animation, soft texture, stylized cinematic";
 }
+
+// MASTER KARAKTER (ANTI BERUBAH)
+let karakterMaster = karakter.value==="none"
+? `${tema.value}`
+: `${karakterFinal}, consistent face, same person across all scenes, same outfit, same identity`;
+
+// NEGATIVE PROMPT (ANTI ERROR)
+let negative = "blurry, low quality, bad anatomy, deformed face, extra fingers, broken hands, distorted face, unrealistic proportions, watermark, text, logo, low resolution";
 
 let struktur=[
 "HOOK","KOMEN","KONFLIK","EMOSI NAIK","FLASHBACK",
@@ -260,14 +269,21 @@ for(let i=1;i<=maxScene;i++){
 
 let title=struktur[i-1]||"SCENE";
 
-let visual=`${karakterFinal}, ${tema.value}, ${styleFinal}, natural look, highly detailed skin texture, micro expressions, emotional storytelling, cinematic lighting, soft shadows, rim light, global illumination, ultra realistic, depth of field, bokeh, 35mm film, volumetric lighting, dramatic composition`;
+// LIGHTING DINAMIS (BIAR HIDUP)
+let lighting = i < maxScene/2
+? "soft daylight, natural lighting"
+: "warm cinematic lighting, dramatic shadows";
 
+// VISUAL MASTER (UPGRADE)
+let visual=`${karakterMaster}, ${tema.value}, ${styleFinal}, ${lighting}, highly detailed skin texture, micro expressions, emotional storytelling, cinematic lighting, soft shadows, rim light, global illumination, ultra realistic, depth of field, bokeh, 35mm film, volumetric lighting, dramatic composition`;
+
+// CAMERA
 let i2v=i%2===0
 ? "slow cinematic zoom, focus shift, depth motion"
 : "camera pan, auto zoom dialog, emotional focus";
 
+// VOICE OVER
 let vo="";
-
 if(i===1){
 vo=`"${judul.value}... semuanya berubah sejak hari itu..."`;
 }
@@ -284,8 +300,10 @@ else{
 vo=`narasi ${emosiFinal}`;
 }
 
+// OUTPUT
 hasil+=`🎬 SCENE ${i} — ${title}\n\n`;
 hasil+=`Visual:\n${visual}\n\n`;
+hasil+=`Negative Prompt:\n${negative}\n\n`;
 hasil+=`I2V:\n${i2v}\n\n`;
 hasil+=`VO:\n${vo}\n\n`;
 hasil+="====================\n\n";
@@ -294,6 +312,7 @@ hasil+="====================\n\n";
 
 output.innerText=hasil;
 
+// CREDIT
 credit--;
 localStorage.setItem("ai_credit",credit);
 updateCredit();
@@ -308,6 +327,5 @@ alert("Copied");
 updateCredit();
 
 </script>
-
 </body>
 </html>
