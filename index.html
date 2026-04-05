@@ -140,6 +140,9 @@ Free 10 credit / hari • Premium tanpa batas
 <option>Ibu</option>
 <option>Anak</option>
 <option>Remaja</option>
+<option>Buah</option>
+<option>Sayur</option>
+<option>Benda</option>
 <option value="custom">Custom</option>
 <option value="none">Tanpa Karakter</option>
 </select>
@@ -242,9 +245,15 @@ return;
 let hasil="🔥 SCRIPT SIAP PRODUKSI (AUTO CINEMATIC + DIALOG)\n\n";
 
 let karakterFinal=karakter.value==="custom"?customKarakter.value:karakter.value;
+
+// DETEKSI OBJECT TALK
+let isObjectTalk = ["Buah","Sayur","Benda"].includes(karakterFinal);
 let emosiFinal=emosi.value==="custom"?customEmosi.value:emosi.value;
 let styleFinal=style.value==="custom"?customStyle.value:style.value;
-
+if(isObjectTalk){
+styleFinal += ", 3D animated, pixar style, expressive eyes";
+}
+  
 // CLAY MODE
 if(template.value==="clay"){
 styleFinal+=", clay animation, soft texture, stylized cinematic";
@@ -275,7 +284,9 @@ let lighting = i < maxScene/2
 : "warm cinematic lighting, dramatic shadows";
 
 // VISUAL MASTER (UPGRADE)
-let visual=`${karakterMaster}, ${tema.value}, ${styleFinal}, ${lighting}, highly detailed skin texture, micro expressions, emotional storytelling, cinematic lighting, soft shadows, rim light, global illumination, ultra realistic, depth of field, bokeh, 35mm film, volumetric lighting, dramatic composition`;
+let visual = isObjectTalk
+? `${karakterFinal} object talk, expressive face, talking object, animated expression, ${tema.value}, ${styleFinal}, ${lighting}, cinematic storytelling, depth of field, 3D look`
+: `${karakterMaster}, ${tema.value}, ${styleFinal}, ${lighting}, highly detailed skin texture, micro expressions, cinematic storytelling, depth of field`;
 
 // CAMERA
 let i2v=i%2===0
