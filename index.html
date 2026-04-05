@@ -171,7 +171,7 @@ Free 10 credit / hari • Premium tanpa batas
 <div class="feature">Leonardo Prompt</div>
 <div class="feature">Veo Video Prompt</div>
 <div class="feature">Analyze Video</div>
-<div class="feature">Gabungkan Foto</div>
+
 </div>
 
 <a href="/chat.html">
@@ -185,53 +185,6 @@ Free 10 credit / hari • Premium tanpa batas
 
 <script>
 
-let credit = localStorage.getItem("ai_credit") || 10;
-
-// reset harian
-let today=new Date().toDateString();
-if(localStorage.getItem("last_reset")!==today){
-credit=10;
-localStorage.setItem("ai_credit",credit);
-localStorage.setItem("last_reset",today);
-}
-
-function updateCredit(){
-document.getElementById("creditInfo").innerText="Credit: "+credit;
-}
-
-// TEMPLATE
-template.onchange=function(){
-if(this.value==="ibu"){
-judul.value="Anak Menyesal";
-tema.value="Durhaka kepada ibu lalu menyesal";
-emosi.value="Sedih";
-}
-if(this.value==="horor"){
-judul.value="Malam Terakhir";
-tema.value="Teror misterius di rumah";
-emosi.value="Tegang";
-}
-if(this.value==="iklan"){
-mode.value="iklan";
-}
-if(this.value==="clay"){
-judul.value="Ibu yang Terlupakan";
-tema.value="Anak melupakan ibunya lalu menyesal";
-emosi.value="Sedih";
-}
-};
-
-// MODE
-mode.onchange=function(){
-produk.style.display=this.value==="iklan"?"block":"none";
-produkImg.style.display=this.value==="iklan"?"block":"none";
-};
-
-// CUSTOM
-karakter.onchange=()=>customKarakter.style.display=karakter.value==="custom"?"block":"none";
-emosi.onchange=()=>customEmosi.style.display=emosi.value==="custom"?"block":"none";
-style.onchange=()=>customStyle.style.display=style.value==="custom"?"block":"none";
-
 function generate(){
 
 if(credit<=0){
@@ -239,7 +192,7 @@ alert("Credit habis!");
 return;
 }
 
-let hasil="🔥 SCRIPT SIAP PRODUKSI (AUTO CINEMATIC + DIALOG)\n\n";
+let hasil="🔥 FULL SCRIPT SIAP PRODUKSI (MASTER PROMPT + CINEMATIC)\n\n";
 
 let karakterFinal=karakter.value==="custom"?customKarakter.value:karakter.value;
 let emosiFinal=emosi.value==="custom"?customEmosi.value:emosi.value;
@@ -248,6 +201,18 @@ let styleFinal=style.value==="custom"?customStyle.value:style.value;
 if(template.value==="clay"){
 styleFinal+=", clay animation, soft texture, stylized cinematic";
 }
+
+// 🔥 MASTER KARAKTER
+hasil += `👤 MASTER KARAKTER:\n`;
+hasil += `${karakterFinal}, konsisten wajah, usia realistis, detail wajah sama di setiap scene, natural expression, cinematic look\n\n`;
+
+// 🔥 NEGATIVE PROMPT
+hasil += `🚫 NEGATIVE PROMPT:\n`;
+hasil += `blur, low quality, bad anatomy, distorted face, extra limbs, watermark, text, logo, low detail, unrealistic lighting\n\n`;
+
+// 🔥 MASTER PROMPT GLOBAL
+hasil += `🎯 MASTER PROMPT GLOBAL:\n`;
+hasil += `${tema.value}, ${styleFinal}, cinematic storytelling, ultra realistic, highly detailed skin texture, emotional, cinematic lighting, rim light, soft shadow, global illumination, depth of field, bokeh, 35mm film, volumetric lighting, dramatic composition\n\n`;
 
 let struktur=[
 "HOOK","KOMEN","KONFLIK","EMOSI NAIK","FLASHBACK",
@@ -260,12 +225,15 @@ for(let i=1;i<=maxScene;i++){
 
 let title=struktur[i-1]||"SCENE";
 
-let visual=`${karakterFinal}, ${tema.value}, ${styleFinal}, natural look, highly detailed skin texture, micro expressions, emotional storytelling, cinematic lighting, soft shadows, rim light, global illumination, ultra realistic, depth of field, bokeh, 35mm film, volumetric lighting, dramatic composition`;
+// 🔥 VISUAL SUPER DETAIL
+let t2i=`${karakterFinal}, ${tema.value}, ${styleFinal}, natural look, highly detailed skin texture, micro expressions, emotional storytelling, cinematic lighting, soft shadows, rim light, global illumination, ultra realistic, depth of field, bokeh, 35mm film, volumetric lighting, dramatic composition`;
 
+// 🔥 I2V
 let i2v=i%2===0
 ? "slow cinematic zoom, focus shift, depth motion"
 : "camera pan, auto zoom dialog, emotional focus";
 
+// 🔥 DIALOG HIDUP
 let vo="";
 
 if(i===1){
@@ -284,30 +252,24 @@ else{
 vo=`narasi ${emosiFinal}`;
 }
 
+// OUTPUT
+hasil+=`====================\n`;
 hasil+=`🎬 SCENE ${i} — ${title}\n\n`;
-hasil+=`Visual:\n${visual}\n\n`;
-hasil+=`I2V:\n${i2v}\n\n`;
+hasil+=`Prompt T2I:\n${t2i}\n\n`;
+hasil+=`Prompt I2V:\n${i2v}\n\n`;
 hasil+=`VO:\n${vo}\n\n`;
-hasil+="====================\n\n";
 
 }
 
 output.innerText=hasil;
 
+// credit
 credit--;
 localStorage.setItem("ai_credit",credit);
 updateCredit();
 
 }
 
-function copyText(){
-navigator.clipboard.writeText(output.innerText);
-alert("Copied");
-}
-
-updateCredit();
-
 </script>
-
 </body>
 </html>
