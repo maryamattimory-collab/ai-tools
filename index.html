@@ -77,7 +77,6 @@ margin-top:15px;
 color:#64748b;
 font-size:12px;
 }
-.extra{display:none;}
 </style>
 </head>
 
@@ -90,10 +89,7 @@ font-size:12px;
 
 <div class="card">
 
-<div id="creditInfo" style="margin-bottom:5px;color:#38bdf8;font-weight:bold;">
-Credit: 10
-</div>
-
+<div id="creditInfo" style="color:#38bdf8;font-weight:bold;">Credit: 10</div>
 <div style="font-size:12px;color:#94a3b8;margin-bottom:10px;">
 Free 10 credit / hari • Premium tanpa batas
 </div>
@@ -129,8 +125,12 @@ Free 10 credit / hari • Premium tanpa batas
 
 <select id="emosi">
 <option>Sedih</option>
+<option>Haru</option>
 <option>Bahagia</option>
+<option>Religius</option>
 <option>Tegang</option>
+<option>Ceria</option>
+<option>Seru</option>
 <option value="custom">Custom</option>
 </select>
 <input id="customEmosi" placeholder="Custom emosi" style="display:none;">
@@ -139,6 +139,7 @@ Free 10 credit / hari • Premium tanpa batas
 <option>Ibu & Anak</option>
 <option>Ibu</option>
 <option>Anak</option>
+<option>Remaja</option>
 <option value="custom">Custom</option>
 <option value="none">Tanpa Karakter</option>
 </select>
@@ -148,6 +149,7 @@ Free 10 credit / hari • Premium tanpa batas
 <option>Realistic Cinematic</option>
 <option>3D Pixar</option>
 <option>Anime</option>
+<option>Kartun Anak</option>
 <option value="custom">Custom</option>
 </select>
 <input id="customStyle" placeholder="Custom style" style="display:none;">
@@ -159,6 +161,24 @@ Free 10 credit / hari • Premium tanpa batas
 
 </div>
 
+<!-- TOOLS AI -->
+<div class="card">
+<h4>Tools AI</h4>
+
+<div class="features">
+<div class="feature">Infografis Generator</div>
+<div class="feature">TikTok Carousel</div>
+<div class="feature">Leonardo Prompt</div>
+<div class="feature">Veo Video Prompt</div>
+<div class="feature">Analyze Video</div>
+<div class="feature">Gabungkan Foto</div>
+</div>
+
+<a href="/chat.html">
+<button>Masuk ke AI Tools</button>
+</a>
+</div>
+
 <div class="footer">AI Studio Pro</div>
 
 </div>
@@ -167,35 +187,44 @@ Free 10 credit / hari • Premium tanpa batas
 
 let credit = localStorage.getItem("ai_credit") || 10;
 
+// reset harian
+let today=new Date().toDateString();
+if(localStorage.getItem("last_reset")!==today){
+credit=10;
+localStorage.setItem("ai_credit",credit);
+localStorage.setItem("last_reset",today);
+}
+
 function updateCredit(){
 document.getElementById("creditInfo").innerText="Credit: "+credit;
 }
 
 // TEMPLATE
 template.onchange=function(){
-
 if(this.value==="ibu"){
 judul.value="Anak Menyesal";
-tema.value="Durhaka lalu menyesal";
+tema.value="Durhaka kepada ibu lalu menyesal";
 emosi.value="Sedih";
 }
-
 if(this.value==="horor"){
-judul.value="Rumah Terakhir";
-tema.value="Teror misterius";
+judul.value="Malam Terakhir";
+tema.value="Teror misterius di rumah";
 emosi.value="Tegang";
 }
-
 if(this.value==="iklan"){
 mode.value="iklan";
 }
-
 if(this.value==="clay"){
 judul.value="Ibu yang Terlupakan";
-tema.value="Anak melupakan ibu";
+tema.value="Anak melupakan ibunya lalu menyesal";
 emosi.value="Sedih";
 }
+};
 
+// MODE
+mode.onchange=function(){
+produk.style.display=this.value==="iklan"?"block":"none";
+produkImg.style.display=this.value==="iklan"?"block":"none";
 };
 
 // CUSTOM
@@ -203,7 +232,6 @@ karakter.onchange=()=>customKarakter.style.display=karakter.value==="custom"?"bl
 emosi.onchange=()=>customEmosi.style.display=emosi.value==="custom"?"block":"none";
 style.onchange=()=>customStyle.style.display=style.value==="custom"?"block":"none";
 
-// GENERATE
 function generate(){
 
 if(credit<=0){
@@ -211,15 +239,14 @@ alert("Credit habis!");
 return;
 }
 
-let hasil="🔥 SCRIPT SIAP PRODUKSI\n\n";
+let hasil="🔥 SCRIPT SIAP PRODUKSI (AUTO CINEMATIC + DIALOG)\n\n";
 
 let karakterFinal=karakter.value==="custom"?customKarakter.value:karakter.value;
 let emosiFinal=emosi.value==="custom"?customEmosi.value:emosi.value;
 let styleFinal=style.value==="custom"?customStyle.value:style.value;
 
-// CLAY
 if(template.value==="clay"){
-styleFinal+=" clay animation cinematic";
+styleFinal+=", clay animation, soft texture, stylized cinematic";
 }
 
 let struktur=[
@@ -227,20 +254,37 @@ let struktur=[
 "PIKIRAN DALAM","TITIK TERENDAH","PENYESALAN","PESAN","ENDING"
 ];
 
-let maxScene=parseInt(scene.value);
+let maxScene=Math.min(parseInt(scene.value),10);
 
 for(let i=1;i<=maxScene;i++){
 
 let title=struktur[i-1]||"SCENE";
 
-let visual = `${karakterFinal}, ${tema.value}, ${styleFinal}, natural look, expressive face, emotional, cinematic lighting, soft shadows, ultra detailed, depth of field, 35mm lens`;
-let vo="narasi "+emosiFinal;
-let i2v=i%2?"auto zoom dialog":"slow pan";
+let visual=`${karakterFinal}, ${tema.value}, ${styleFinal}, natural look, highly detailed skin texture, micro expressions, emotional storytelling, cinematic lighting, soft shadows, rim light, global illumination, ultra realistic, depth of field, bokeh, 35mm film, volumetric lighting, dramatic composition`;
 
-if(i===1) vo="Hook kuat";
-if(i===maxScene) vo="Ending emosional";
+let i2v=i%2===0
+? "slow cinematic zoom, focus shift, depth motion"
+: "camera pan, auto zoom dialog, emotional focus";
 
-hasil+=`🎬 SCENE ${i} — ${title}\n`;
+let vo="";
+
+if(i===1){
+vo=`"${judul.value}... semuanya berubah sejak hari itu..."`;
+}
+else if(i===3){
+vo=`"Bu... maafin aku..."`;
+}
+else if(i===7){
+vo=`"Ini semua salahku..."`;
+}
+else if(i===maxScene){
+vo=`"Kalau waktu bisa diulang... aku akan memilih berbeda..."`;
+}
+else{
+vo=`narasi ${emosiFinal}`;
+}
+
+hasil+=`🎬 SCENE ${i} — ${title}\n\n`;
 hasil+=`Visual:\n${visual}\n\n`;
 hasil+=`I2V:\n${i2v}\n\n`;
 hasil+=`VO:\n${vo}\n\n`;
