@@ -16,67 +16,12 @@ align-items:center;
 justify-content:center;
 min-height:100vh;
 }
-.container{
-text-align:center;
-max-width:750px;
-padding:40px;
-}
-h1{font-size:42px;margin-bottom:10px;}
-.sub{color:#94a3b8;margin-bottom:25px;}
-.card{
-background:#1e293b;
-padding:25px;
-border-radius:16px;
-margin-bottom:20px;
-}
-.features{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin-bottom:20px;
-}
-.feature{
-background:#020617;
-padding:10px;
-border-radius:8px;
-font-size:13px;
-color:#94a3b8;
-}
-input, select{
-width:100%;
-padding:10px;
-margin-bottom:10px;
-border-radius:8px;
-border:none;
-outline:none;
-}
-button{
-background:#38bdf8;
-border:none;
-padding:14px 20px;
-font-size:15px;
-border-radius:10px;
-cursor:pointer;
-color:white;
-font-weight:bold;
-margin:5px;
-}
-button:hover{background:#0ea5e9;}
+.container{max-width:750px;padding:40px;text-align:center;}
+.card{background:#1e293b;padding:25px;border-radius:16px;margin-bottom:20px;}
+input,select{width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:none;}
+button{background:#38bdf8;padding:12px;border:none;border-radius:10px;color:white;margin:5px;cursor:pointer;}
 .copy-btn{background:#22c55e;}
-.output{
-background:#020617;
-padding:15px;
-border-radius:10px;
-margin-top:15px;
-text-align:left;
-white-space:pre-line;
-font-size:14px;
-}
-.footer{
-margin-top:15px;
-color:#64748b;
-font-size:12px;
-}
+.output{background:#020617;padding:15px;border-radius:10px;margin-top:15px;white-space:pre-line;text-align:left;}
 </style>
 </head>
 
@@ -85,7 +30,6 @@ font-size:12px;
 <div class="container">
 
 <h1>🎬 AI Studio Pro</h1>
-<div class="sub">Generator Film, Iklan, Edukasi AI</div>
 
 <div class="card">
 
@@ -105,42 +49,59 @@ font-size:12px;
 <option selected>10</option>
 </select>
 
-<select id="emosi">
-<option>Sedih</option>
-<option value="custom">Custom</option>
-</select>
-<input id="customEmosi" placeholder="Custom emosi" style="display:none;">
-
 <select id="karakter">
 <option>Ibu & Anak</option>
+<option>Ibu</option>
+<option>Anak</option>
 <option value="custom">Custom</option>
 </select>
 <input id="customKarakter" placeholder="Custom karakter" style="display:none;">
 
+<select id="emosi">
+<option>Sedih</option>
+<option>Haru</option>
+<option value="custom">Custom</option>
+</select>
+<input id="customEmosi" placeholder="Custom emosi" style="display:none;">
+
 <select id="style">
 <option>Realistic Cinematic</option>
+<option>Anime</option>
 <option value="custom">Custom</option>
 </select>
 <input id="customStyle" placeholder="Custom style" style="display:none;">
 
 <button onclick="generate()">Generate</button>
-<button onclick="copyText()">Copy</button>
+<button onclick="copyText()" class="copy-btn">Copy</button>
 
 <div id="output" class="output"></div>
 
 </div>
 
+<!-- TOOLS -->
+<div class="card">
+<h4>Tools AI</h4>
+<div>Infografis • Carousel • Leonardo • Veo • Analyze</div>
+<a href="/chat.html"><button>Masuk Tools</button></a>
+</div>
+
+</div>
+
 <script>
 
-// CREDIT FIX
-let credit = localStorage.getItem("ai_credit");
-if(!credit){credit=10;}
+// CREDIT
+let credit = localStorage.getItem("ai_credit") || 10;
 
 function updateCredit(){
 document.getElementById("creditInfo").innerText="Credit: "+credit;
 }
 
-// GENERATE FIX
+// CUSTOM
+karakter.onchange=()=>customKarakter.style.display=karakter.value==="custom"?"block":"none";
+emosi.onchange=()=>customEmosi.style.display=emosi.value==="custom"?"block":"none";
+style.onchange=()=>customStyle.style.display=style.value==="custom"?"block":"none";
+
+// GENERATE
 function generate(){
 
 if(credit<=0){
@@ -148,39 +109,64 @@ alert("Credit habis!");
 return;
 }
 
-let judul = document.getElementById("judul").value;
-let tema = document.getElementById("tema").value;
-let karakter = document.getElementById("karakter").value;
-let emosi = document.getElementById("emosi").value;
-let style = document.getElementById("style").value;
-let scene = document.getElementById("scene").value;
+let judul=document.getElementById("judul").value;
+let tema=document.getElementById("tema").value;
+let karakterVal=document.getElementById("karakter").value;
+let emosiVal=document.getElementById("emosi").value;
+let styleVal=document.getElementById("style").value;
+let sceneVal=document.getElementById("scene").value;
+let templateVal=document.getElementById("template").value;
 
-let hasil="🔥 SCRIPT SIAP PRODUKSI\n\n";
+// custom
+let karakter=karakterVal==="custom"?customKarakter.value:karakterVal;
+let emosi=emosiVal==="custom"?customEmosi.value:emosiVal;
+let style=styleVal==="custom"?customStyle.value:styleVal;
 
-for(let i=1;i<=scene;i++){
+// clay
+if(templateVal==="clay"){
+style+=", clay animation, soft texture";
+}
 
-let vo = i===1
+let hasil="🔥 FULL SCRIPT SIAP PRODUKSI\n\n";
+
+// MASTER
+hasil+=`👤 MASTER KARAKTER:\n${karakter}, konsisten wajah\n\n`;
+hasil+=`🚫 NEGATIVE:\nblur, low quality, bad anatomy, watermark\n\n`;
+hasil+=`🎯 MASTER PROMPT:\n${tema}, ${style}, cinematic lighting, ultra detailed, 35mm, depth of field\n\n`;
+
+let struktur=["HOOK","KONFLIK","EMOSI","FLASHBACK","PENYESALAN","ENDING"];
+
+for(let i=1;i<=sceneVal;i++){
+
+let t2i=`${karakter}, ${tema}, ${style}, cinematic, ultra detailed`;
+
+let i2v=i%2===0?"slow zoom":"auto zoom dialog";
+
+let vo=i===1
 ? `"${judul}... semuanya berubah"`
-: i==scene
+: i==sceneVal
 ? `"Aku menyesal..."`
 : `narasi ${emosi}`;
 
-hasil+=`SCENE ${i}\n`;
-hasil+=`TEMA: ${tema}\n`;
-hasil+=`VISUAL: ${karakter}, ${style}\n`;
-hasil+=`VO: ${vo}\n\n`;
-
+hasil+=`🎬 SCENE ${i}\n`;
+hasil+=`T2I:\n${t2i}\n`;
+hasil+=`I2V:\n${i2v}\n`;
+hasil+=`VO:\n${vo}\n\n`;
 }
 
-document.getElementById("output").innerText=hasil;
+// tampil
+output.innerText=hasil;
 
+// credit
 credit--;
 localStorage.setItem("ai_credit",credit);
 updateCredit();
+
 }
 
+// COPY
 function copyText(){
-navigator.clipboard.writeText(document.getElementById("output").innerText);
+navigator.clipboard.writeText(output.innerText);
 alert("Copied");
 }
 
