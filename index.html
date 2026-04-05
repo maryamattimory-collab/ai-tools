@@ -1,161 +1,152 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Studio Pro</title>
-
-<style>
-body{
-margin:0;
-font-family:Arial, sans-serif;
-background:linear-gradient(135deg,#0f172a,#020617);
-color:white;
-display:flex;
-align-items:center;
-justify-content:center;
-min-height:100vh;
-}
-.container{max-width:750px;padding:40px;text-align:center;}
-.card{background:#1e293b;padding:25px;border-radius:16px;margin-bottom:20px;}
-input,select{width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:none;}
-button{background:#38bdf8;padding:12px;border:none;border-radius:10px;color:white;margin:5px;cursor:pointer;}
-.copy-btn{background:#22c55e;}
-.output{background:#020617;padding:15px;border-radius:10px;margin-top:15px;white-space:pre-line;text-align:left;}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<h1>🎬 AI Studio Pro</h1>
-
-<div class="card">
-
-<div id="creditInfo">Credit: 10</div>
-
-<select id="template">
-<option value="">Pilih Ide</option>
-<option value="clay">Clay Viral</option>
-</select>
-
-<input id="judul" placeholder="Judul">
-<input id="tema" placeholder="Tema">
-
-<select id="scene">
-<option>3</option>
-<option>5</option>
-<option selected>10</option>
-</select>
-
-<select id="karakter">
-<option>Ibu & Anak</option>
-<option>Ibu</option>
-<option>Anak</option>
-<option value="custom">Custom</option>
-</select>
-<input id="customKarakter" placeholder="Custom karakter" style="display:none;">
-
-<select id="emosi">
-<option>Sedih</option>
-<option>Haru</option>
-<option value="custom">Custom</option>
-</select>
-<input id="customEmosi" placeholder="Custom emosi" style="display:none;">
-
-<select id="style">
-<option>Realistic Cinematic</option>
-<option>Anime</option>
-<option value="custom">Custom</option>
-</select>
-<input id="customStyle" placeholder="Custom style" style="display:none;">
-
-<button onclick="generate()">Generate</button>
-<button onclick="copyText()" class="copy-btn">Copy</button>
-
-<div id="output" class="output"></div>
-
-</div>
-
-<!-- TOOLS -->
-<div class="card">
-<h4>Tools AI</h4>
-<div>Infografis • Carousel • Leonardo • Veo • Analyze</div>
-<a href="/chat.html"><button>Masuk Tools</button></a>
-</div>
-
-</div>
-
 <script>
 
-// CREDIT
-let credit = localStorage.getItem("ai_credit") || 10;
+// ================= CREDIT =================
+let credit = localStorage.getItem("ai_credit");
 
-function updateCredit(){
-document.getElementById("creditInfo").innerText="Credit: "+credit;
+if(credit === null){
+credit = 10;
+localStorage.setItem("ai_credit", credit);
+}else{
+credit = parseInt(credit);
 }
 
-// CUSTOM
-karakter.onchange=()=>customKarakter.style.display=karakter.value==="custom"?"block":"none";
-emosi.onchange=()=>customEmosi.style.display=emosi.value==="custom"?"block":"none";
-style.onchange=()=>customStyle.style.display=style.value==="custom"?"block":"none";
+// reset harian
+let today = new Date().toDateString();
+let lastReset = localStorage.getItem("last_reset");
 
-// GENERATE
+if(lastReset !== today){
+credit = 10;
+localStorage.setItem("ai_credit", credit);
+localStorage.setItem("last_reset", today);
+}
+
+function updateCredit(){
+let el = document.getElementById("creditInfo");
+if(el) el.innerText = "Credit: " + credit;
+}
+
+// ================= SAFE ELEMENT =================
+function getVal(id){
+let el = document.getElementById(id);
+return el ? el.value : "";
+}
+
+// ================= MODE =================
+let modeEl = document.getElementById("mode");
+if(modeEl){
+modeEl.onchange = function(){
+let produk = document.getElementById("produk");
+let produkImg = document.getElementById("produkImg");
+
+if(produk) produk.style.display = this.value==="iklan"?"block":"none";
+if(produkImg) produkImg.style.display = this.value==="iklan"?"block":"none";
+};
+}
+
+// ================= CUSTOM =================
+function toggleCustom(selectId, inputId){
+let select = document.getElementById(selectId);
+let input = document.getElementById(inputId);
+
+if(select && input){
+select.onchange = function(){
+input.style.display = this.value==="custom"?"block":"none";
+};
+}
+}
+
+toggleCustom("karakter","customKarakter");
+toggleCustom("emosi","customEmosi");
+toggleCustom("style","customStyle");
+
+// ================= GENERATE =================
 function generate(){
 
 if(credit<=0){
-alert("Credit habis!");
+alert("🔥 Credit kamu habis!");
 return;
 }
 
-let judul=document.getElementById("judul").value;
-let tema=document.getElementById("tema").value;
-let karakterVal=document.getElementById("karakter").value;
-let emosiVal=document.getElementById("emosi").value;
-let styleVal=document.getElementById("style").value;
-let sceneVal=document.getElementById("scene").value;
-let templateVal=document.getElementById("template").value;
+// ambil data aman
+let judul = getVal("judul");
+let tema = getVal("tema");
+let karakterVal = getVal("karakter");
+let emosiVal = getVal("emosi");
+let styleVal = getVal("style");
+let sceneVal = parseInt(getVal("scene")) || 3;
+let templateVal = getVal("template");
 
 // custom
-let karakter=karakterVal==="custom"?customKarakter.value:karakterVal;
-let emosi=emosiVal==="custom"?customEmosi.value:emosiVal;
-let style=styleVal==="custom"?customStyle.value:styleVal;
+let karakter = karakterVal==="custom" ? getVal("customKarakter") : karakterVal;
+let emosi = emosiVal==="custom" ? getVal("customEmosi") : emosiVal;
+let style = styleVal==="custom" ? getVal("customStyle") : styleVal;
+
+// fallback biar gak kosong
+if(!karakter) karakter = "karakter manusia";
+if(!emosi) emosi = "emosional";
+if(!style) style = "cinematic";
 
 // clay
 if(templateVal==="clay"){
-style+=", clay animation, soft texture";
+style += ", clay animation, soft texture, cinematic lighting";
 }
 
-let hasil="🔥 FULL SCRIPT SIAP PRODUKSI\n\n";
+// OUTPUT
+let hasil="🔥 FULL SCRIPT SIAP PRODUKSI (MASTER + CINEMATIC)\n\n";
 
 // MASTER
-hasil+=`👤 MASTER KARAKTER:\n${karakter}, konsisten wajah\n\n`;
-hasil+=`🚫 NEGATIVE:\nblur, low quality, bad anatomy, watermark\n\n`;
-hasil+=`🎯 MASTER PROMPT:\n${tema}, ${style}, cinematic lighting, ultra detailed, 35mm, depth of field\n\n`;
+hasil += `👤 MASTER KARAKTER:\n${karakter}, konsisten wajah, detail sama tiap scene\n\n`;
+hasil += `🚫 NEGATIVE PROMPT:\nblur, low quality, bad anatomy, extra limbs, watermark, text\n\n`;
+hasil += `🎯 MASTER PROMPT:\n${tema}, ${style}, cinematic lighting, ultra detailed, 35mm, depth of field, emotional storytelling\n\n`;
 
-let struktur=["HOOK","KONFLIK","EMOSI","FLASHBACK","PENYESALAN","ENDING"];
+// struktur
+let struktur=[
+"HOOK","KOMEN","KONFLIK","EMOSI NAIK","FLASHBACK",
+"PIKIRAN DALAM","TITIK TERENDAH","PENYESALAN","PESAN","ENDING"
+];
 
-for(let i=1;i<=sceneVal;i++){
+let maxScene = Math.min(sceneVal,10);
 
-let t2i=`${karakter}, ${tema}, ${style}, cinematic, ultra detailed`;
+// loop scene
+for(let i=1;i<=maxScene;i++){
 
-let i2v=i%2===0?"slow zoom":"auto zoom dialog";
+let title = struktur[i-1] || "SCENE";
 
-let vo=i===1
-? `"${judul}... semuanya berubah"`
-: i==sceneVal
-? `"Aku menyesal..."`
-: `narasi ${emosi}`;
+let t2i = `${karakter}, ${tema}, ${style}, highly detailed, cinematic lighting, depth of field, 35mm`;
 
-hasil+=`🎬 SCENE ${i}\n`;
-hasil+=`T2I:\n${t2i}\n`;
-hasil+=`I2V:\n${i2v}\n`;
-hasil+=`VO:\n${vo}\n\n`;
+let i2v = i%2===0
+? "slow cinematic zoom, focus shift"
+: "camera pan, auto zoom dialog";
+
+let vo;
+
+if(i===1){
+vo=`"${judul || "Cerita ini"}... semuanya berubah sejak hari itu..."`;
+}
+else if(i===3){
+vo=`"Aku mulai sadar semuanya salah..."`;
+}
+else if(i===7){
+vo=`"Ini semua salahku..."`;
+}
+else if(i===maxScene){
+vo=`"Kalau waktu bisa diulang... aku akan memilih berbeda..."`;
+}
+else{
+vo=`narasi ${emosi}`;
 }
 
-// tampil
-output.innerText=hasil;
+hasil+=`====================\n`;
+hasil+=`🎬 SCENE ${i} — ${title}\n\n`;
+hasil+=`Prompt T2I:\n${t2i}\n\n`;
+hasil+=`Prompt I2V:\n${i2v}\n\n`;
+hasil+=`VO:\n${vo}\n\n`;
+
+}
+
+// tampilkan
+let output = document.getElementById("output");
+if(output) output.innerText = hasil;
 
 // credit
 credit--;
@@ -164,15 +155,16 @@ updateCredit();
 
 }
 
-// COPY
+// ================= COPY =================
 function copyText(){
-navigator.clipboard.writeText(output.innerText);
+let text = document.getElementById("output");
+if(text){
+navigator.clipboard.writeText(text.innerText);
 alert("Copied");
 }
+}
 
+// INIT
 updateCredit();
 
 </script>
-
-</body>
-</html>
