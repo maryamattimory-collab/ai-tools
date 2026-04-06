@@ -247,7 +247,41 @@ let title=struktur[i-1]||"SCENE";
 let visual=`${karakterFinal}, ${tema.value}, ${styleFinal}, cinematic lighting, ultra detail`;
 let i2v="cinematic movement, auto zoom dialog";
 
-let vo=`"${karakterFinal} merasakan ${emosiFinal.toLowerCase()}... semuanya berubah perlahan..."`;
+let vo="";
+
+if(i===1){
+vo=`"${judul.value}... semuanya berubah sejak hari itu..."`;
+}
+else if(i===2){
+vo=`"Awalnya terasa biasa saja..."`;
+}
+else if(i===3){
+vo=`"Tapi perlahan, semuanya mulai berbeda..."`;
+}
+else if(i===4){
+vo=`"${karakterFinal} mulai merasa ${emosiFinal.toLowerCase()}..."`;
+}
+else if(i===5){
+vo=`"Kenangan itu kembali muncul di pikirannya..."`;
+}
+else if(i===6){
+vo=`"Seandainya waktu bisa diulang..."`;
+}
+else if(i===7){
+vo=`"Ini semua salahku..."`;
+}
+else if(i===8){
+vo=`"${karakterFinal} tak bisa menahan perasaan lagi..."`;
+}
+else if(i===9){
+vo=`"Penyesalan itu datang terlambat..."`;
+}
+else if(i===10){
+vo=`"Kalau waktu bisa diulang... aku akan memilih berbeda..."`;
+}
+else{
+vo=`"${karakterFinal} terdiam dalam ${emosiFinal.toLowerCase()}..."`;
+}
 
 hasil+=`🎬 SCENE ${i} — ${title}\n\n`;
 hasil+=`Visual:\n${visual}\n\n`;
