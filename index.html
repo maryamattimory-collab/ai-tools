@@ -101,6 +101,7 @@ Free 10 credit / hari • Premium tanpa batas
 <option value="iklan">Iklan Produk</option>
 <option value="edukasi">Edukasi</option>
 <option value="clay">🔥 Clay Viral Story</option>
+<option value="object">🗣️ Object Talk</option>
 </select>
 
 <select id="mode">
@@ -115,6 +116,19 @@ Free 10 credit / hari • Premium tanpa batas
 
 <input id="produk" placeholder="Nama Produk" style="display:none;">
 <input type="file" id="produkImg" style="display:none;">
+
+<div id="edukasiProBox" style="display:none;">
+<select id="outputType">
+<option value="storybook">📖 Storybook</option>
+<option value="lkpd">📝 LKPD</option>
+<option value="komik">💬 Komik</option>
+<option value="workbook">📚 Workbook</option>
+<option value="script">🎬 Script Video</option>
+</select>
+
+<input id="usia" placeholder="Usia anak">
+<input id="tujuan" placeholder="Tujuan pembelajaran">
+</div>
 
 <select id="scene">
 <option>3</option>
@@ -164,10 +178,9 @@ Free 10 credit / hari • Premium tanpa batas
 
 </div>
 
-<!-- TOOLS AI -->
+<!-- TOOLS -->
 <div class="card">
 <h4>Tools AI</h4>
-
 <div class="features">
 <div class="feature">Infografis Generator</div>
 <div class="feature">TikTok Carousel</div>
@@ -176,10 +189,7 @@ Free 10 credit / hari • Premium tanpa batas
 <div class="feature">Analyze Video</div>
 <div class="feature">Gabungkan Foto</div>
 </div>
-
-<a href="/chat.html">
-<button>Masuk ke AI Tools</button>
-</a>
+<a href="/chat.html"><button>Masuk ke AI Tools</button></a>
 </div>
 
 <div class="footer">AI Studio Pro</div>
@@ -190,37 +200,17 @@ Free 10 credit / hari • Premium tanpa batas
 
 let credit = localStorage.getItem("ai_credit") || 10;
 
-// reset harian
-let today=new Date().toDateString();
-if(localStorage.getItem("last_reset")!==today){
-credit=10;
-localStorage.setItem("ai_credit",credit);
-localStorage.setItem("last_reset",today);
-}
-
 function updateCredit(){
 document.getElementById("creditInfo").innerText="Credit: "+credit;
 }
 
 // TEMPLATE
 template.onchange=function(){
-if(this.value==="ibu"){
-judul.value="Anak Menyesal";
-tema.value="Durhaka kepada ibu lalu menyesal";
-emosi.value="Sedih";
-}
-if(this.value==="horor"){
-judul.value="Malam Terakhir";
-tema.value="Teror misterius di rumah";
-emosi.value="Tegang";
-}
-if(this.value==="iklan"){
-mode.value="iklan";
-}
-if(this.value==="clay"){
-judul.value="Ibu yang Terlupakan";
-tema.value="Anak melupakan ibunya lalu menyesal";
-emosi.value="Sedih";
+if(this.value==="object"){
+mode.value="edukasi";
+judul.value="Benda yang Bicara";
+tema.value="Sebuah benda memberi pelajaran hidup";
+karakter.value="Benda";
 }
 };
 
@@ -228,9 +218,9 @@ emosi.value="Sedih";
 mode.onchange=function(){
 produk.style.display=this.value==="iklan"?"block":"none";
 produkImg.style.display=this.value==="iklan"?"block":"none";
+edukasiProBox.style.display=this.value==="edukasi_pro"?"block":"none";
 };
 
-// CUSTOM INPUT
 karakter.onchange=()=>customKarakter.style.display=karakter.value==="custom"?"block":"none";
 emosi.onchange=()=>customEmosi.style.display=emosi.value==="custom"?"block":"none";
 style.onchange=()=>customStyle.style.display=style.value==="custom"?"block":"none";
@@ -238,83 +228,29 @@ style.onchange=()=>customStyle.style.display=style.value==="custom"?"block":"non
 function generate(){
 
 if(credit<=0){
-alert("🔥 Credit habis!\n\nUpgrade untuk akses tanpa batas ya 😉");
+alert("Credit habis!");
 return;
 }
 
-let hasil="🔥 SCRIPT SIAP PRODUKSI (AUTO CINEMATIC + DIALOG)\n\n";
+let hasil="🔥 SCRIPT FULL SIAP PRODUKSI\n\n";
 
 let karakterFinal=karakter.value==="custom"?customKarakter.value:karakter.value;
-
-// DETEKSI OBJECT TALK
-let isObjectTalk = ["Buah","Sayur","Benda"].includes(karakterFinal);
 let emosiFinal=emosi.value==="custom"?customEmosi.value:emosi.value;
 let styleFinal=style.value==="custom"?customStyle.value:style.value;
-if(isObjectTalk){
-styleFinal += ", 3D animated, pixar style, expressive eyes";
-}
-  
-// CLAY MODE
-if(template.value==="clay"){
-styleFinal+=", clay animation, soft texture, stylized cinematic";
-}
 
-// MASTER KARAKTER (ANTI BERUBAH)
-let karakterMaster = karakter.value==="none"
-? `${tema.value}`
-: `${karakterFinal}, consistent face, same person across all scenes, same outfit, same identity`;
+let struktur=["HOOK","KONFLIK","EMOSI NAIK","TITIK TERENDAH","ENDING"];
 
-// NEGATIVE PROMPT (ANTI ERROR)
-let negative = "blurry, low quality, bad anatomy, deformed face, extra fingers, broken hands, distorted face, unrealistic proportions, watermark, text, logo, low resolution";
-
-let struktur=[
-"HOOK","KOMEN","KONFLIK","EMOSI NAIK","FLASHBACK",
-"PIKIRAN DALAM","TITIK TERENDAH","PENYESALAN","PESAN","ENDING"
-];
-
-let maxScene=Math.min(parseInt(scene.value),10);
-
-for(let i=1;i<=maxScene;i++){
+for(let i=1;i<=parseInt(scene.value);i++){
 
 let title=struktur[i-1]||"SCENE";
 
-// LIGHTING DINAMIS (BIAR HIDUP)
-let lighting = i < maxScene/2
-? "soft daylight, natural lighting"
-: "warm cinematic lighting, dramatic shadows";
+let visual=`${karakterFinal}, ${tema.value}, ${styleFinal}, cinematic lighting, ultra detail`;
+let i2v="cinematic movement, auto zoom dialog";
 
-// VISUAL MASTER (UPGRADE)
-let visual = isObjectTalk
-? `${karakterFinal} object talk, expressive face, talking object, animated expression, ${tema.value}, ${styleFinal}, ${lighting}, cinematic storytelling, depth of field, 3D look`
-: `${karakterMaster}, ${tema.value}, ${styleFinal}, ${lighting}, highly detailed skin texture, micro expressions, cinematic storytelling, depth of field`;
+let vo=`"${karakterFinal} merasakan ${emosiFinal.toLowerCase()}... semuanya berubah perlahan..."`;
 
-// CAMERA
-let i2v=i%2===0
-? "slow cinematic zoom, focus shift, depth motion"
-: "camera pan, auto zoom dialog, emotional focus";
-
-// VOICE OVER
-let vo="";
-if(i===1){
-vo=`"${judul.value}... semuanya berubah sejak hari itu..."`;
-}
-else if(i===3){
-vo=`"Bu... maafin aku..."`;
-}
-else if(i===7){
-vo=`"Ini semua salahku..."`;
-}
-else if(i===maxScene){
-vo=`"Kalau waktu bisa diulang... aku akan memilih berbeda..."`;
-}
-else{
-vo=`narasi ${emosiFinal}`;
-}
-
-// OUTPUT
 hasil+=`🎬 SCENE ${i} — ${title}\n\n`;
 hasil+=`Visual:\n${visual}\n\n`;
-hasil+=`Negative Prompt:\n${negative}\n\n`;
 hasil+=`I2V:\n${i2v}\n\n`;
 hasil+=`VO:\n${vo}\n\n`;
 hasil+="====================\n\n";
@@ -323,11 +259,8 @@ hasil+="====================\n\n";
 
 output.innerText=hasil;
 
-// CREDIT
 credit--;
-localStorage.setItem("ai_credit",credit);
 updateCredit();
-
 }
 
 function copyText(){
