@@ -49,6 +49,7 @@ margin-bottom:10px;
 border-radius:8px;
 border:none;
 outline:none;
+box-sizing:border-box;
 }
 button{
 background:#38bdf8;
@@ -63,6 +64,7 @@ margin:5px;
 }
 button:hover{background:#0ea5e9;}
 .copy-btn{background:#22c55e;}
+.copy-btn:hover{background:#16a34a;}
 .output{
 background:#020617;
 padding:15px;
@@ -191,7 +193,6 @@ Free 10 credit / hari • Premium tanpa batas
 <div class="feature">Gabungkan Foto</div>
 </div>
 
-<!-- BUTTON DIUBAH -->
 <button style="background:#475569;cursor:not-allowed;">
 🚧 AI Tools (Coming Soon)
 </button>
@@ -201,104 +202,206 @@ Segera hadir: Infografis, Carousel, Prompt AI & lainnya
 </div>
 
 </div>
-<script>
 
-let credit = localStorage.getItem("ai_credit") || 10;
+<div class="footer">AI Studio Pro</div>
+
+</div>
+
+<script>
+let credit = parseInt(localStorage.getItem("ai_credit") || "10", 10);
 
 function updateCredit(){
-document.getElementById("creditInfo").innerText="Credit: "+credit;
+document.getElementById("creditInfo").innerText = "Credit: " + credit;
 }
 
 // TEMPLATE
-template.onchange=function(){
-if(this.value==="object"){
-mode.value="edukasi";
-judul.value="Benda yang Bicara";
-tema.value="Sebuah benda memberi pelajaran hidup";
-karakter.value="Benda";
+template.onchange = function(){
+if(this.value === "ibu"){
+mode.value = "film";
+judul.value = "Anak Menyesal";
+tema.value = "Anak durhaka kepada ibu lalu menyesal";
+emosi.value = "Sedih";
+karakter.value = "Ibu & Anak";
 }
+else if(this.value === "horor"){
+mode.value = "film";
+judul.value = "Malam Terakhir";
+tema.value = "Rumah angker penuh misteri";
+emosi.value = "Tegang";
+karakter.value = "Remaja";
+}
+else if(this.value === "iklan"){
+mode.value = "iklan";
+judul.value = "Iklan Produk Viral";
+tema.value = "Produk unik yang menarik perhatian";
+produk.value = "Produk Viral";
+}
+else if(this.value === "edukasi"){
+mode.value = "edukasi";
+judul.value = "Pelajaran dari Kehidupan";
+tema.value = "Nilai hidup yang bisa dipelajari anak";
+karakter.value = "Anak";
+}
+else if(this.value === "clay"){
+mode.value = "film";
+judul.value = "Clay Viral Story";
+tema.value = "Cerita pendek emosional bergaya clay animation";
+style.value = "3D Pixar";
+}
+else if(this.value === "object"){
+mode.value = "edukasi";
+judul.value = "Benda yang Bicara";
+tema.value = "Sebuah benda memberi pelajaran hidup";
+karakter.value = "Benda";
+}
+mode.onchange();
+karakter.onchange();
+emosi.onchange();
+style.onchange();
 };
 
 // MODE
-mode.onchange=function(){
-produk.style.display=this.value==="iklan"?"block":"none";
-produkImg.style.display=this.value==="iklan"?"block":"none";
-edukasiProBox.style.display=this.value==="edukasi_pro"?"block":"none";
+mode.onchange = function(){
+produk.style.display = this.value === "iklan" ? "block" : "none";
+produkImg.style.display = this.value === "iklan" ? "block" : "none";
+edukasiProBox.style.display = this.value === "edukasi_pro" ? "block" : "none";
 };
 
-karakter.onchange=()=>customKarakter.style.display=karakter.value==="custom"?"block":"none";
-emosi.onchange=()=>customEmosi.style.display=emosi.value==="custom"?"block":"none";
-style.onchange=()=>customStyle.style.display=style.value==="custom"?"block":"none";
+karakter.onchange = function(){
+customKarakter.style.display = karakter.value === "custom" ? "block" : "none";
+};
+
+emosi.onchange = function(){
+customEmosi.style.display = emosi.value === "custom" ? "block" : "none";
+};
+
+style.onchange = function(){
+customStyle.style.display = style.value === "custom" ? "block" : "none";
+};
 
 function generate(){
 
-if(credit<=0){
+if(credit <= 0){
 alert("Credit habis!");
 return;
 }
 
-let hasil="🔥 SCRIPT FULL SIAP PRODUKSI\n\n";
+let hasil = "🔥 SCRIPT FULL SIAP PRODUKSI\n\n";
 
-let karakterFinal=karakter.value==="custom"?customKarakter.value:karakter.value;
-let emosiFinal=emosi.value==="custom"?customEmosi.value:emosi.value;
-let styleFinal=style.value==="custom"?customStyle.value:style.value;
+let karakterFinal = karakter.value === "custom" ? customKarakter.value.trim() : karakter.value;
+let emosiFinal = emosi.value === "custom" ? customEmosi.value.trim() : emosi.value;
+let styleFinal = style.value === "custom" ? customStyle.value.trim() : style.value;
 
-let struktur=["HOOK","KONFLIK","EMOSI NAIK","TITIK TERENDAH","ENDING"];
+if(!karakterFinal) karakterFinal = "Karakter";
+if(!emosiFinal) emosiFinal = "Emosional";
+if(!styleFinal) styleFinal = "Realistic Cinematic";
 
-for(let i=1;i<=parseInt(scene.value);i++){
+const modeVal = mode.value;
 
-let title=struktur[i-1]||"SCENE";
+if(modeVal === "edukasi_pro"){
+hasil += `📚 EDUKASI PRO\n\n`;
+hasil += `Judul: ${judul.value || "-"}\n`;
+hasil += `Tema: ${tema.value || "-"}\n`;
+hasil += `Jenis Output: ${outputType.value}\n`;
+hasil += `Usia Anak: ${usia.value || "-"}\n`;
+hasil += `Tujuan: ${tujuan.value || "-"}\n\n`;
 
-let visual=`${karakterFinal}, ${tema.value}, ${styleFinal}, cinematic lighting, ultra detail`;
-let i2v="cinematic movement, auto zoom dialog";
-
-let vo="";
-
-if(i===1){
-vo=`"${judul.value}... semuanya berubah sejak hari itu..."`;
+if(outputType.value === "storybook"){
+hasil += `📖 STORYBOOK\n\n`;
+hasil += `Buat cerita anak dengan tema "${tema.value}" untuk usia ${usia.value || "anak-anak"}.\n`;
+hasil += `Gunakan bahasa sederhana, emosional, dan mudah dipahami.\n`;
 }
-else if(i===2){
-vo=`"Awalnya terasa biasa saja..."`;
+else if(outputType.value === "lkpd"){
+hasil += `📝 LKPD\n\n`;
+hasil += `Tema: ${tema.value}\n`;
+hasil += `Tujuan pembelajaran: ${tujuan.value || "-"}\n`;
+hasil += `Sertakan aktivitas, refleksi, dan pertanyaan sederhana.\n`;
 }
-else if(i===3){
-vo=`"Tapi perlahan, semuanya mulai berbeda..."`;
+else if(outputType.value === "komik"){
+hasil += `💬 KOMIK\n\n`;
+hasil += `Buat komik singkat bertema "${tema.value}" dengan dialog sederhana dan pesan moral jelas.\n`;
 }
-else if(i===4){
-vo=`"${karakterFinal} mulai merasa ${emosiFinal.toLowerCase()}..."`;
+else if(outputType.value === "workbook"){
+hasil += `📚 WORKBOOK\n\n`;
+hasil += `Buat workbook bertema "${tema.value}" dengan latihan sederhana dan tugas refleksi.\n`;
 }
-else if(i===5){
-vo=`"Kenangan itu kembali muncul di pikirannya..."`;
+else if(outputType.value === "script"){
+hasil += `🎬 SCRIPT VIDEO\n\n`;
+hasil += `Buat script video edukasi bertema "${tema.value}" untuk anak usia ${usia.value || "-"}.\n`;
 }
-else if(i===6){
-vo=`"Seandainya waktu bisa diulang..."`;
-}
-else if(i===7){
-vo=`"Ini semua salahku..."`;
-}
-else if(i===8){
-vo=`"${karakterFinal} tak bisa menahan perasaan lagi..."`;
-}
-else if(i===9){
-vo=`"Penyesalan itu datang terlambat..."`;
-}
-else if(i===10){
-vo=`"Kalau waktu bisa diulang... aku akan memilih berbeda..."`;
 }
 else{
-vo=`"${karakterFinal} terdiam dalam ${emosiFinal.toLowerCase()}..."`;
+hasil += `Judul: ${judul.value || "-"}\n`;
+hasil += `Mode: ${modeVal}\n`;
+hasil += `Tema: ${tema.value || "-"}\n`;
+
+if(modeVal === "iklan"){
+hasil += `Produk: ${produk.value || "-"}\n`;
 }
 
-hasil+=`🎬 SCENE ${i} — ${title}\n\n`;
-hasil+=`Visual:\n${visual}\n\n`;
-hasil+=`I2V:\n${i2v}\n\n`;
-hasil+=`VO:\n${vo}\n\n`;
-hasil+="====================\n\n";
+hasil += "\n";
 
+let struktur = ["HOOK","KONFLIK","EMOSI NAIK","TITIK TERENDAH","ENDING"];
+
+for(let i = 1; i <= parseInt(scene.value, 10); i++){
+
+let title = struktur[i - 1] || "SCENE";
+
+let visual = `${karakterFinal}, ${tema.value}, ${styleFinal}, cinematic lighting, ultra detail`;
+let i2v = "cinematic movement, auto zoom dialog";
+
+if(karakterFinal === "Tanpa Karakter" || karakter.value === "none"){
+visual = `${tema.value}, ${styleFinal}, cinematic lighting, ultra detail, no character`;
 }
 
-output.innerText=hasil;
+let vo = "";
+
+if(i === 1){
+vo = `"${judul.value || "Semua berubah"}... semuanya berubah sejak hari itu..."`;
+}
+else if(i === 2){
+vo = `"Awalnya terasa biasa saja..."`;
+}
+else if(i === 3){
+vo = `"Tapi perlahan, semuanya mulai berbeda..."`;
+}
+else if(i === 4){
+vo = `"${karakterFinal} mulai merasa ${String(emosiFinal).toLowerCase()}..."`;
+}
+else if(i === 5){
+vo = `"Kenangan itu kembali muncul di pikirannya..."`;
+}
+else if(i === 6){
+vo = `"Seandainya waktu bisa diulang..."`;
+}
+else if(i === 7){
+vo = `"Ini semua salahku..."`;
+}
+else if(i === 8){
+vo = `"${karakterFinal} tak bisa menahan perasaan lagi..."`;
+}
+else if(i === 9){
+vo = `"Penyesalan itu datang terlambat..."`;
+}
+else if(i === 10){
+vo = `"Kalau waktu bisa diulang... aku akan memilih berbeda..."`;
+}
+else{
+vo = `"${karakterFinal} terdiam dalam ${String(emosiFinal).toLowerCase()}..."`;
+}
+
+hasil += `🎬 SCENE ${i} — ${title}\n\n`;
+hasil += `Visual:\n${visual}\n\n`;
+hasil += `I2V:\n${i2v}\n\n`;
+hasil += `VO:\n${vo}\n\n`;
+hasil += "====================\n\n";
+}
+}
+
+output.innerText = hasil;
 
 credit--;
+localStorage.setItem("ai_credit", credit);
 updateCredit();
 }
 
@@ -308,7 +411,11 @@ alert("Copied");
 }
 
 updateCredit();
-
+mode.onchange();
+karakter.onchange();
+emosi.onchange();
+style.onchange();
 </script>
+
 </body>
 </html>
